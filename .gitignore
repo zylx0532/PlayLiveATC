@@ -30,3 +30,22 @@
 *.exe
 *.out
 *.app
+
+.DS_Store
+.localized
+.image
+.vs/
+
+# Build directories
+build/
+build-lin/
+build-win/
+build-mac/
+
+# XCode user specific files
+xcuserdata/
+*.xcworkspace/
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.pbxuser
