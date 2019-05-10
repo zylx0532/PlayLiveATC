@@ -46,12 +46,6 @@ enum dataRefsXP_LT {
 };
 constexpr dataRefsXP_LT DR_FIRST_LT_DR = DR_LT_FD_BUF_PERIOD;
 
-// XP standard commands
-enum cmdRefsXP {
-    CR_NO_COMMAND = -1,                 // initialization placeholder
-    CNT_CMDREFS_XP                      // always last, number of elements
-};
-
 // SLA commands to be offered
 enum cmdRefsSLA {
     CR_TOGGLE_ACT_COM1 = 0,
@@ -69,7 +63,6 @@ class DataRefs
 protected:
     XPLMDataRef adrXP[CNT_DATAREFS_XP];                 // array of XP data refs to read from
 public:
-    XPLMCommandRef cmdXP[CNT_CMDREFS_XP];               // array of command refs
     XPLMCommandRef cmdSLA[CNT_CMDREFS_SLA];
 
 //MARK: Provided Data, i.e. global variables

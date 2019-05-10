@@ -41,16 +41,8 @@ static_assert(sizeof(DATA_REFS_XP) / sizeof(DATA_REFS_XP[0]) == CNT_DATAREFS_XP,
     "dataRefsXP and DATA_REFS_XP[] differ in number of elements");
 
 //
-// MARK: X-Plane Command Refs
+// MARK: SwitchLiveATC Command Refs
 //
-const char* CMD_REFS_XP[] = {
-};
-
-static_assert(sizeof(CMD_REFS_XP) / sizeof(CMD_REFS_XP[0]) == CNT_CMDREFS_XP,
-    "cmdRefsXP and CMD_REFS_XP[] differ in number of elements");
-
-
-//MARK: SwitchLiveATC Command Refs
 struct cmdRefDescrTy {
     const char* cmdName;
     const char* cmdDescr;
@@ -114,15 +106,6 @@ bool DataRefs::Init ()
     if (!FindDataRefs(true))
         return false;
     
-    // Fetch all XP-provided cmd refs and verify if OK, but accept errors
-    for (int i = 0; i < CNT_CMDREFS_XP; i++)
-    {
-        if ((cmdXP[i] = XPLMFindCommand(CMD_REFS_XP[i])) == NULL)
-        {
-            LOG_MSG(logERR, ERR_DATAREF_FIND, CMD_REFS_XP[i]);
-        }
-    }
-
     // register all LiveTraffic-provided commands, errors aren't critical here
     RegisterCommands();
 

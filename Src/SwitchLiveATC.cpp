@@ -26,7 +26,11 @@
 
 #include "SwitchLiveATC.h"
 
-//
+#if IBM
+#include <objbase.h>        // for CoInitializeEx
+#endif
+
+ //
 // MARK: Globals
 //
 

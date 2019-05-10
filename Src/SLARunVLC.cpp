@@ -43,7 +43,7 @@ int vlcPid = 0;
 void RVDoPlayStream (const std::string& playUrl)
 {
 #if IBM
-#error Yet to be implemented
+
 #else
     // Idea is: We call the command line to start VLC in the background.
     //          Doing so returns a text like
@@ -104,7 +104,7 @@ void RVDoPlayStream (const std::string& playUrl)
 void RVStopAll()
 {
 #if IBM
-#error Yet to be implemented
+
 #else
     if (vlcPid > 0) {
         kill(vlcPid, SIGTERM);
