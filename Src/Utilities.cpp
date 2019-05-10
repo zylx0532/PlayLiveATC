@@ -51,7 +51,7 @@ void OpenURL  (const std::string url)
     (void)system((std::string("xdg-open ") + url).c_str());
 #pragma GCC diagnostic pop
 #else
-    // Max use standard system/open
+    // Mac use standard system/open
     system((std::string("open ") + url).c_str());
     // Code that causes warning goes here
 #endif

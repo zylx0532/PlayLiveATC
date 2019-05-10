@@ -182,22 +182,22 @@ bool RegisterCommandHandlers ()
 
 struct ComFrequTy {
 protected:
-    int stable = 0;             // stable, currently tuned frequncy [Hz as returned by XP]
-    std::string stableString;   // frequncy as string in format ###.###
+    int frequ = 0;             // stable, currently tuned frequncy [Hz as returned by XP]
+    std::string frequString;   // frequncy as string in format ###.###
     
 public:
-    int getStable() const                   { return stable; }
-    std::string getStableString() const     { return stableString; }
+    int getFrequ() const                   { return frequ; }
+    std::string getFrequString() const     { return frequString; }
     
     // if current differs from stable
     // THEN we consider it a change to a new stable frequency
     bool doChange(int _curr)
     {
-        if (_curr != stable) {
+        if (_curr != frequ) {
             char buf[20];
-            stable = _curr;
-            snprintf(buf, sizeof(buf), "%d.%03d", stable / 1000, stable % 1000);
-            stableString = buf;
+            frequ = _curr;
+            snprintf(buf, sizeof(buf), "%d.%03d", frequ / 1000, frequ % 1000);
+            frequString = buf;
             return true;
         } else {
             return false;
@@ -207,14 +207,20 @@ public:
 } gFrequ[COM_CNT];
 
 // callback called every second to identify COM frequency changes
-float SLARegularCB (float, float, int, void*)
+float SLAFlightLoopCB (float, float, int, void*)
 {
     // loop over all COM radios we support
     for (int idx = 0; idx < COM_CNT; idx++) {
         // get current frequency and check if this is considered a change
-        if (gFrequ[idx].doChange(dataRefs.GetComFreq(idx))) {
-            LOG_MSG(logINFO, MSG_COM_CHANGE_DETECT, idx+1,
-                    gFrequ[idx].getStableString().c_str());
+        if (gFrequ[idx].doChange(dataRefs.GetComFreq(idx)) &&
+            // and shall we actually _act_ on that change?
+            dataRefs.ShallActOnCom(idx))
+        {
+            SHOW_MSG(logINFO, MSG_COM_CHANGE_DETECT, idx+1,
+                     gFrequ[idx].getFrequString().c_str());
+            RVPlayStream(gFrequ[idx].getFrequString() == "118.000" ?
+                         "https://www.liveatc.net/play/kjfk_twr.pls" :
+                         "https://www.liveatc.net/play/ksfo_twr.pls");
         }
             
     }
@@ -230,7 +236,7 @@ float SLAOneTimeCB (float, float, int, void*)
     // fetch dataRefs we might need
     if (dataRefs.LateInit()) {
         // start the regular callback
-        XPLMRegisterFlightLoopCallback(SLARegularCB, 1, NULL);
+        XPLMRegisterFlightLoopCallback(SLAFlightLoopCB, 1, NULL);
     }
     
     // don't call me again
@@ -304,8 +310,12 @@ PLUGIN_API int  XPluginEnable(void)
 
 PLUGIN_API void XPluginDisable(void)
 {
+    // make sure all children are stopped
+    RVStopAll();
+    
+    // cleanup
     XPLMUnregisterFlightLoopCallback(SLAOneTimeCB, NULL);
-    XPLMUnregisterFlightLoopCallback(SLARegularCB, NULL);
+    XPLMUnregisterFlightLoopCallback(SLAFlightLoopCB, NULL);
     LOG_MSG(logMSG, MSG_DISABLED);
 }
 

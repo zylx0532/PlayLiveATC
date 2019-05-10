@@ -46,6 +46,8 @@
 #include <vector>
 #include <chrono>
 #include <fstream>
+#include <thread>
+#include <regex>
 
 // Windows
 #if IBM
@@ -82,6 +84,8 @@
 #include "TextIO.h"
 #include "DataRefs.h"
 #include "SettingsUI.h"
+#include "SLAFindLiveATC.h"
+#include "SLARunVLC.h"
 
 // Global variables
 extern DataRefs dataRefs;           // in SwitchLiveATC.cpp

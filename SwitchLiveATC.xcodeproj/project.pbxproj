@@ -14,6 +14,8 @@
 		255F2B8B227A1E1A003CAE65 /* SettingsUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */; };
 		25831F2E2258D08B002398D2 /* XPWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25831F2C2258D08B002398D2 /* XPWidgets.framework */; };
 		25831F2F2258D08B002398D2 /* XPLM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25831F2D2258D08B002398D2 /* XPLM.framework */; };
+		25A1EFC1227CDFCA00F940E3 /* SLAFindLiveATC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25A1EFBF227CDFCA00F940E3 /* SLAFindLiveATC.cpp */; };
+		25A1EFC2227CDFCA00F940E3 /* SLARunVLC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25A1EFC0227CDFCA00F940E3 /* SLARunVLC.cpp */; };
 		25C55C1B2278D00F0030D47D /* Utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25C55C1A2278D00F0030D47D /* Utilities.cpp */; };
 		25D6C0BF227792300080E8B3 /* TFWidgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D6C0BD227792300080E8B3 /* TFWidgets.cpp */; };
 		25D6C0C0227792300080E8B3 /* TextIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D6C0BE227792300080E8B3 /* TextIO.cpp */; };
@@ -40,6 +42,10 @@
 		255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SettingsUI.cpp; sourceTree = "<group>"; };
 		25831F2C2258D08B002398D2 /* XPWidgets.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPWidgets.framework; path = Lib/XPSDK301/Libraries/Mac/XPWidgets.framework; sourceTree = "<group>"; };
 		25831F2D2258D08B002398D2 /* XPLM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPLM.framework; path = Lib/XPSDK301/Libraries/Mac/XPLM.framework; sourceTree = "<group>"; };
+		25A1EFBD227CDF5F00F940E3 /* SLAFindLiveATC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SLAFindLiveATC.h; sourceTree = "<group>"; };
+		25A1EFBE227CDF5F00F940E3 /* SLARunVLC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SLARunVLC.h; sourceTree = "<group>"; };
+		25A1EFBF227CDFCA00F940E3 /* SLAFindLiveATC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SLAFindLiveATC.cpp; sourceTree = "<group>"; };
+		25A1EFC0227CDFCA00F940E3 /* SLARunVLC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SLARunVLC.cpp; sourceTree = "<group>"; };
 		25C55C1A2278D00F0030D47D /* Utilities.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Utilities.cpp; sourceTree = "<group>"; };
 		25C55C1C2278D0550030D47D /* Utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
 		25D6C0BB227792270080E8B3 /* TextIO.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextIO.h; sourceTree = "<group>"; };
@@ -75,6 +81,8 @@
 		25D6C0B9227791EC0080E8B3 /* Src */ = {
 			isa = PBXGroup;
 			children = (
+				25A1EFBF227CDFCA00F940E3 /* SLAFindLiveATC.cpp */,
+				25A1EFC0227CDFCA00F940E3 /* SLARunVLC.cpp */,
 				255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */,
 				25D6C0CA22779CC30080E8B3 /* Version.cpp */,
 				25D6C0C72277965D0080E8B3 /* DataRefs.cpp */,
@@ -89,6 +97,8 @@
 		25D6C0BA227791FD0080E8B3 /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				25A1EFBD227CDF5F00F940E3 /* SLAFindLiveATC.h */,
+				25A1EFBE227CDF5F00F940E3 /* SLARunVLC.h */,
 				255F2B89227A1E12003CAE65 /* SettingsUI.h */,
 				25D6C0C6227796540080E8B3 /* DataRefs.h */,
 				25D6C0C52277941E0080E8B3 /* SwitchLiveATC.h */,
@@ -193,8 +203,10 @@
 				254CCAB322666C2A003878B1 /* SwitchLiveATC.cpp in Sources */,
 				254BE2B62279CBFD00D1DC25 /* Version.cpp in Sources */,
 				25D6C0BF227792300080E8B3 /* TFWidgets.cpp in Sources */,
+				25A1EFC1227CDFCA00F940E3 /* SLAFindLiveATC.cpp in Sources */,
 				254BE2B72279D70400D1DC25 /* DataRefs.cpp in Sources */,
 				25C55C1B2278D00F0030D47D /* Utilities.cpp in Sources */,
+				25A1EFC2227CDFCA00F940E3 /* SLARunVLC.cpp in Sources */,
 				25D6C0C0227792300080E8B3 /* TextIO.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
