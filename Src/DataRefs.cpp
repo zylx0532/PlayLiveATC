@@ -109,6 +109,10 @@ bool DataRefs::Init ()
     // register all LiveTraffic-provided commands, errors aren't critical here
     RegisterCommands();
 
+    // pre-fill VLC path with a good guess
+    if (existsFile(CFG_PATH_DEFAULT))
+        VLCPath = CFG_PATH_DEFAULT;
+
     // read configuration file if any
     if (!LoadConfigFile())
         return false;

@@ -33,7 +33,7 @@
 // parameters to use if not overriden in advanced settings
 #define VLC_DEFAULT_PARAM   "-I dummy"
 
-#define ERR_NO_VLC_START    "Could not start VLC command '%s': %s"
+#define ERR_SHELL_FAILED    "ShellExecute failed with %lu - %s"
 #define ERR_FORK_FAILED     "Fork failed with %d - %s"
 #define ERR_EXEC_VLC        "Could not start '%s' for playing '%s'"
 #define ERR_ERRNO           "%d - %s"

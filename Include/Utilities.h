@@ -42,6 +42,14 @@ std::istream& safeGetline(std::istream& is, std::string& t);
 // does a file path exist?
 bool existsFile (const std::string& filename);
 
+#if IBM
+// returns text for the given error code, per default taken from GetLastError
+std::string GetErrorStr(DWORD err = -1);
+
+// https://stackoverflow.com/a/21767578
+HWND FindMainWindow(HANDLE hProcess);
+#endif
+
 // MARK: String helpers
 
 // separates string into tokens

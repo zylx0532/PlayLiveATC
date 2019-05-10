@@ -28,6 +28,7 @@
 #include "SwitchLiveATC.h"
 
 #if IBM
+#include <shellapi.h>
 #else
 #include <unistd.h>
 #include <signal.h>
@@ -38,23 +39,43 @@
 // MARK: Individual Thread controlling VLC
 //
 
+#if IBM
+HANDLE vlcProc = NULL;
+#else
 int vlcPid = 0;
+#endif
 
 void RVDoPlayStream (const std::string& playUrl)
 {
-#if IBM
-
-#else
-    // Idea is: We call the command line to start VLC in the background.
-    //          Doing so returns a text like
-    //            [1]  <pid>
-    //          on the command line, ie. given the pid we later need to kill
-    
     char vlc[256];
     char url[256];
-    strcpy_s (vlc, sizeof(vlc), dataRefs.GetVLCPath().c_str());
-    strcpy_s (url, sizeof(url), playUrl.c_str());
+    strcpy_s(vlc, sizeof(vlc), dataRefs.GetVLCPath().c_str());
+    strcpy_s(url, sizeof(url), playUrl.c_str());
 
+#if IBM
+    char params[512];
+    strcpy_s(params, sizeof(params), (dataRefs.GetVLCParams() + ' ' + playUrl).c_str());
+
+    SHELLEXECUTEINFO exeVlc = { 0 };
+    exeVlc.cbSize   = sizeof(exeVlc);
+    exeVlc.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_NOASYNC | SEE_MASK_FLAG_NO_UI;
+    exeVlc.lpVerb = NULL;
+    exeVlc.lpFile = vlc;
+    exeVlc.lpParameters = params;
+    exeVlc.nShow = SW_SHOWNOACTIVATE;
+    if (ShellExecuteExA(&exeVlc)) {
+        // save process handle of VLC process for later kill
+        vlcProc = exeVlc.hProcess;
+    }
+    else
+    {
+        SHOW_MSG(logERR, ERR_EXEC_VLC, vlc, url);
+        LOG_MSG(logERR, ERR_SHELL_FAILED, GetLastError(), GetErrorStr().c_str());
+    }
+#else
+    // Mac/Linux:
+    // Classic fork/execvp approach
+    
     char* const params[3] = {
         vlc,
         url,
@@ -64,6 +85,8 @@ void RVDoPlayStream (const std::string& playUrl)
     
     int pid = fork();
     if (pid == 0) {
+        // CHILD PROCESS
+        // FIXME: inactivate all signal handlers, they point into core XP code!
         // child shall run VLC
         execvp(vlc, params);
         // we only get here if the above call failed to find 'vlc', return the error code to the caller:
@@ -104,7 +127,19 @@ void RVDoPlayStream (const std::string& playUrl)
 void RVStopAll()
 {
 #if IBM
+    if (vlcProc) {
+        // we send WM_QUIT, just in case...seems to clean up tray icon at least
+        HWND hwndVLC = FindMainWindow(vlcProc);
+        if (hwndVLC) {
+            PostThreadMessageA(GetWindowThreadProcessId(hwndVLC, NULL), WM_QUIT, 0, 0);
+            // can WaitForSingleObject do this wait "better"?
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        }
 
+        // this is not nice...but VLC doesn't react properly to WM_QUIT or WM_DESTROY: The window's gone, but not the process.
+        TerminateProcess(vlcProc, 0);
+        vlcProc = NULL;
+    }
 #else
     if (vlcPid > 0) {
         kill(vlcPid, SIGTERM);
@@ -117,6 +152,7 @@ void RVStopAll()
 // (all else is read from the config)
 bool RVPlayStream(const std::string& playUrl)
 {
+    // TODO: Put all that in an asynch call...lot's of wait and I/O in there
     RVStopAll();
     RVDoPlayStream(playUrl);
 //    std::thread thrVLC(RVDoPlayStream, playUrl);

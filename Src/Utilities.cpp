@@ -103,6 +103,51 @@ bool existsFile (const std::string& filename) {
     return (stat (filename.c_str(), &buffer) == 0);
 }
 
+#if IBM
+// returns text for the given error code, per default taken from GetLastError
+std::string GetErrorStr(DWORD err)
+{
+    char errTxt[100] = { 0 };
+    if (err == -1)
+        err = GetLastError();
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, errTxt, sizeof(errTxt), NULL);
+    return std::string(errTxt);
+}
+
+// find (good guess of a) main window of a process
+// https://stackoverflow.com/a/21767578
+struct wndEnumData {
+    unsigned long process_id;
+    HWND window_handle;
+};
+
+BOOL is_main_window(HWND handle)
+{
+    return GetWindow(handle, GW_OWNER) == (HWND)0; // && IsWindowVisible(handle);
+}
+
+BOOL CALLBACK enum_windows_callback(HWND handle, LPARAM lParam)
+{
+    wndEnumData& data = *(wndEnumData*)lParam;
+    unsigned long process_id = 0;
+    GetWindowThreadProcessId(handle, &process_id);
+    if (data.process_id != process_id || !is_main_window(handle))
+        return TRUE;
+    data.window_handle = handle;
+    return FALSE;
+}
+
+HWND FindMainWindow(HANDLE hProcess)
+{
+    wndEnumData data;
+    data.process_id = GetProcessId(hProcess);
+    data.window_handle = 0;
+    EnumWindows(enum_windows_callback, (LPARAM)&data);
+    return data.window_handle;
+}
+
+
+#endif
 
 // separates string into tokens
 std::vector<std::string> str_tokenize (const std::string s,

@@ -76,7 +76,7 @@ protected:
     
     bool    bActOnCom[COM_CNT] = {true,true};   // which frequency to act upon?
     std::string VLCPath;                        // how to start VLC?
-    std::string VLCParams;                      // parameter definition
+    std::string VLCParams = CFG_PARAMS_DEFAULT; // parameter definition
     
 //MARK: Constructor
 public:
