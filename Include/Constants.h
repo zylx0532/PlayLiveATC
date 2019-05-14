@@ -81,13 +81,21 @@ constexpr int SLA_NEW_VER_CHECK_TIME = 48;   // [h] between two checks of a new
 #define CFG_TOGGLE_COM          "ActOnChangeOfCOM%d"
 #define CFG_VLC_PATH            "VLCPath"
 #define CFG_VLC_PARAMS          "VLCParams"
-#if IBM                         // start VLC in a hidden way:
+
+#if IBM                         // Windows default path and parameters
 #define CFG_PATH_DEFAULT        "c:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe"
-#define CFG_PARAMS_DEFAULT      "--qt-start-minimized"      // minimized in system tray
-#else
-#error Define default path
-#define CFG_PARAMS_DEFAULT      "-I dummy"                  // no window at all
+#define CFG_PARAMS_DEFAULT      "--qt-start-minimized --audio-desync={desync} {url}"
+#elif LIN                       // Linux default path and parameters
+#define CFG_PATH_DEFAULT        "/usr/bin/vlc"
+#define CFG_PARAMS_DEFAULT      "-Idummy --audio-desync={desync} {url}"
+#else                           // Mac OS default path and parameters
+#define CFG_PATH_DEFAULT        "/Applications/VLC.app/Contents/MacOS/VLC"
+#define CFG_PARAMS_DEFAULT      "-Idummy --audio-desync={desync} {url}"
 #endif
+
+#define PARAM_REPL_DESYNC       "{desync}"
+#define PARAM_REPL_URL          "{url}"
+
 #define CFG_LOG_LEVEL           "LogLevel"
 #define CFG_MSG_AREA_LEVEL      "MsgAreaLevel"
 

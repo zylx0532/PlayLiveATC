@@ -172,3 +172,20 @@ std::vector<std::string> str_tokenize (const std::string s,
     return v;
 }
 
+// replace 'find' with 'replace', returns number of repacements
+int str_replace (std::string& s,
+                 const std::string& find,
+                 const std::string& repl)
+{
+    int replacements = 0;
+    const std::string::size_type lenFind = find.length();
+    // loop for each finding of 'find':
+    for (std::string::size_type pos = s.find(find);
+         pos != std::string::npos;
+         pos = s.find(find, pos+1))     // +1 ensures we'll always terminate even if find==repl
+    {
+        s.replace(pos, lenFind, repl);
+        replacements++;
+    }
+    return replacements;
+}

@@ -30,5 +30,6 @@
 #ifndef SLAFindLiveATC_h
 #define SLAFindLiveATC_h
 
+std::string FLAGetUrl (const std::string frequ);
 
 #endif /* SLAFindLiveATC_h */

@@ -30,22 +30,75 @@
 #ifndef SLARunVLC_h
 #define SLARunVLC_h
 
-// parameters to use if not overriden in advanced settings
-#define VLC_DEFAULT_PARAM   "-I dummy"
-
 #define ERR_SHELL_FAILED    "ShellExecute failed with %lu - %s"
 #define ERR_FORK_FAILED     "Fork failed with %d - %s"
-#define ERR_EXEC_VLC        "Could not start '%s' for playing '%s'"
+#define ERR_EXEC_VLC        "Could not run: %s %s"
 #define ERR_ERRNO           "%d - %s"
 #define ERR_SIGNAL          "Signal %d"
 
-#define DBG_POPEN_PID       "pid is %d for command '%s'"
+#define DBG_RUN_CMD         "Will run: %s %s"
+#define DBG_FORK_PID        "pid is %d for url '%s'"
+#define DBG_KILL_PID        "killing pid %d for url %s"
+
+//
+// MARK: Class representing one COM channel, which can run a VLC stream
+//
+
+class COMChannel {
+protected:
+    int idx = -1;               // COM idx, starting from 0
+    // X-Plane data
+    int frequ = 0;              // currently tuned frequncy [Hz as returned by XP]
+    std::string frequString;    // frequncy as string in format ###.###
+    // LiveATC data
+    std::string playUrl;        // URL to play according to LiveATC
+    // VLC data
+    // the actual process running VLC, needed to stop it:
+#if IBM
+    HANDLE vlcProc = NULL;
+#else
+    int vlcPid = 0;
+#endif
+    std::future<void> futVlcStart;
+    
+public:
+    COMChannel(int i) : idx(i) {}
+    int GetIdx() const { return idx; }
+    // stop VLC, reset frequency
+    void ClearChannel();
+
+    // X-Plane data
+    int GetFrequ() const                   { return frequ; }
+    std::string GetFrequString() const     { return frequString; }
+    
+    // if _new differs from frequ
+    // THEN we consider it a change to a new frequency
+    bool doChange(int _new);
+
+    // LiveATC data
+    std::string GetPlayURL() const { return playUrl; }
+
+    // VLC control
+    // asynchronous/non-blocking cllas, which encapsulate blocking calls in threads
+    void StartStreamAsync (std::string&& url);
+    void StopStreamAsync ();
+    
+    // blocking calls, called by above asynch threads
+    void StartStream (std::string&& url);
+    void StopStream ();
+    
+    // compute complete parameter string for VLC
+    std::string GetVlcParams();
+};
+
+//
+// MARK: Global Functions
+//
+
+extern COMChannel gChn[COM_CNT];
 
 // stop still running VLC instances
 void RVStopAll();
 
-// start a VLC instance with the given stream to play
-// (all else is read from the config)
-bool RVPlayStream(const std::string& playUrl);
 
 #endif /* SLARunVLC_h */

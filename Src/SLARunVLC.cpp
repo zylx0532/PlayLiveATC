@@ -36,26 +36,76 @@
 #endif
 
 //
-// MARK: Individual Thread controlling VLC
+// MARK: Globals
 //
 
-#if IBM
-HANDLE vlcProc = NULL;
-#else
-int vlcPid = 0;
-#endif
+// one COM channel per COM channel - obviously ;)
+COMChannel gChn[COM_CNT] = {
+    {0}, {1}
+};
 
-void RVDoPlayStream (const std::string& playUrl)
+//
+// MARK: Class representing one COM channel, which can run a VLC stream
+//
+
+// stop VLC, reset frequency
+void COMChannel::ClearChannel()
 {
+    StopStreamAsync();
+    frequ = 0;
+    frequString.clear();
+}
+
+
+// if _new differs from frequ
+// THEN we consider it a change to a new frequency
+bool COMChannel::doChange(int _new)
+{
+    if (_new != frequ) {
+        char buf[20];
+        frequ = _new;
+        snprintf(buf, sizeof(buf), "%d.%03d", frequ / 1000, frequ % 1000);
+        frequString = buf;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// VLC play control
+
+void COMChannel::StartStreamAsync (std::string&& url)
+{
+    // we don't need control over the thread, it lasts for 2s only
+    futVlcStart = std::async(std::launch::async, &COMChannel::StartStream, this, url);
+}
+
+void COMChannel::StopStreamAsync ()
+{
+    // we don't need control over the thread, it lasts for 2s only
+    futVlcStart = std::async(std::launch::async, &COMChannel::StopStream, this);
+}
+
+void COMChannel::StartStream (std::string&& url)
+{
+    // make sure there is no stream running at the moment
+    StopStream();
+    
+    // store our new URL
+    playUrl = std::move(url);
+    
+    // character-array access to what we need for calls
+    // calls to execvp/ShellExecuteExA don't work with string::c_str() pointers
     char vlc[256];
-    char url[256];
+    char params[512];
     strcpy_s(vlc, sizeof(vlc), dataRefs.GetVLCPath().c_str());
-    strcpy_s(url, sizeof(url), playUrl.c_str());
+    std::string allParams(GetVlcParams());
+    strcpy_s(params, sizeof(params), allParams.c_str());
+
+    LOG_MSG(logDEBUG, DBG_RUN_CMD, vlc, allParams.c_str());
 
 #if IBM
-    char params[512];
-    strcpy_s(params, sizeof(params), (dataRefs.GetVLCParams() + ' ' + playUrl).c_str());
-
+    
     SHELLEXECUTEINFO exeVlc = { 0 };
     exeVlc.cbSize   = sizeof(exeVlc);
     exeVlc.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_NOASYNC | SEE_MASK_FLAG_NO_UI;
@@ -69,37 +119,54 @@ void RVDoPlayStream (const std::string& playUrl)
     }
     else
     {
-        SHOW_MSG(logERR, ERR_EXEC_VLC, vlc, url);
+        SHOW_MSG(logERR, ERR_EXEC_VLC, vlc, params);
         LOG_MSG(logERR, ERR_SHELL_FAILED, GetLastError(), GetErrorStr().c_str());
     }
 #else
     // Mac/Linux:
     // Classic fork/execvp approach
     
-    char* const params[3] = {
-        vlc,
-        url,
-        NULL
-    };
+    // execvp requires parameters in individual array elements
+    // so we separate them at the spaces as a command line would do, too
+    std::vector<char*> vParams;             // this will become the vector of pointers pointing to the individual parameters
+    vParams.push_back(vlc);                 // by convention 0th parameter is path to executable
+    vParams.push_back(params);              // here starts the 1st actual parameter
+    for (char* p = strchr(params, ' ');
+         p != NULL;
+         p = strchr(p+1, ' '))
+    {
+        *p = '\0';                          // zero-terminate individual parameter, overwriting the space
+        if (*(p+1) != ' ' &&                // this handles the case of multiple spaces
+            *(p+1) != '\0')                 // ...and string end
+            vParams.push_back(p+1);
+    }
+    vParams.push_back(NULL);                // need a terminating NULL for execvp
+
+    // now do the fork
+    vlcPid = fork();
     
-    
-    int pid = fork();
-    if (pid == 0) {
-        // CHILD PROCESS
-        // FIXME: inactivate all signal handlers, they point into core XP code!
-        // child shall run VLC
-        execvp(vlc, params);
-        // we only get here if the above call failed to find 'vlc', return the error code to the caller:
+    if (vlcPid == 0) {
+        // CHILD PROCESS - which is to start VLC
+        
+        // Inactivate all signal handlers, they point into core XP code!
+        for (int sig = SIGHUP; sig <= SIGUSR2; sig++)
+            signal(sig, SIG_DFL);
+        
+        // child shall just and only run VLC
+        execvp(vlc, vParams.data());
+        
+        // we only get here if the above call failed to find 'vlc', return the error code to the caller
+        // without triggering any signal handlers (well...double safety...we just removed them anyway)
         _Exit(errno);
-    } else if (pid < 0) {
+        
+    } else if (vlcPid < 0) {
         // error during fork
-        SHOW_MSG(logERR, ERR_EXEC_VLC, vlc, url);
+        SHOW_MSG(logERR, ERR_EXEC_VLC, vlc, allParams.c_str());
         LOG_MSG(logERR, ERR_FORK_FAILED, errno, std::strerror(errno));
     } else {
         // fork successful...other process should be running now
-        vlcPid = pid;
-        LOG_MSG(logDEBUG, DBG_POPEN_PID, vlcPid, vlc);
-
+        LOG_MSG(logDEBUG, DBG_FORK_PID, vlcPid, playUrl.c_str());
+        
         // wait for 2 seconds and then check if the child already terminated
         std::this_thread::sleep_for(std::chrono::seconds(2));
         
@@ -107,7 +174,8 @@ void RVDoPlayStream (const std::string& playUrl)
         int stat = 0;
         if (wait4(vlcPid, &stat, WNOHANG, NULL) != 0) {
             // exited already!
-            SHOW_MSG(logERR, ERR_EXEC_VLC, vlc, url);
+            vlcPid = 0;
+            SHOW_MSG(logERR, ERR_EXEC_VLC, vlc, allParams.c_str());
             // we return errno via _Exit, so fetch it and output it into the log
             if (WIFEXITED(stat)) {
                 LOG_MSG(logERR, ERR_ERRNO, WEXITSTATUS(stat), std::strerror(WEXITSTATUS(stat)));
@@ -119,12 +187,7 @@ void RVDoPlayStream (const std::string& playUrl)
 #endif
 }
 
-//
-// MARK: Thread-controlling functions called from outside
-//
-
-// stop still running VLC instances
-void RVStopAll()
+void COMChannel::StopStream ()
 {
 #if IBM
     if (vlcProc) {
@@ -135,32 +198,39 @@ void RVStopAll()
             // can WaitForSingleObject do this wait "better"?
             std::this_thread::sleep_for(std::chrono::milliseconds(250));
         }
-
+        
         // this is not nice...but VLC doesn't react properly to WM_QUIT or WM_DESTROY: The window's gone, but not the process.
         TerminateProcess(vlcProc, 0);
         vlcProc = NULL;
     }
 #else
     if (vlcPid > 0) {
+        LOG_MSG(logDEBUG, DBG_KILL_PID, vlcPid, playUrl.c_str());
         kill(vlcPid, SIGTERM);
     }
     vlcPid = 0;
 #endif
 }
 
-// start a VLC instance with the given stream to play
-// (all else is read from the config)
-bool RVPlayStream(const std::string& playUrl)
+// compute complete parameter string for VLC
+std::string COMChannel::GetVlcParams()
 {
-    // TODO: Put all that in an asynch call...lot's of wait and I/O in there
-    RVStopAll();
-    RVDoPlayStream(playUrl);
-//    std::thread thrVLC(RVDoPlayStream, playUrl);
-//    auto hThr = thrVLC.native_handle();
-//    thrVLC.detach();
-//    std::this_thread::sleep_for(std::chrono::seconds(5));
-//    if (hThr != NULL)
-//        pthread_cancel(hThr);
-    return true;
+    std::string params = dataRefs.GetVLCParams();
+    // FIXME: Actual desync time!!!
+    str_replace(params, PARAM_REPL_DESYNC, "0");
+    str_replace(params, PARAM_REPL_URL, playUrl);
+    return params;
+}
+
+//
+// MARK: Global functions using COMChannel
+//
+
+// stop still running VLC instances
+// (synchronously! Expected to be called during deactivation/shutdown only)
+void RVStopAll()
+{
+    for (COMChannel& chn: gChn)
+        chn.StopStream();
 }
 

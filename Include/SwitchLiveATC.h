@@ -46,7 +46,7 @@
 #include <vector>
 #include <chrono>
 #include <fstream>
-#include <thread>
+#include <future>
 #include <regex>
 
 // Windows

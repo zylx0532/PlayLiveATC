@@ -26,3 +26,10 @@
  */
 
 #include "SwitchLiveATC.h"
+
+std::string FLAGetUrl (const std::string frequ)
+{
+    return frequ == "118.000" ?
+    "https://www.liveatc.net/play/kjfk_twr.pls" :
+    "https://www.liveatc.net/play/ksfo_twr.pls";
+}

@@ -68,9 +68,11 @@ void MenuHandlerCB(void * /*mRef*/, void * iRef)
         switch (reinterpret_cast<unsigned long long>(iRef)) {
             case MENU_ID_TOGGLE_COM1:
                 dataRefs.ToggleActOnCom(0);
+                gChn[0].ClearChannel();
                 break;
             case MENU_ID_TOGGLE_COM2:
                 dataRefs.ToggleActOnCom(1);
+                gChn[1].ClearChannel();
                 break;
             case MENU_ID_SETTINGS_UI:
                 settingsUI.Show();
@@ -184,52 +186,30 @@ bool RegisterCommandHandlers ()
 // MARK: Flight loop callbacks
 //
 
-struct ComFrequTy {
-protected:
-    int frequ = 0;             // stable, currently tuned frequncy [Hz as returned by XP]
-    std::string frequString;   // frequncy as string in format ###.###
-    
-public:
-    int getFrequ() const                   { return frequ; }
-    std::string getFrequString() const     { return frequString; }
-    
-    // if current differs from stable
-    // THEN we consider it a change to a new stable frequency
-    bool doChange(int _curr)
-    {
-        if (_curr != frequ) {
-            char buf[20];
-            frequ = _curr;
-            snprintf(buf, sizeof(buf), "%d.%03d", frequ / 1000, frequ % 1000);
-            frequString = buf;
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-} gFrequ[COM_CNT];
-
 // callback called every second to identify COM frequency changes
 float SLAFlightLoopCB (float, float, int, void*)
 {
     // loop over all COM radios we support
-    for (int idx = 0; idx < COM_CNT; idx++) {
-        // get current frequency and check if this is considered a change
-        if (gFrequ[idx].doChange(dataRefs.GetComFreq(idx)) &&
-            // and shall we actually _act_ on that change?
-            dataRefs.ShallActOnCom(idx))
+    for (COMChannel& chn: gChn) {
+        
+        const int idx = chn.GetIdx();
+        if (// should we actually _act_ on that change?
+            dataRefs.ShallActOnCom(idx) &&
+            // get current frequency and check if this is considered a change
+            chn.doChange(dataRefs.GetComFreq(idx)))
         {
             SHOW_MSG(logINFO, MSG_COM_CHANGE_DETECT, idx+1,
-                     gFrequ[idx].getFrequString().c_str());
-            RVPlayStream(gFrequ[idx].getFrequString() == "118.000" ?
-                         "https://www.liveatc.net/play/kjfk_twr.pls" :
-                         "https://www.liveatc.net/play/ksfo_twr.pls");
+                     chn.GetFrequString().c_str());
+            // TODO: Find nearest airport, if none found don't start!
+            chn.StartStreamAsync(FLAGetUrl(chn.GetFrequString()));
         }
-            
     }
     
-    // call me again in s scond
+    // TODO: Once per minute Monitor airport distance
+    //       1. If no frequ tuned in find a nearest airport
+    //       2. If tuned in check if airport still in reachable distance
+    
+    // call me again in a second
     return 1.0f;
 }
 

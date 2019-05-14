@@ -57,6 +57,11 @@ std::vector<std::string> str_tokenize (const std::string s,
                                        const std::string tokens,
                                        bool bSkipEmpty = true);
 
+// replace 'find' with 'replace', returns number of repacements
+int str_replace (std::string& s,
+                 const std::string& find,
+                 const std::string& repl);
+
 // MARK: Compiler differences
 
 #if APL == 1 || LIN == 1

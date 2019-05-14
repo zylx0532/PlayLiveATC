@@ -262,7 +262,13 @@ bool LTSettingsUI::MsgTextFieldChanged (XPWidgetID textWidget, std::string text)
     
     // *** Advanced ***
     if (txtVLCParams == textWidget) {
-        dataRefs.SetVLCParams(text);
+        if (text.empty()) {                 // empty input == 'return to default'
+            dataRefs.SetVLCParams(CFG_PARAMS_DEFAULT);
+            txtVLCParams.SetDescriptor(CFG_PARAMS_DEFAULT);
+        }
+        else {
+            dataRefs.SetVLCParams(text);
+        }
         return true;
     }
     
@@ -306,6 +312,7 @@ bool LTSettingsUI::MsgButtonStateChanged (XPWidgetID buttonWidget, bool bNowChec
     for (int idx = 0; idx < COM_CNT; idx++) {
         if (btnBasicsCom[idx] == buttonWidget) {
             dataRefs.SetActOnCom(idx, bNowChecked);
+            gChn[idx].ClearChannel();       // reset channel so that it either fells silent or can be reactivated
             return true;
         }
     }

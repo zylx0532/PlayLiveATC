@@ -117,6 +117,10 @@ bool DataRefs::Init ()
     if (!LoadConfigFile())
         return false;
     
+    // make sure there is some parameters, won't work without
+    if (VLCParams.empty())
+        VLCParams = CFG_PARAMS_DEFAULT;
+    
     return true;
 }
 
@@ -229,6 +233,7 @@ bool DataRefs::LoadConfigFile()
         // ignore empty lines
         if (lnBuf.empty())
             continue;
+        LOG_MSG(logDEBUG, lnBuf.c_str());
         
         // otherwise should be 2 tokens
         ln = str_tokenize(lnBuf, " ");        

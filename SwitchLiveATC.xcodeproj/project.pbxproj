@@ -37,6 +37,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		253FEF42228B616400A59BB9 /* VLC_command_line_options.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = VLC_command_line_options.txt; path = Doc/VLC_command_line_options.txt; sourceTree = "<group>"; };
 		254CCAB222666C2A003878B1 /* SwitchLiveATC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SwitchLiveATC.cpp; sourceTree = "<group>"; };
 		255F2B89227A1E12003CAE65 /* SettingsUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsUI.h; sourceTree = "<group>"; };
 		255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SettingsUI.cpp; sourceTree = "<group>"; };
@@ -46,6 +47,8 @@
 		25A1EFBE227CDF5F00F940E3 /* SLARunVLC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SLARunVLC.h; sourceTree = "<group>"; };
 		25A1EFBF227CDFCA00F940E3 /* SLAFindLiveATC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SLAFindLiveATC.cpp; sourceTree = "<group>"; };
 		25A1EFC0227CDFCA00F940E3 /* SLARunVLC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SLARunVLC.cpp; sourceTree = "<group>"; };
+		25C0C99F2288326100427E72 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		25C0C9A02288326100427E72 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		25C55C1A2278D00F0030D47D /* Utilities.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Utilities.cpp; sourceTree = "<group>"; };
 		25C55C1C2278D0550030D47D /* Utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
 		25D6C0BB227792270080E8B3 /* TextIO.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextIO.h; sourceTree = "<group>"; };
@@ -113,6 +116,7 @@
 		25D6C0C8227796BC0080E8B3 /* Links */ = {
 			isa = PBXGroup;
 			children = (
+				253FEF42228B616400A59BB9 /* VLC_command_line_options.txt */,
 				25D6C0C9227796E10080E8B3 /* DataRefs.txt */,
 			);
 			name = Links;
@@ -121,6 +125,8 @@
 		D607B15F09A5563000699BC3 = {
 			isa = PBXGroup;
 			children = (
+				25C0C9A02288326100427E72 /* CMakeLists.txt */,
+				25C0C99F2288326100427E72 /* README.md */,
 				25D6C0C8227796BC0080E8B3 /* Links */,
 				25D6C0BA227791FD0080E8B3 /* Include */,
 				25D6C0B9227791EC0080E8B3 /* Src */,
