@@ -61,6 +61,8 @@ set(Header_Files
     Include/Constants.h
     Include/DataRefs.h
     Include/SettingsUI.h
+    Include/SLAFindLiveATC.h
+    Include/SLARunVLC.h
     Include/SwitchLiveATC.h
     Include/TextIO.h
     Include/TFWidgets.h
@@ -71,6 +73,8 @@ source_group("Header Files" FILES ${Header_Files})
 set(Source_Files
     Src/DataRefs.cpp
     Src/SettingsUI.cpp
+    Src/SLAFindLiveATC.cpp
+    Src/SLARunVLC.cpp
     Src/SwitchLiveATC.cpp
     Src/TextIO.cpp
     Src/TFWidgets.cpp
@@ -111,12 +115,12 @@ if ( GLUT_FOUND )
     target_link_libraries( SwitchLiveATC ${GLUT_LIBRARIES} )
 endif( GLUT_FOUND )
 
-# find_package(ZLIB REQUIRED)  # sudo apt-get install zlib1g-dev
-# if ( ZLIB_FOUND )
-#     include_directories( ${ZLIB_INCLUDE_DIRS} )
-#     target_link_libraries( SwitchLiveATC ${ZLIB_LIBRARIES} )
-# endif( ZLIB_FOUND )
-#
+find_package(ZLIB REQUIRED)  # sudo apt-get install zlib1g-dev
+if ( ZLIB_FOUND )
+    include_directories( ${ZLIB_INCLUDE_DIRS} )
+    target_link_libraries( SwitchLiveATC ${ZLIB_LIBRARIES} )
+endif( ZLIB_FOUND )
+
 # find_package(PNG REQUIRED)  # sudo apt-get install libpng-dev
 # if ( PNG_FOUND )
 #     include_directories( ${PNG_INCLUDE_DIRS} )

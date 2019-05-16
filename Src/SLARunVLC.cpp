@@ -34,6 +34,9 @@
 #include <signal.h>
 #include <fcntl.h>
 #endif
+#if LIN
+#include <wait.h>
+#endif
 
 //
 // MARK: Globals
@@ -172,7 +175,7 @@ void COMChannel::StartStream (std::string&& url)
         
         // expected is that the child is still running!
         int stat = 0;
-        if (wait4(vlcPid, &stat, WNOHANG, NULL) != 0) {
+        if (waitpid(vlcPid, &stat, WNOHANG) != 0) {
             // exited already!
             vlcPid = 0;
             SHOW_MSG(logERR, ERR_EXEC_VLC, vlc, allParams.c_str());

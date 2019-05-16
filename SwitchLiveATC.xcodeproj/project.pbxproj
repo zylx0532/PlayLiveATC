@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		253FEF44228DF21A00A59BB9 /* libcurl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 253FEF43228DF21A00A59BB9 /* libcurl.framework */; };
+		253FEF46228DF35200A59BB9 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 253FEF45228DF35200A59BB9 /* Security.framework */; };
+		253FEF49228DF36C00A59BB9 /* GSS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 253FEF47228DF36B00A59BB9 /* GSS.framework */; };
+		253FEF4A228DF36C00A59BB9 /* libgssapi_krb5.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 253FEF48228DF36C00A59BB9 /* libgssapi_krb5.tbd */; };
+		253FEF4C228DF3B800A59BB9 /* libz.1.2.11.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 253FEF4B228DF3B800A59BB9 /* libz.1.2.11.tbd */; };
 		254BE2B62279CBFD00D1DC25 /* Version.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D6C0CA22779CC30080E8B3 /* Version.cpp */; };
 		254BE2B72279D70400D1DC25 /* DataRefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D6C0C72277965D0080E8B3 /* DataRefs.cpp */; };
 		254CCAB322666C2A003878B1 /* SwitchLiveATC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 254CCAB222666C2A003878B1 /* SwitchLiveATC.cpp */; };
@@ -38,6 +43,11 @@
 
 /* Begin PBXFileReference section */
 		253FEF42228B616400A59BB9 /* VLC_command_line_options.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = VLC_command_line_options.txt; path = Doc/VLC_command_line_options.txt; sourceTree = "<group>"; };
+		253FEF43228DF21A00A59BB9 /* libcurl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libcurl.framework; path = "../../Frameworks-release/libcurl.framework"; sourceTree = "<group>"; };
+		253FEF45228DF35200A59BB9 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		253FEF47228DF36B00A59BB9 /* GSS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GSS.framework; path = System/Library/Frameworks/GSS.framework; sourceTree = SDKROOT; };
+		253FEF48228DF36C00A59BB9 /* libgssapi_krb5.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libgssapi_krb5.tbd; path = usr/lib/libgssapi_krb5.tbd; sourceTree = SDKROOT; };
+		253FEF4B228DF3B800A59BB9 /* libz.1.2.11.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.2.11.tbd; path = usr/lib/libz.1.2.11.tbd; sourceTree = SDKROOT; };
 		254CCAB222666C2A003878B1 /* SwitchLiveATC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SwitchLiveATC.cpp; sourceTree = "<group>"; };
 		255F2B89227A1E12003CAE65 /* SettingsUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsUI.h; sourceTree = "<group>"; };
 		255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SettingsUI.cpp; sourceTree = "<group>"; };
@@ -72,6 +82,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				D6A7BDC116A1DEC000D1426A /* CoreFoundation.framework in Frameworks */,
+				253FEF49228DF36C00A59BB9 /* GSS.framework in Frameworks */,
+				253FEF4A228DF36C00A59BB9 /* libgssapi_krb5.tbd in Frameworks */,
+				253FEF4C228DF3B800A59BB9 /* libz.1.2.11.tbd in Frameworks */,
+				253FEF46228DF35200A59BB9 /* Security.framework in Frameworks */,
+				253FEF44228DF21A00A59BB9 /* libcurl.framework in Frameworks */,
 				D6A7BDAA16A1DEA200D1426A /* OpenGL.framework in Frameworks */,
 				25831F2F2258D08B002398D2 /* XPLM.framework in Frameworks */,
 				25831F2E2258D08B002398D2 /* XPWidgets.framework in Frameworks */,
@@ -84,15 +99,15 @@
 		25D6C0B9227791EC0080E8B3 /* Src */ = {
 			isa = PBXGroup;
 			children = (
+				25D6C0C72277965D0080E8B3 /* DataRefs.cpp */,
+				255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */,
 				25A1EFBF227CDFCA00F940E3 /* SLAFindLiveATC.cpp */,
 				25A1EFC0227CDFCA00F940E3 /* SLARunVLC.cpp */,
-				255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */,
-				25D6C0CA22779CC30080E8B3 /* Version.cpp */,
-				25D6C0C72277965D0080E8B3 /* DataRefs.cpp */,
 				254CCAB222666C2A003878B1 /* SwitchLiveATC.cpp */,
 				25D6C0BE227792300080E8B3 /* TextIO.cpp */,
 				25D6C0BD227792300080E8B3 /* TFWidgets.cpp */,
 				25C55C1A2278D00F0030D47D /* Utilities.cpp */,
+				25D6C0CA22779CC30080E8B3 /* Version.cpp */,
 			);
 			path = Src;
 			sourceTree = "<group>";
@@ -100,12 +115,12 @@
 		25D6C0BA227791FD0080E8B3 /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				25D6C0C1227792830080E8B3 /* Constants.h */,
+				25D6C0C6227796540080E8B3 /* DataRefs.h */,
+				255F2B89227A1E12003CAE65 /* SettingsUI.h */,
 				25A1EFBD227CDF5F00F940E3 /* SLAFindLiveATC.h */,
 				25A1EFBE227CDF5F00F940E3 /* SLARunVLC.h */,
-				255F2B89227A1E12003CAE65 /* SettingsUI.h */,
-				25D6C0C6227796540080E8B3 /* DataRefs.h */,
 				25D6C0C52277941E0080E8B3 /* SwitchLiveATC.h */,
-				25D6C0C1227792830080E8B3 /* Constants.h */,
 				25D6C0BB227792270080E8B3 /* TextIO.h */,
 				25D6C0BC227792280080E8B3 /* TFWidgets.h */,
 				25C55C1C2278D0550030D47D /* Utilities.h */,
@@ -146,6 +161,11 @@
 		D6A7BDAD16A1DEA700D1426A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				253FEF4B228DF3B800A59BB9 /* libz.1.2.11.tbd */,
+				253FEF47228DF36B00A59BB9 /* GSS.framework */,
+				253FEF48228DF36C00A59BB9 /* libgssapi_krb5.tbd */,
+				253FEF45228DF35200A59BB9 /* Security.framework */,
+				253FEF43228DF21A00A59BB9 /* libcurl.framework */,
 				D6A7BDC016A1DEC000D1426A /* CoreFoundation.framework */,
 				D6A7BDA916A1DEA200D1426A /* OpenGL.framework */,
 				25831F2D2258D08B002398D2 /* XPLM.framework */,
@@ -252,7 +272,10 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				EXECUTABLE_EXTENSION = xpl;
-				FRAMEWORK_SEARCH_PATHS = "$(XPSDK_ROOT)/Libraries/Mac";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(XPSDK_ROOT)/Libraries/Mac",
+					"../../Frameworks-debug",
+				);
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -264,6 +287,7 @@
 					"LIN=0",
 					"XPLM200=1",
 					"XPLM210=1",
+					"CURL_STATICLIB=1",
 					"DEBUG=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
@@ -335,7 +359,10 @@
 				DYLIB_CURRENT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				EXECUTABLE_EXTENSION = xpl;
-				FRAMEWORK_SEARCH_PATHS = "$(XPSDK_ROOT)/Libraries/Mac";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(XPSDK_ROOT)/Libraries/Mac",
+					"../../Frameworks-release",
+				);
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -347,6 +374,7 @@
 					"LIN=0",
 					"XPLM200=1",
 					"XPLM210=1",
+					"CURL_STATICLIB=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = "";

@@ -264,6 +264,16 @@ PLUGIN_API int XPluginStart(
     CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 #endif
     
+    // global init libcurl
+    CURLcode resCurl = curl_global_init (CURL_GLOBAL_ALL);
+    if ( resCurl != CURLE_OK )
+    {
+        // something went wrong
+        LOG_MSG(logFATAL,ERR_CURL_INIT,curl_easy_strerror(resCurl));
+        DestroyWindow();
+        return 0;
+    }
+    
     // Success
     return 1;
 }

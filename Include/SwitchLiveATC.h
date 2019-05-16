@@ -67,6 +67,10 @@
 #include <GL/gl.h>
 #endif
 
+// CURL
+// #define CURL_STATICLIB if linking with a static CURL lib!
+#include "curl/curl.h"              // for CURL*
+
 // C++
 
 // X-Plane SDK
