@@ -198,10 +198,7 @@ float SLAFlightLoopCB (float, float, int, void*)
             // get current frequency and check if this is considered a change
             chn.doChange(dataRefs.GetComFreq(idx)))
         {
-            SHOW_MSG(logINFO, MSG_COM_CHANGE_DETECT, idx+1,
-                     chn.GetFrequString().c_str());
-            // TODO: Find nearest airport, if none found don't start!
-            chn.StartStreamAsync(FLAGetUrl(chn.GetFrequString()));
+            chn.StartStreamAsync();
         }
     }
     
@@ -305,7 +302,7 @@ PLUGIN_API int  XPluginEnable(void)
 PLUGIN_API void XPluginDisable(void)
 {
     // make sure all children are stopped
-    RVStopAll();
+    COMChannel::StopAll();
     
     // cleanup
     XPLMUnregisterFlightLoopCallback(SLAOneTimeCB, NULL);

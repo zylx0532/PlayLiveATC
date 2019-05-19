@@ -32,8 +32,6 @@
 //
 constexpr float VERSION_NR = 0.01f;
 constexpr bool VERSION_BETA = true;
-extern float verXPlaneOrg;          // version on X-Plane.org
-extern int verDateXPlaneOrg;        // and its date
 
 //MARK: Window Position
 #define WIN_WIDTH       400         // window width
@@ -118,13 +116,6 @@ constexpr int SERR_LEN = 100;                   // size of buffer for IO error t
 constexpr int ERR_CFG_FILE_MAXWARN = 5;     // maximum number of warnings while reading config file, then: dead
 #define ERR_APPEND_MENU_ITEM    "Could not append a menu item"
 #define ERR_CREATE_MENU         "Could not create menu %s"
-#define ERR_CURL_INIT           "Could not initialize CURL: %s"
-#define ERR_CURL_EASY_INIT      "Could not initialize easy CURL"
-#define ERR_CURL_PERFORM        "%s: Could not get network data: %d - %s"
-#define ERR_CURL_NOVERCHECK     "Could not browse X-Plane.org for version info: %d - %s"
-#define ERR_CURL_HTTP_RESP      "%s: HTTP response is not OK but %ld"
-#define ERR_CURL_REVOKE_MSG     "revocation"                // appears in error text if querying revocation list fails
-#define ERR_CURL_DISABLE_REV_QU "%s: Querying revocation list failed - have set CURLSSLOPT_NO_REVOKE and am trying again"
 #define ERR_DATAREF_FIND        "Could not find DataRef/CmdRef: %s"
 #define ERR_CREATE_COMMAND      "Could not create command %s"
 #define ERR_TOP_LEVEL_EXCEPTION "Caught top-level exception! %s"
@@ -146,7 +137,7 @@ constexpr int ERR_CFG_FILE_MAXWARN = 5;     // maximum number of warnings while 
 // MARK: Processing Info
 #define MSG_STARTUP             SWITCH_LIVE_ATC " %s starting up..."
 #define MSG_DISABLED            SWITCH_LIVE_ATC " disabled"
-#define MSG_COM_CHANGE_DETECT   "COM%d is now %s"
+#define MSG_COM_IS_NOW          "COM%d is now %s"
 
 //MARK: Debug Texts
 #define DBG_MENU_CREATED        "Menu created"

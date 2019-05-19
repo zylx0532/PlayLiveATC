@@ -33,10 +33,6 @@ char SLA_VERSION[10] = "";
 char SLA_VERSION_FULL[30] = "";
 char HTTP_USER_AGENT[50] = "";
 
-// version availble on X-Plane.org
-float verXPlaneOrg = NAN;
-int verDateXPlaneOrg = 0;
-
 // BETA versions are limited for 30 days...people shall use release versions!
 time_t SLA_BETA_VER_LIMIT = 0;
 char SLA_BETA_VER_LIMIT_TXT[12] = "";

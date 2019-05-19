@@ -61,8 +61,7 @@ set(Header_Files
     Include/Constants.h
     Include/DataRefs.h
     Include/SettingsUI.h
-    Include/SLAFindLiveATC.h
-    Include/SLARunVLC.h
+    Include/SLACOMChannel.h
     Include/SwitchLiveATC.h
     Include/TextIO.h
     Include/TFWidgets.h
@@ -73,8 +72,7 @@ source_group("Header Files" FILES ${Header_Files})
 set(Source_Files
     Src/DataRefs.cpp
     Src/SettingsUI.cpp
-    Src/SLAFindLiveATC.cpp
-    Src/SLARunVLC.cpp
+    Src/SLACOMChannel.cpp
     Src/SwitchLiveATC.cpp
     Src/TextIO.cpp
     Src/TFWidgets.cpp

@@ -44,6 +44,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <map>
 #include <chrono>
 #include <fstream>
 #include <future>
@@ -88,8 +89,7 @@
 #include "TextIO.h"
 #include "DataRefs.h"
 #include "SettingsUI.h"
-#include "SLAFindLiveATC.h"
-#include "SLARunVLC.h"
+#include "SLACOMChannel.h"
 
 // Global variables
 extern DataRefs dataRefs;           // in SwitchLiveATC.cpp

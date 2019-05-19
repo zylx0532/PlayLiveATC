@@ -103,9 +103,9 @@ public:
     void SetActOnCom(int idx, bool bEnable) { if (0<=idx&&idx<COM_CNT) {bActOnCom[idx] = bEnable; MenuUpdateCheckmarks();} }
     void ToggleActOnCom(int idx) { SetActOnCom(idx,!ShallActOnCom(idx)); }
     
-    inline std::string GetVLCPath() const { return VLCPath; }
+    inline const std::string& GetVLCPath() const { return VLCPath; }
     void SetVLCPath (const std::string newPath) { VLCPath = newPath; }
-    inline std::string GetVLCParams() const { return VLCParams; }
+    inline const std::string& GetVLCParams() const { return VLCParams; }
     void SetVLCParams (const std::string newParams) { VLCParams = newParams; }
 
     // specific access
