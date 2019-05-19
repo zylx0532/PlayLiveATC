@@ -39,12 +39,24 @@ enum dataRefsXP_LT {
     // XP standard
     DR_XP_RADIO_COM1_FREQ = 0,          // sim/cockpit/radios/com1_freq_hz
     DR_XP_RADIO_COM2_FREQ,              // sim/cockpit/radios/com2_freq_hz
+    DR_XP_RADIO_COM1_SEL,               // sim/cockpit2/radios/actuators/audio_selection_com1
+    DR_XP_RADIO_COM2_SEL,               // sim/cockpit2/radios/actuators/audio_selection_com2
+    DR_PLANE_LAT,                       // user's plane's position
+    DR_PLANE_LON,
+    DR_PLANE_ELEV,
+    DR_PLANE_PITCH,
+    DR_PLANE_ROLL,
+    DR_PLANE_HEADING,
+    DR_PLANE_TRACK,
+    DR_PLANE_TRUE_AIRSPEED,
+    DR_PLANE_ONGRND,
     // LiveTraffic
+    DR_LT_AIRCRAFTS_DISPLAYED,          // is LiveTraffic active?
     DR_LT_FD_BUF_PERIOD,                // LiveTraffic's buffering period
     // always last, number of elements
     CNT_DATAREFS_XP
 };
-constexpr dataRefsXP_LT DR_FIRST_LT_DR = DR_LT_FD_BUF_PERIOD;
+constexpr dataRefsXP_LT DR_FIRST_LT_DR = DR_LT_AIRCRAFTS_DISPLAYED;
 
 // SLA commands to be offered
 enum cmdRefsSLA {
@@ -74,9 +86,14 @@ protected:
     std::string PluginPath;                             // path to plugin directory
     std::string DirSeparator;
     
-    bool    bActOnCom[COM_CNT] = {true,true};   // which frequency to act upon?
+    bool bActOnCom[COM_CNT] = {true,true};      // which frequency to act upon?
+    bool bRespectAudioSelect = false;           // only start VLC for selected radio
     std::string VLCPath;                        // how to start VLC?
     std::string VLCParams = CFG_PARAMS_DEFAULT; // parameter definition
+    bool bDesyncLiveTrafficDelay = true;        // audio-desync with LiveTraffic's delay?
+    int desyncManual = -10;                     // [s] (additional) manual audio-desync
+    bool bPrevFrequRunsTilDesync = true;        // have the previous radio frequency continue till new one reaches desync period
+    int maxRadioDist = 50;                      // [nm] max distance a radio can be received
     
 //MARK: Constructor
 public:
@@ -99,18 +116,41 @@ public:
     inline logLevelTy GetLogLevel()     { return iLogLevel; }
     inline logLevelTy GetMsgAreaLevel()         { return iMsgAreaLevel; }
 
+    // Configuration
     inline bool ShallActOnCom(int idx) const { return 0<=idx&&idx<COM_CNT ? bActOnCom[idx] : false; }
-    void SetActOnCom(int idx, bool bEnable) { if (0<=idx&&idx<COM_CNT) {bActOnCom[idx] = bEnable; MenuUpdateCheckmarks();} }
+    inline void SetActOnCom(int idx, bool bEnable) { if (0<=idx&&idx<COM_CNT) {bActOnCom[idx] = bEnable; MenuUpdateCheckmarks();} }
     void ToggleActOnCom(int idx) { SetActOnCom(idx,!ShallActOnCom(idx)); }
+    inline bool ShallRespectAudioSelect() const { return bRespectAudioSelect; }
+    void SetRespectAudioSelect (bool b) { bRespectAudioSelect = b; }
     
     inline const std::string& GetVLCPath() const { return VLCPath; }
     void SetVLCPath (const std::string newPath) { VLCPath = newPath; }
     inline const std::string& GetVLCParams() const { return VLCParams; }
     void SetVLCParams (const std::string newParams) { VLCParams = newParams; }
-
+    
+    // Desync
+    inline bool ShallDesyncWithLTDelay () const { return bDesyncLiveTrafficDelay; }
+    void SetDesyncWithLTDelay (bool b) { bDesyncLiveTrafficDelay = b; }
+    inline bool ShallRunPrevFrequTillDesync () const { return bPrevFrequRunsTilDesync; }
+    void SetRunPrevFrequTillDesync (bool b) { bPrevFrequRunsTilDesync = b; }
+    int GetManualDesync () const { return desyncManual; }
+    void SetManualDesync (int i) { desyncManual = i; }
+    
     // specific access
     inline int   GetComFreq(int idx) const  { return 0<=idx&&idx<COM_CNT ? XPLMGetDatai(adrXP[int(DR_XP_RADIO_COM1_FREQ)+idx]) : 0; }
+    inline int   IsComSel(int idx) const    { return 0<=idx&&idx<COM_CNT ? XPLMGetDatai(adrXP[int(DR_XP_RADIO_COM1_SEL)+idx]) : 0; }
+    positionTy GetUsersPlanePos() const;
+    int GetMaxRadioDist () const { return maxRadioDist; }
+    void SetMaxRadioDist (int i) { maxRadioDist = i; }
 
+    // LiveTraffic specifics
+    bool IsLTActive () const;
+    int GetLTBufPeriod () const;
+
+    // return actual current observation, considering all options above
+    bool ConsiderCom(int idx) const;
+    int GetDesyncPeriod () const;
+    
     // Get XP System Path
     inline std::string GetXPSystemPath() const  { return XPSystemPath; }
     inline std::string GetPluginPath()   const  { return PluginPath; }

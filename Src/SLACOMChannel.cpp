@@ -59,6 +59,7 @@ void COMChannel::ClearChannel()
     StopStreamAsync(false);
     frequ = 0;
     frequString.clear();
+    curr = LiveATCDataTy();
 }
 
 
@@ -85,20 +86,43 @@ void COMChannel::StartStreamAsync ()
     futVlcStart = std::async(std::launch::async, &COMChannel::StartStream, this);
 }
 
-void COMChannel::StopStreamAsync (bool bNext)
+void COMChannel::StopStreamAsync (bool bPrev)
 {
     // we don't need control over the thread, it lasts for 2s only
-    futVlcStart = std::async(std::launch::async, &COMChannel::StopStream, this, bNext);
+    if (IsPlaying(bPrev))
+        futVlcStart = std::async(std::launch::async, &COMChannel::StopStream, this, bPrev);
+}
+
+// check distance and then don't change anything, stop the channel, or switch over to another radio
+void COMChannel::CheckComDistance ()
+{
+    // If we are playing then check distance to current station
+    if (IsPlaying(false)) {
+        positionTy posPlane = dataRefs.GetUsersPlanePos();
+        // and stop playing if too far out
+        if (posPlane.dist(currPos) / M_per_NM > dataRefs.GetMaxRadioDist()) {
+            SHOW_MSG(logINFO, MSG_AP_OUT_OF_REACH, curr.streamName.c_str());
+            StopStreamAsync(false);
+        }
+    } else {
+        // find closest airport in mapAirportStream
+        const AirportStreamMapTy::iterator apIter = FindClosestAirport();
+        if (apIter != mapAirportStream.end()) {
+            // found an airport, use that data from now on
+            curr = apIter->second;
+            StartStreamAsync();
+        }
+    }
 }
 
 void COMChannel::StartStream ()
 {
-    // tell the world we work on a frequency
-    SHOW_MSG(logINFO, MSG_COM_IS_NOW, idx+1, frequString.c_str());
-    
     // find a new URL of a stream to play -> playUrl
     if (!FetchUrlForFrequ())
         return;
+    
+    // tell the world we work on a frequency
+    SHOW_MSG(logINFO, MSG_COM_IS_NOW, idx+1, frequString.c_str(), curr.streamName.c_str());
     
     // make sure there is no stream running at the moment
     // TODO: Let old stream run until desync is over
@@ -125,7 +149,7 @@ void COMChannel::StartStream ()
     exeVlc.nShow = SW_SHOWNOACTIVATE;
     if (ShellExecuteExA(&exeVlc)) {
         // save process handle of VLC process for later kill
-        vlcProc = exeVlc.hProcess;
+        vlcPid = exeVlc.hProcess;
     }
     else
     {
@@ -197,12 +221,14 @@ void COMChannel::StartStream ()
 #endif
 }
 
-void COMChannel::StopStream (bool bNext)
+void COMChannel::StopStream (bool bPrev)
 {
 #if IBM
-    if (vlcProc) {
+    // work on either normal or next process
+    HANDLE& pid = bPrev ? vlcPrev : vlcPid;
+    if (pid) {
         // we send WM_QUIT, just in case...seems to clean up tray icon at least
-        HWND hwndVLC = FindMainWindow(vlcProc);
+        HWND hwndVLC = FindMainWindow(pid);
         if (hwndVLC) {
             PostThreadMessageA(GetWindowThreadProcessId(hwndVLC, NULL), WM_QUIT, 0, 0);
             // can WaitForSingleObject do this wait "better"?
@@ -210,12 +236,12 @@ void COMChannel::StopStream (bool bNext)
         }
         
         // this is not nice...but VLC doesn't react properly to WM_QUIT or WM_DESTROY: The window's gone, but not the process.
-        TerminateProcess(vlcProc, 0);
-        vlcProc = NULL;
+        TerminateProcess(pid, 0);
+        pid = NULL;
     }
 #else
     // work on either normal or next process
-    int& pid = bNext ? vlcNext : vlcPid;
+    int& pid = bPrev ? vlcPrev : vlcPid;
     if (pid > 0) {
         // process still running?
         int stat = 0;
@@ -274,12 +300,12 @@ bool COMChannel::FetchUrlForFrequ ()
         return false;
     
     // find closest airport in mapAirportStream
-    std::string airp = FindClosestAirport();
-    if (airp.empty())
+    const AirportStreamMapTy::iterator apIter = FindClosestAirport();
+    if (apIter == mapAirportStream.end())
         return false;
     
     // found an airport, use that data from now on
-    curr = mapAirportStream[airp];
+    curr = apIter->second;
     return true;
 }
 
@@ -359,21 +385,47 @@ void COMChannel::ParseForAirportStreams ()
 
 
 // find closest airport in mapAirportStream
-std::string COMChannel::FindClosestAirport()
+COMChannel::AirportStreamMapTy::iterator COMChannel::FindClosestAirport()
 {
     // Sanity check...there must be any for us to find one
     if (mapAirportStream.empty())
-        return std::string();
+        return mapAirportStream.end();
     
-    // FIXME: Implement
-    AirportStreamMapTy::iterator mapIter = mapAirportStream.find("KSFO");
-    if (mapIter != mapAirportStream.end())
-        return mapIter->first;
-    mapIter = mapAirportStream.find("KJFK");
-    if (mapIter != mapAirportStream.end())
-        return mapIter->first;
+    // plane's position
+    const positionTy planePos = dataRefs.GetUsersPlanePos();
+    
+    // loop airports in mapAirportStream and for each of it
+    // determine distance to plane, remember the closest airport
+    AirportStreamMapTy::iterator closestAirport = mapAirportStream.end();
+    double closestDist_nm = dataRefs.GetMaxRadioDist();    // with this init we will not consider airports father away
+    for (AirportStreamMapTy::iterator iter = mapAirportStream.begin();
+         iter != mapAirportStream.end();
+         iter++)
+    {
+        // find that airport in X-Plane's nav database
+        float lat = NAN, lon = NAN, alt_m = NAN;
+        XPLMNavRef apRef = XPLMFindNavAid(NULL, iter->first.c_str(), NULL, NULL, NULL, xplm_Nav_Airport);
+        if (apRef) {
+            XPLMGetNavAidInfo(apRef, NULL, &lat, &lon, &alt_m, NULL, NULL, NULL, NULL, NULL);
+            const positionTy apPos (lat, lon, alt_m);
+            // check distance to airport and if it is the closest seen so far
+            double dist_nm = planePos.dist(apPos) / M_per_NM;
+            if (dist_nm < closestDist_nm) {
+                closestDist_nm = dist_nm;
+                closestAirport = iter;
+                currPos = apPos;
+            }
+        } else {
+            LOG_MSG(logDEBUG, DBG_AP_NOT_FOUND, iter->first.c_str());
+        }
+    }
+    
+    if (closestAirport != mapAirportStream.end())
+        LOG_MSG(logDEBUG,DBG_AP_CLOSEST,closestAirport->first.c_str(), closestDist_nm)
+    else
+        LOG_MSG(logDEBUG,DBG_AP_NO_CLOSEST,closestDist_nm)
 
-    return mapAirportStream.cbegin()->first;
+    return closestAirport;
 }
 
 //

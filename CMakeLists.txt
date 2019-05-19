@@ -59,6 +59,7 @@ add_compile_options(-O3 -fPIC)
 ################################################################################
 set(Header_Files
     Include/Constants.h
+    Include/CoordCalc.h
     Include/DataRefs.h
     Include/SettingsUI.h
     Include/SLACOMChannel.h
@@ -70,6 +71,7 @@ set(Header_Files
 source_group("Header Files" FILES ${Header_Files})
 
 set(Source_Files
+    Src/CoordCalc.cpp
     Src/DataRefs.cpp
     Src/SettingsUI.cpp
     Src/SLACOMChannel.cpp

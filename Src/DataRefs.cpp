@@ -33,7 +33,19 @@ const char* DATA_REFS_XP[] = {
     // XP standard
     "sim/cockpit2/radios/actuators/com1_frequency_hz_833",  // int    y    hertz    Com radio 1 frequency, hz, supports 8.3 khz spacing
     "sim/cockpit2/radios/actuators/com2_frequency_hz_833",  // int    y    hertz    Com radio 2 frequency, hz, supports 8.3 khz spacing
+    "sim/cockpit2/radios/actuators/audio_selection_com1",   // int    y    boolean    is com1 selected for listening
+    "sim/cockpit2/radios/actuators/audio_selection_com2",   // int    y    boolean    is com2 selected for listening
+    "sim/flightmodel/position/latitude",                    // user's plane's position
+    "sim/flightmodel/position/longitude",
+    "sim/flightmodel/position/elevation",
+    "sim/flightmodel/position/true_theta",
+    "sim/flightmodel/position/true_phi",
+    "sim/flightmodel/position/true_psi",
+    "sim/flightmodel/position/hpath",
+    "sim/flightmodel/position/true_airspeed",
+    "sim/flightmodel/failures/onground_any",
     // LiveTraffic
+    "livetraffic/cfg/aircrafts_displayed",
     "livetraffic/cfg/fd_buf_period",
 };
 
@@ -91,7 +103,7 @@ bool DataRefs::Init ()
     PluginPath = aszPath;
     LOG_ASSERT(!PluginPath.empty());
     
-    // PluginPath is now something like "...:Resources:plugins:LiveTraffic:64:mac.xpl"
+    // PluginPath is now something like "...:Resources:plugins:SwitchLiveATC:64:mac.xpl"
     // we now reduce the path to the beginning of the plugin:
     // remove the file name
     std::string::size_type pos = PluginPath.rfind(DirSeparator);
@@ -106,7 +118,7 @@ bool DataRefs::Init ()
     if (!FindDataRefs(true))
         return false;
     
-    // register all LiveTraffic-provided commands, errors aren't critical here
+    // register all self-provided commands, errors aren't critical here
     RegisterCommands();
 
     // pre-fill VLC path with a good guess
@@ -178,6 +190,79 @@ bool DataRefs::RegisterCommands()
 }
 
 //
+// MARK: Configurations and Data Access
+//
+
+// return user's plane pos
+positionTy DataRefs::GetUsersPlanePos() const
+{
+    using namespace std::chrono;
+    positionTy pos
+    (
+     XPLMGetDatad(adrXP[DR_PLANE_LAT]),
+     XPLMGetDatad(adrXP[DR_PLANE_LON]),
+     XPLMGetDatad(adrXP[DR_PLANE_ELEV]),
+     // system time in microseconds
+     double(duration_cast<microseconds>(system_clock::now().time_since_epoch()).count())
+     // divided by 1000000 to create seconds with fractionals
+     / 1000000.0,
+     XPLMGetDataf(adrXP[DR_PLANE_HEADING]),
+     XPLMGetDataf(adrXP[DR_PLANE_PITCH]),
+     XPLMGetDataf(adrXP[DR_PLANE_ROLL]),
+     XPLMGetDatai(adrXP[DR_PLANE_ONGRND]) ? positionTy::GND_ON : positionTy::GND_OFF
+     );
+    
+    // make invalid pos invalid
+    if (pos.lat() < -75 || pos.lat() > 75)
+    pos.lat() = NAN;
+    
+    return pos;
+}
+
+//
+// MARK: Access to LiveTraffic
+//
+
+bool DataRefs::IsLTActive () const
+{
+    return (// could we map the dataRefs at all?
+            adrXP[DR_LT_AIRCRAFTS_DISPLAYED] &&
+            // is LiveTraffic activated?
+            XPLMGetDatai(adrXP[DR_PLANE_ONGRND]) != 0);
+}
+
+int DataRefs::GetLTBufPeriod () const
+{
+    return (// could we map the dataRefs at all?
+            adrXP[DR_LT_FD_BUF_PERIOD] ?
+            // if so then return LT's buffering period, otherweise 0
+            XPLMGetDatai(adrXP[DR_LT_FD_BUF_PERIOD]) : 0);
+}
+
+//
+// MARK: Actual Current Observations
+//
+
+// consider given COM only if configured to do so and check for selection
+bool DataRefs::ConsiderCom(int idx) const
+{
+    return
+    ShallActOnCom(idx) &&
+    (!ShallRespectAudioSelect() || IsComSel(idx));
+}
+
+// return actual current desync period, considering all config settings
+int DataRefs::GetDesyncPeriod () const
+{
+    if (ShallDesyncWithLTDelay() && IsLTActive())
+        return GetLTBufPeriod() + GetManualDesync();
+    else
+        return GetManualDesync();
+}
+
+
+
+//
 // MARK: Config File
 //
 
@@ -209,7 +294,7 @@ bool DataRefs::LoadConfigFile()
     std::string lnBuf;
     if (!safeGetline(fIn, lnBuf) ||                     // read a line
         (ln = str_tokenize(lnBuf, " ")).size() != 2 ||  // split into two words
-        ln[0] != SWITCH_LIVE_ATC)                          // 1. is LiveTraffic
+        ln[0] != SWITCH_LIVE_ATC)                          // 1. is SwitchLiveATC
     {
         LOG_MSG(logERR, ERR_CFG_FILE_VER, sFileName.c_str(), lnBuf.c_str());
         return false;

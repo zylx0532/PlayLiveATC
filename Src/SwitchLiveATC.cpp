@@ -62,17 +62,15 @@ int aMenuItems[CNT_MENU_ID];
 // Callback called by XP, so this is an entry point into the plugin
 void MenuHandlerCB(void * /*mRef*/, void * iRef)
 {
-    // LiveTraffic top level exception handling
+    // top level exception handling
     try {
         // act based on menu id
         switch (reinterpret_cast<unsigned long long>(iRef)) {
             case MENU_ID_TOGGLE_COM1:
                 dataRefs.ToggleActOnCom(0);
-                gChn[0].ClearChannel();
                 break;
             case MENU_ID_TOGGLE_COM2:
                 dataRefs.ToggleActOnCom(1);
-                gChn[1].ClearChannel();
                 break;
             case MENU_ID_SETTINGS_UI:
                 settingsUI.Show();
@@ -189,22 +187,32 @@ bool RegisterCommandHandlers ()
 // callback called every second to identify COM frequency changes
 float SLAFlightLoopCB (float, float, int, void*)
 {
+    static int callCnt = 0;
+    
+    // increase call counter, reset to zero after 20 calls
+    if (++callCnt > 20)
+        callCnt = 0;
+    
     // loop over all COM radios we support
     for (COMChannel& chn: gChn) {
-        
         const int idx = chn.GetIdx();
-        if (// should we actually _act_ on that change?
-            dataRefs.ShallActOnCom(idx) &&
+        // should we actually _act_ on that COM radio?
+        if (dataRefs.ConsiderCom(idx)) {
+            // yes, consider this COM radio
             // get current frequency and check if this is considered a change
-            chn.doChange(dataRefs.GetComFreq(idx)))
-        {
-            chn.StartStreamAsync();
+            if (chn.doChange(dataRefs.GetComFreq(idx)))
+                chn.StartStreamAsync();
+            // every 20 calls check for distance to radio station
+            else if (!callCnt)
+                chn.CheckComDistance();
+        } else {
+            // do _not_ consider this COM
+            // stop if it is running
+            if (chn.IsPlaying())
+                chn.ClearChannel();
         }
+        
     }
-    
-    // TODO: Once per minute Monitor airport distance
-    //       1. If no frequ tuned in find a nearest airport
-    //       2. If tuned in check if airport still in reachable distance
     
     // call me again in a second
     return 1.0f;
@@ -243,7 +251,7 @@ PLUGIN_API int XPluginStart(
     XPLMEnableFeature("XPLM_USE_NATIVE_PATHS",1);
     
     // init our version number
-    // (also outputs the "LiveTraffic ... starting up" log message)
+    // (also outputs the "SwitchLiveATC ... starting up" log message)
     if (!InitFullVersion ()) { DestroyWindow(); return 0; }
     
     // init DataRefs

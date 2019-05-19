@@ -34,12 +34,16 @@
 #define LIVE_ATC_BASE       "https://" LIVE_ATC_DOMAIN
 #define LIVE_ATC_URL        LIVE_ATC_BASE "/search/f.php?freq=%s"
 
+#define MSG_COM_IS_NOW      "COM%d is now %s, tuning to '%s'"
+#define MSG_AP_OUT_OF_REACH "'%s' now out of reach"
 #define DBG_QUERY_URL       "Sending query %s"
 #define WARN_RE_ICAO        "Could not find %s in LiveATC reply"
 #define DBG_STREAM_NOT_UP   "Stream %s skipped as it is not UP but '%s'"
 #define DBG_ADDING_STREAM   "Adding    stream %s"
 #define DBG_REPL_STREAM     "Replacing stream %s"
-
+#define DBG_AP_NOT_FOUND    "Could not find airport %s in X-Plane's nav database"
+#define DBG_AP_CLOSEST      "Closest airport is %s (%.1fnm)"
+#define DBG_AP_NO_CLOSEST   "No airport found within %.1fnm"
 #define DBG_RUN_CMD         "Will run: %s %s"
 #define DBG_FORK_PID        "pid is %d for url '%s'"
 #define DBG_KILL_PID        "killing pid %d for url %s"
@@ -78,16 +82,17 @@ protected:
         std::string dbgOut () const { return airportIcao+'|'+streamName+'|'+std::to_string(nFacilities)+'|'+playUrl; }
     };
     LiveATCDataTy curr;         // current in use
+    positionTy currPos;         // position of current in-use airport
     
     // VLC data
 protected:
     // the actual process running VLC, needed to stop it:
 #if IBM
-    HANDLE vlcProc = NULL;
-    HANDLE vlcNext = NULL;      // next VLC process during desync period
+    HANDLE vlcPid  = NULL;
+    HANDLE vlcPrev = NULL;      // previous VLC process during desync period
 #else
     int vlcPid  = 0;
-    int vlcNext = 0;            // next VLC process during desync period
+    int vlcPrev = 0;            // previous VLC process during desync period
 #endif
     std::future<void> futVlcStart;
     
@@ -111,17 +116,20 @@ public:
     // VLC control
     // asynchronous/non-blocking cllas, which encapsulate blocking calls in threads
     void StartStreamAsync ();
-    void StopStreamAsync (bool bNext);
-    
+    void StopStreamAsync (bool bPrev);
+    // check distance and then don't change anything, stop the channel, or switch over to another radio
+    void CheckComDistance ();
+
     // blocking calls, called by above asynch threads
     void StartStream ();
-    void StopStream (bool bNext);
+    void StopStream (bool bPrev);
     // stop still running VLC instances
     static void StopAll();
 
     // VLC status
-    bool IsPlaying () const { return vlcPid > 0; }
-    
+    bool IsPlaying (bool bPrev) const { return bPrev ? vlcPrev > 0 : vlcPid > 0; }
+    bool IsPlaying () const { return IsPlaying(true) || IsPlaying(false); }
+
     // compute complete parameter string for VLC
     std::string GetVlcParams();
     
@@ -136,7 +144,7 @@ protected:
     void ParseForAirportStreams ();
     
     // find closest airport in mapAirportStream
-    std::string FindClosestAirport();
+    AirportStreamMapTy::iterator FindClosestAirport();
     
     // communication with LiveATC.net
     std::string readBuf;

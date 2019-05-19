@@ -81,11 +81,13 @@
 #include "XPLMProcessing.h"
 #include "XPLMDisplay.h"
 #include "XPLMGraphics.h"
+#include "XPLMNavigation.h"
 
 // SwitchLiveATC Includes
 #include "TFWidgets.h"
 #include "Constants.h"
 #include "Utilities.h"
+#include "CoordCalc.h"
 #include "TextIO.h"
 #include "DataRefs.h"
 #include "SettingsUI.h"

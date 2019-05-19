@@ -43,21 +43,39 @@ constexpr int WIN_TIME_DISPLAY=8;       // duration of displaying a message wind
 constexpr std::chrono::milliseconds WIN_TIME_REMAIN(500); // time to keep the msg window after last message
 
 //MARK: Unit conversions
+constexpr int M_per_NM      = 1852;     // meter per 1 nautical mile = 1/60 of a lat degree
+constexpr double M_per_FT   = 0.3048;   // meter per 1 foot
+constexpr int M_per_KM      = 1000;
+constexpr double KT_per_M_per_S = 1.94384;  // 1m/s = 1.94384kt
 constexpr int SEC_per_M     = 60;       // 60 seconds per minute
 constexpr int SEC_per_H     = 3600;     // 3600 seconds per hour
 constexpr int H_per_D       = 24;       // 24 hours per day
 constexpr int M_per_D       = 1440;     // 24*60 minutes per day
 constexpr int SEC_per_D     = SEC_per_H * H_per_D;        // seconds per day
+constexpr double Ms_per_FTm = M_per_FT / SEC_per_M;     //1 m/s = 196.85... ft/min
+constexpr double PI         = 3.1415926535897932384626433832795028841971693993751;
+constexpr double EARTH_D_M  = 6371.0 * 2 * 1000;    // earth diameter in meter
+constexpr double JAN_FIRST_2019 = 1546344000;   // 01.01.2019
+constexpr double HPA_STANDARD   = 1013.25;      // air pressure
+constexpr double INCH_STANDARD  = 2992.126;
+constexpr double HPA_per_INCH   = HPA_STANDARD/INCH_STANDARD;
+// The pressure drops approximately by 11.3 Pa per meter in first 1000 meters above sea level.
+constexpr double PA_per_M       = 11.3;         // https://en.wikipedia.org/wiki/Barometric_formula
+// ft altitude diff per hPa change
+constexpr double FT_per_HPA     = (100/PA_per_M)/M_per_FT;
 
+constexpr double SIMILAR_TS_INTVL = 3;          // seconds: Less than that difference and position-timestamps are considered "similar" -> positions are merged rather than added additionally
+constexpr double MDL_ALT_MIN =         -1500;   // [ft] minimum allowed altitude
+constexpr double MDL_ALT_MAX =          60000;  // [ft] maximum allowed altitude
 
 //MARK: Version Information
 extern char SLA_VERSION[];               // like "1.0"
 extern char SLA_VERSION_FULL[];          // like "1.0.181231" with last digits being build date
-extern char HTTP_USER_AGENT[];          // like "LiveTraffic/1.0"
+extern char HTTP_USER_AGENT[];          // like "SwitchLiveATC/1.0"
 extern time_t SLA_BETA_VER_LIMIT;        // BETA versions are limited
 extern char SLA_BETA_VER_LIMIT_TXT[];
 #define BETA_LIMITED_VERSION    "BETA limited to %s"
-#define BETA_LIMITED_EXPIRED    "BETA-Version limited to %s has EXPIRED -> SHUTTING DOWN!"
+#define BETA_LIMITED_EXPIRED    "BETA-Version limited to %s has EXPIRED -> SHUTTING DOWN! Get an up-to-date version from X-Plane.org."
 constexpr int SLA_NEW_VER_CHECK_TIME = 48;   // [h] between two checks of a new
 
 //MARK: Text Constants
@@ -133,11 +151,11 @@ constexpr int ERR_CFG_FILE_MAXWARN = 5;     // maximum number of warnings while 
 #define ERR_CFG_FORMAT          "Format mismatch in '%s', line %d: %s"
 #define ERR_CFG_VAL_INVALID     "Value invalid in '%s', line %d: %s"
 #define ERR_WIDGET_CREATE       "Could not create widget required for settings UI"
+#define ERR_Y_PROBE             "Y Probe returned %d at %s"
 
 // MARK: Processing Info
 #define MSG_STARTUP             SWITCH_LIVE_ATC " %s starting up..."
 #define MSG_DISABLED            SWITCH_LIVE_ATC " disabled"
-#define MSG_COM_IS_NOW          "COM%d is now %s"
 
 //MARK: Debug Texts
 #define DBG_MENU_CREATED        "Menu created"

@@ -312,7 +312,6 @@ bool LTSettingsUI::MsgButtonStateChanged (XPWidgetID buttonWidget, bool bNowChec
     for (int idx = 0; idx < COM_CNT; idx++) {
         if (btnBasicsCom[idx] == buttonWidget) {
             dataRefs.SetActOnCom(idx, bNowChecked);
-            gChn[idx].ClearChannel();       // reset channel so that it either fells silent or can be reactivated
             return true;
         }
     }

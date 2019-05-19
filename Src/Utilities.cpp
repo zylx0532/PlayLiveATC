@@ -189,3 +189,17 @@ int str_replace (std::string& s,
     }
     return replacements;
 }
+
+//
+// MARK: Misc
+//
+
+// comparing 2 doubles for near-equality
+bool dequal ( const double d1, const double d2 )
+{
+    const double epsilon = 0.00001;
+    return ((d1 - epsilon) < d2) &&
+    ((d1 + epsilon) > d2);
+}
+
+

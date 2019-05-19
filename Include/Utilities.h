@@ -62,6 +62,11 @@ int str_replace (std::string& s,
                  const std::string& find,
                  const std::string& repl);
 
+// MARK: Misc
+
+// comparing 2 doubles for near-equality
+bool dequal ( const double d1, const double d2 );
+
 // MARK: Compiler differences
 
 #if APL == 1 || LIN == 1

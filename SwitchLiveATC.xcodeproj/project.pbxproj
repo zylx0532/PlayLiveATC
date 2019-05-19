@@ -17,6 +17,7 @@
 		254CCAB322666C2A003878B1 /* SwitchLiveATC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 254CCAB222666C2A003878B1 /* SwitchLiveATC.cpp */; };
 		255F2B88227A1C07003CAE65 /* mac.xpl in CopyFiles */ = {isa = PBXBuildFile; fileRef = D607B19909A556E400699BC3 /* mac.xpl */; };
 		255F2B8B227A1E1A003CAE65 /* SettingsUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */; };
+		256FBDF92291D996006AEF68 /* CoordCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 256FBDF82291D996006AEF68 /* CoordCalc.cpp */; };
 		25831F2E2258D08B002398D2 /* XPWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25831F2C2258D08B002398D2 /* XPWidgets.framework */; };
 		25831F2F2258D08B002398D2 /* XPLM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25831F2D2258D08B002398D2 /* XPLM.framework */; };
 		25A1EFC2227CDFCA00F940E3 /* SLACOMChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25A1EFC0227CDFCA00F940E3 /* SLACOMChannel.cpp */; };
@@ -51,6 +52,8 @@
 		254CCAB222666C2A003878B1 /* SwitchLiveATC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SwitchLiveATC.cpp; sourceTree = "<group>"; };
 		255F2B89227A1E12003CAE65 /* SettingsUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsUI.h; sourceTree = "<group>"; };
 		255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SettingsUI.cpp; sourceTree = "<group>"; };
+		256FBDF72291D958006AEF68 /* CoordCalc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoordCalc.h; sourceTree = "<group>"; };
+		256FBDF82291D996006AEF68 /* CoordCalc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CoordCalc.cpp; sourceTree = "<group>"; };
 		25831F2C2258D08B002398D2 /* XPWidgets.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPWidgets.framework; path = Lib/XPSDK301/Libraries/Mac/XPWidgets.framework; sourceTree = "<group>"; };
 		25831F2D2258D08B002398D2 /* XPLM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPLM.framework; path = Lib/XPSDK301/Libraries/Mac/XPLM.framework; sourceTree = "<group>"; };
 		25A1EFBE227CDF5F00F940E3 /* SLACOMChannel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SLACOMChannel.h; sourceTree = "<group>"; };
@@ -97,6 +100,7 @@
 		25D6C0B9227791EC0080E8B3 /* Src */ = {
 			isa = PBXGroup;
 			children = (
+				256FBDF82291D996006AEF68 /* CoordCalc.cpp */,
 				25D6C0C72277965D0080E8B3 /* DataRefs.cpp */,
 				255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */,
 				25A1EFC0227CDFCA00F940E3 /* SLACOMChannel.cpp */,
@@ -112,6 +116,7 @@
 		25D6C0BA227791FD0080E8B3 /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				256FBDF72291D958006AEF68 /* CoordCalc.h */,
 				25D6C0C1227792830080E8B3 /* Constants.h */,
 				25D6C0C6227796540080E8B3 /* DataRefs.h */,
 				255F2B89227A1E12003CAE65 /* SettingsUI.h */,
@@ -226,6 +231,7 @@
 				254CCAB322666C2A003878B1 /* SwitchLiveATC.cpp in Sources */,
 				254BE2B62279CBFD00D1DC25 /* Version.cpp in Sources */,
 				25D6C0BF227792300080E8B3 /* TFWidgets.cpp in Sources */,
+				256FBDF92291D996006AEF68 /* CoordCalc.cpp in Sources */,
 				254BE2B72279D70400D1DC25 /* DataRefs.cpp in Sources */,
 				25C55C1B2278D00F0030D47D /* Utilities.cpp in Sources */,
 				25A1EFC2227CDFCA00F940E3 /* SLACOMChannel.cpp in Sources */,
