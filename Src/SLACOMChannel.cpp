@@ -278,8 +278,7 @@ void COMChannel::StopAll()
 std::string COMChannel::GetVlcParams()
 {
     std::string params = dataRefs.GetVLCParams();
-    // FIXME: Actual desync time!!!
-    str_replace(params, PARAM_REPL_DESYNC, "0");
+    str_replace(params, PARAM_REPL_DESYNC, std::to_string(dataRefs.GetDesyncPeriod()));
     str_replace(params, PARAM_REPL_URL, curr.playUrl);
     return params;
 }

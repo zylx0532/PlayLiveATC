@@ -83,6 +83,9 @@ constexpr int SLA_NEW_VER_CHECK_TIME = 48;   // [h] between two checks of a new
 #define SLA_CFG_VERSION         "1.0"        // current version of config file format
 #define PLUGIN_SIGNATURE        "TwinFan.plugin.SwitchLiveATC"
 #define PLUGIN_DESCRIPTION      "Switch LiveATC channel based on COM radios."
+#define LT_UNAVAILABLE          "not available"
+#define LT_INACTIVE             "installed, but inactive"
+#define LT_ACTIVE               "active, displaying aircrafts"
 
 //MARK: Menu Items
 #define MENU_TOGGLE_COM1        "Act on COM1 change"
@@ -95,6 +98,7 @@ constexpr int SLA_NEW_VER_CHECK_TIME = 48;   // [h] between two checks of a new
 
 //MARK: Config File Entries
 #define CFG_TOGGLE_COM          "ActOnChangeOfCOM%d"
+#define CFG_RESPECT_COM_SEL     "PlayComSelected"
 #define CFG_VLC_PATH            "VLCPath"
 #define CFG_VLC_PARAMS          "VLCParams"
 
@@ -111,6 +115,11 @@ constexpr int SLA_NEW_VER_CHECK_TIME = 48;   // [h] between two checks of a new
 
 #define PARAM_REPL_DESYNC       "{desync}"
 #define PARAM_REPL_URL          "{url}"
+
+#define CFG_LT_DESYNC_BUF       "LTDesyncByBufPeriod"
+#define CFG_DESYNC_MANUAL_ADJ   "DesyncManualAdjust"
+#define CFG_PREV_WHILE_DESYNC   "ContPrevFrequWhileDesync"
+#define CFG_MAX_RADIO_DIST      "MaxRadioDist"
 
 #define CFG_LOG_LEVEL           "LogLevel"
 #define CFG_MSG_AREA_LEVEL      "MsgAreaLevel"

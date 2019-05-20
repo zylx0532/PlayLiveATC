@@ -284,9 +284,12 @@ PLUGIN_API int XPluginStart(
 }
 
 PLUGIN_API void	XPluginStop(void)
-{
+{    
     // Cleanup dataRef registration
     dataRefs.Stop();
+    // Save config
+    dataRefs.SaveConfigFile();
+
     DestroyWindow();
 }
 

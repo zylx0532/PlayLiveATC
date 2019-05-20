@@ -249,7 +249,8 @@ public:
         TFF_ANY = 0,
         TFF_UPPER_CASE,
         TFF_HEX,
-        TFF_DIGITS
+        TFF_DIGITS,
+        TFF_NEG_DIGITS
     } tfFormat = TFF_ANY;
     TFTextFieldWidget (XPWidgetID _me = NULL) : TFWidget(_me) {}
     

@@ -223,12 +223,18 @@ positionTy DataRefs::GetUsersPlanePos() const
 // MARK: Access to LiveTraffic
 //
 
+std::string DataRefs::GetLTStatusText () const
+{
+    if (!adrXP[DR_LT_AIRCRAFTS_DISPLAYED]) return LT_UNAVAILABLE;
+    return IsLTActive() ? LT_ACTIVE : LT_INACTIVE;
+}
+
 bool DataRefs::IsLTActive () const
 {
     return (// could we map the dataRefs at all?
             adrXP[DR_LT_AIRCRAFTS_DISPLAYED] &&
             // is LiveTraffic activated?
-            XPLMGetDatai(adrXP[DR_PLANE_ONGRND]) != 0);
+            XPLMGetDatai(adrXP[DR_LT_AIRCRAFTS_DISPLAYED]) != 0);
 }
 
 int DataRefs::GetLTBufPeriod () const
@@ -252,12 +258,13 @@ bool DataRefs::ConsiderCom(int idx) const
 }
 
 // return actual current desync period, considering all config settings
+// return milliseconds
 int DataRefs::GetDesyncPeriod () const
 {
+    int ret = GetManualDesync();
     if (ShallDesyncWithLTDelay() && IsLTActive())
-        return GetLTBufPeriod() + GetManualDesync();
-    else
-        return GetManualDesync();
+        ret += GetLTBufPeriod();
+    return ret > 0 ? ret * 1000 : 0;
 }
 
 
@@ -335,6 +342,7 @@ bool DataRefs::LoadConfigFile()
         long lVal = 0;      // try getting an integer value from it, if possible
         try { lVal = std::stol(sVal); }
         catch (...) {}
+        const bool bVal = lVal != 0;
         const std::string sRestOfLine = lnBuf.substr(lnBuf.find(' ')+1);
         
         // assign values appropriately
@@ -344,7 +352,7 @@ bool DataRefs::LoadConfigFile()
             char buf[50];
             snprintf(buf,sizeof(buf),CFG_TOGGLE_COM,i+1);
             if (sCfgName == buf) {
-                bActOnCom[i] = lVal != 0;
+                bActOnCom[i] = bVal;
                 break;
             }
         }
@@ -352,6 +360,11 @@ bool DataRefs::LoadConfigFile()
         // other entries
              if (sCfgName == CFG_VLC_PATH)          VLCPath = sRestOfLine;
         else if (sCfgName == CFG_VLC_PARAMS)        VLCParams = sRestOfLine;
+        else if (sCfgName == CFG_RESPECT_COM_SEL)   bRespectAudioSelect = bVal;
+        else if (sCfgName == CFG_LT_DESYNC_BUF)     bDesyncLiveTrafficDelay = bVal;
+        else if (sCfgName == CFG_DESYNC_MANUAL_ADJ) desyncManual = (int)lVal;
+        else if (sCfgName == CFG_PREV_WHILE_DESYNC) bPrevFrequRunsTilDesync = bVal;
+        else if (sCfgName == CFG_MAX_RADIO_DIST)    maxRadioDist = (int)lVal;
         else if (sCfgName == CFG_LOG_LEVEL)         iLogLevel = logLevelTy(lVal);
         else if (sCfgName == CFG_MSG_AREA_LEVEL)    iMsgAreaLevel = logLevelTy(lVal);
     }
@@ -408,11 +421,16 @@ bool DataRefs::SaveConfigFile()
     
     // other entries
     if (!VLCPath.empty())
-        fOut << CFG_VLC_PATH    << ' ' << VLCPath          << '\n';
+        fOut << CFG_VLC_PATH        << ' ' << VLCPath                   << '\n';
     if (!VLCParams.empty())
-        fOut << CFG_VLC_PARAMS  << ' ' << VLCParams          << '\n';
-    fOut << CFG_LOG_LEVEL       << ' ' << iLogLevel        << '\n';
-    fOut << CFG_MSG_AREA_LEVEL  << ' ' << iMsgAreaLevel    << '\n';
+        fOut << CFG_VLC_PARAMS      << ' ' << VLCParams                 << '\n';
+    fOut << CFG_RESPECT_COM_SEL     << ' ' << bRespectAudioSelect       << '\n';
+    fOut << CFG_LT_DESYNC_BUF       << ' ' << bDesyncLiveTrafficDelay   << '\n';
+    fOut << CFG_DESYNC_MANUAL_ADJ   << ' ' << desyncManual              << '\n';
+    fOut << CFG_PREV_WHILE_DESYNC   << ' ' << bPrevFrequRunsTilDesync   << '\n';
+    fOut << CFG_MAX_RADIO_DIST      << ' ' << maxRadioDist              << '\n';
+    fOut << CFG_LOG_LEVEL           << ' ' << iLogLevel                 << '\n';
+    fOut << CFG_MSG_AREA_LEVEL      << ' ' << iMsgAreaLevel             << '\n';
     
     // some error checking towards the end
     if (!fOut) {

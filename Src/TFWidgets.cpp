@@ -789,6 +789,15 @@ bool TFTextFieldWidget::MsgKeyPress (XPKeyState_t& key)
             return true;
     }
     
+    // digits and minus only?
+    if (tfFormat == TFF_NEG_DIGITS)
+    {
+        // if key is not one of the digits
+        // we ignore the pressed key by eating the message without processing
+        if ((key.key < '0' || key.key > '9') && key.key != '-')
+            return true;
+    }
+    
     // we don't eat the message but leave it to others for processing
     return false;
 }

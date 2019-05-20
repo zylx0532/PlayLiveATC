@@ -93,7 +93,7 @@ protected:
     bool bDesyncLiveTrafficDelay = true;        // audio-desync with LiveTraffic's delay?
     int desyncManual = -10;                     // [s] (additional) manual audio-desync
     bool bPrevFrequRunsTilDesync = true;        // have the previous radio frequency continue till new one reaches desync period
-    int maxRadioDist = 50;                      // [nm] max distance a radio can be received
+    int maxRadioDist = 300;                     // [nm] max distance a radio can be received
     
 //MARK: Constructor
 public:
@@ -144,6 +144,7 @@ public:
     void SetMaxRadioDist (int i) { maxRadioDist = i; }
 
     // LiveTraffic specifics
+    std::string GetLTStatusText () const;
     bool IsLTActive () const;
     int GetLTBufPeriod () const;
 
