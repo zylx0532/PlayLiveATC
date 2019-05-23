@@ -35,6 +35,8 @@
 #define LIVE_ATC_URL        LIVE_ATC_BASE "/search/f.php?freq=%s"
 
 #define MSG_COM_IS_NOW      "COM%d is now %s, tuning to '%s'"
+#define MSG_COM_IS_NOW_IN   "COM%d is now %s, tuning to '%s' with %ds delay"
+#define MSG_COM_COUNTDOWN   "COM%d: %ds till '%s' starts"
 #define MSG_AP_OUT_OF_REACH "'%s' now out of reach"
 #define DBG_QUERY_URL       "Sending query %s"
 #define WARN_RE_ICAO        "Could not find %s in LiveATC reply"
@@ -50,6 +52,7 @@
 
 // 100 KB of storage initially
 constexpr std::string::size_type READ_BUF_INIT_SIZE = 100 * 1024;
+constexpr long ADD_COUNTDOWN_DELAY_MS = 500;
 #define ERR_CURL_INIT           "Could not initialize CURL: %s"
 #define ERR_CURL_EASY_INIT      "Could not initialize easy CURL"
 #define ERR_CURL_NO_LIVEATC     "Could not query LiveATC.net for version info: %d - %s"
@@ -81,8 +84,9 @@ protected:
         int nFacilities = 0;        // number of facilities table rows
         std::string dbgOut () const { return airportIcao+'|'+streamName+'|'+std::to_string(nFacilities)+'|'+playUrl; }
     };
-    LiveATCDataTy curr;         // current in use
+    LiveATCDataTy curr, prev;   // current in use / previous
     positionTy currPos;         // position of current in-use airport
+    std::atomic_flag flagStartingStream = ATOMIC_FLAG_INIT;
     
     // VLC data
 protected:
@@ -95,16 +99,17 @@ protected:
     int vlcPrev = 0;            // previous VLC process during desync period
 #endif
     std::future<void> futVlcStart;
+    std::chrono::time_point<std::chrono::steady_clock> desyncDone;
     
 public:
     COMChannel(int i) : idx(i) {}
-    int GetIdx() const { return idx; }
+    inline int GetIdx() const { return idx; }
     // stop VLC, reset frequency
     void ClearChannel();
 
     // X-Plane data
-    int GetFrequ() const                   { return frequ; }
-    std::string GetFrequString() const     { return frequString; }
+    inline int GetFrequ() const                   { return frequ; }
+    inline std::string GetFrequString() const     { return frequString; }
     
     // if _new differs from frequ
     // THEN we consider it a change to a new frequency
@@ -117,8 +122,8 @@ public:
     // asynchronous/non-blocking cllas, which encapsulate blocking calls in threads
     void StartStreamAsync ();
     void StopStreamAsync (bool bPrev);
-    // check distance and then don't change anything, stop the channel, or switch over to another radio
-    void CheckComDistance ();
+    // called every second: start new streams, stop out of reach ones...
+    void RegularMaintenance ();
 
     // blocking calls, called by above asynch threads
     void StartStream ();
@@ -127,14 +132,19 @@ public:
     static void StopAll();
 
     // VLC status
-    bool IsPlaying (bool bPrev) const { return bPrev ? vlcPrev > 0 : vlcPid > 0; }
-    bool IsPlaying () const { return IsPlaying(true) || IsPlaying(false); }
+    inline bool IsPlaying (bool bPrev) const { return bPrev ? vlcPrev > 0 : vlcPid > 0; }
+    inline bool IsPlaying () const { return vlcPid > 0 || vlcPrev > 0; }
+    int GetSecTillDesyncDone () const;
+    inline bool IsDesyncing() const { return vlcPid > 0 && GetSecTillDesyncDone() > 0; }
+    inline bool IsDesyncDone() const { return GetSecTillDesyncDone() <= 0; }
 
     // compute complete parameter string for VLC
     std::string GetVlcParams();
     
     // *** Determination of stream URL to play ***
 protected:
+    // turn current stream to previous
+    void TurnCurrToPrev ();
     // query LiveATC, parse result...come up with stream url to play
     bool FetchUrlForFrequ ();
     

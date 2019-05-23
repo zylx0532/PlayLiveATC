@@ -111,10 +111,28 @@ void    draw_msg(XPLMWindowID in_window_id, void * /*in_refcon*/)
     XPLMDrawTranslucentDarkBox(l, t, r, b);
     
     b = WIN_WIDTH;                          // word wrap width = window width
+    t -= WIN_ROW_HEIGHT;                    // move down to text's baseline
     
+    // display desync countdown?
+    bool bNeedWndForCountdown = false;
+    if (dataRefs.GetMsgAreaLevel() <= logINFO)
+        for (COMChannel& chn: gChn)
+            if (chn.IsDesyncing()) {
+                char buf[50];
+                snprintf(buf, sizeof(buf), MSG_COM_COUNTDOWN,
+                         chn.GetIdx()+1,
+                         chn.GetSecTillDesyncDone(),
+                         chn.GetLiveATCData().streamName.c_str());
+                // draw text, take color based on msg level
+                XPLMDrawString(COL_LVL[logINFO], l, t,
+                               buf,
+                               &b, xplmFont_Proportional);
+                t -= WIN_ROW_HEIGHT;
+                bNeedWndForCountdown = true;
+            }
+
     // for each line of text to be displayed
     std::chrono::time_point<std::chrono::steady_clock> currTime = std::chrono::steady_clock::now();
-    t -= WIN_ROW_HEIGHT;                    // move down to text's baseline
     for (auto iter = listTexts.cbegin();
          iter != listTexts.cend();
          )             // can't deduce number of rwos (after word wrap)...just assume 2 rows are enough
@@ -140,7 +158,7 @@ void    draw_msg(XPLMWindowID in_window_id, void * /*in_refcon*/)
     
     // No texts left? Remove window in 1s
     if ((g_window == in_window_id) &&
-        listTexts.empty())
+        listTexts.empty() && !bNeedWndForCountdown)
     {
         if (timeToRemove.time_since_epoch() == std::chrono::steady_clock::duration::zero())
             // set time when to remove

@@ -57,9 +57,6 @@ void COMChannel::ClearChannel()
 {
     StopStreamAsync(true);
     StopStreamAsync(false);
-    frequ = 0;
-    frequString.clear();
-    curr = LiveATCDataTy();
 }
 
 
@@ -93,9 +90,29 @@ void COMChannel::StopStreamAsync (bool bPrev)
         futVlcStart = std::async(std::launch::async, &COMChannel::StopStream, this, bPrev);
 }
 
+// should be called every second:
+// check for frequency change, and if not changed:
 // check distance and then don't change anything, stop the channel, or switch over to another radio
-void COMChannel::CheckComDistance ()
+void COMChannel::RegularMaintenance ()
 {
+    // need to stop previous frequency after desync is done?
+    if (IsPlaying(true) && IsDesyncDone()) {
+        StopStreamAsync(true);
+    }
+    
+    // get current frequency and check if this is considered a change
+    if (doChange(dataRefs.GetComFreq(idx))) {
+        // it is: we start a new stream
+        StartStreamAsync();
+        return;
+    }
+    
+    // *** only every 10th call do the expensive stuff ***
+    static int callCnt = 0;
+    if (++callCnt <= 10)
+        return;
+    callCnt = 0;
+
     // If we are playing then check distance to current station
     if (IsPlaying(false)) {
         positionTy posPlane = dataRefs.GetUsersPlanePos();
@@ -105,7 +122,9 @@ void COMChannel::CheckComDistance ()
             StopStreamAsync(false);
         }
     } else {
-        // find closest airport in mapAirportStream
+        // we are not currently playing something,
+        // find closest airport in mapAirportStream,
+        // maybe something is in reach now?
         const AirportStreamMapTy::iterator apIter = FindClosestAirport();
         if (apIter != mapAirportStream.end()) {
             // found an airport, use that data from now on
@@ -117,17 +136,40 @@ void COMChannel::CheckComDistance ()
 
 void COMChannel::StartStream ()
 {
+    // start it only once...it could take a moment
+    if (flagStartingStream.test_and_set())
+        return;     // return immediately if startup in progress
+    
+    // save time when audio desync should be finished
+    long desyncMilliSecs = dataRefs.GetDesyncPeriod();
+    desyncDone = std::chrono::steady_clock::now() +
+    std::chrono::milliseconds(desyncMilliSecs + ADD_COUNTDOWN_DELAY_MS);
+
+    // move current stream aside
+    TurnCurrToPrev();
+    
+    // if there is no audio desync or we shall not wait for it
+    // then kill that pushed-aside process right away
+    if (desyncMilliSecs <= 0 || !dataRefs.ShallRunPrevFrequTillDesync()) {
+        StopStream(true);
+    }
+    
     // find a new URL of a stream to play -> playUrl
-    if (!FetchUrlForFrequ())
+    if (!FetchUrlForFrequ()) {
+        flagStartingStream.clear();
         return;
+    }
     
     // tell the world we work on a frequency
-    SHOW_MSG(logINFO, MSG_COM_IS_NOW, idx+1, frequString.c_str(), curr.streamName.c_str());
+    if (desyncMilliSecs > 0) {
+        SHOW_MSG(logINFO, MSG_COM_IS_NOW_IN, idx+1, frequString.c_str(),
+                 curr.streamName.c_str(),
+                 int(desyncMilliSecs/1000));
+    } else {
+        SHOW_MSG(logINFO, MSG_COM_IS_NOW, idx+1, frequString.c_str(),
+                 curr.streamName.c_str());
+    }
     
-    // make sure there is no stream running at the moment
-    // TODO: Let old stream run until desync is over
-    StopStream(false);
-
     // character-array access to what we need for calls
     // calls to execvp/ShellExecuteExA don't work with string::c_str() pointers
     char vlc[256];
@@ -219,10 +261,13 @@ void COMChannel::StartStream ()
         }
     }
 #endif
+    
+    flagStartingStream.clear();
 }
 
 void COMChannel::StopStream (bool bPrev)
 {
+    LiveATCDataTy& atcData = bPrev ? prev : curr;
 #if IBM
     // work on either normal or next process
     HANDLE& pid = bPrev ? vlcPrev : vlcPid;
@@ -236,6 +281,7 @@ void COMChannel::StopStream (bool bPrev)
         }
         
         // this is not nice...but VLC doesn't react properly to WM_QUIT or WM_DESTROY: The window's gone, but not the process.
+        LOG_MSG(logDEBUG, DBG_KILL_PID, pid, atcData.playUrl.c_str());
         TerminateProcess(pid, 0);
         pid = NULL;
     }
@@ -246,7 +292,7 @@ void COMChannel::StopStream (bool bPrev)
         // process still running?
         int stat = 0;
         if (waitpid(pid, &stat, WNOHANG) <= 0) {
-            LOG_MSG(logDEBUG, DBG_KILL_PID, pid, curr.playUrl.c_str());
+            LOG_MSG(logDEBUG, DBG_KILL_PID, pid, atcData.playUrl.c_str());
             kill(pid, SIGTERM);
             // cleanup zombies (10 attempts with 100ms pause)
             for (int i = 0;
@@ -254,12 +300,19 @@ void COMChannel::StopStream (bool bPrev)
                  i++)
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
-//                LOG_MSG(logDEBUG, "Waited %d. time for pid %d (%s)", i, pid, playUrl.c_str());
+//                LOG_MSG(logDEBUG, "Waited %d. time for pid %d (%s)", i, pid, atcData.playUrl.c_str());
             }
         }
     }
     pid = 0;
 #endif
+    
+    // clear stream infos
+    atcData = LiveATCDataTy();
+    if (!bPrev) {
+        frequ = 0;
+        frequString.clear();
+    }
 }
 
 
@@ -274,6 +327,14 @@ void COMChannel::StopAll()
 }
 
 
+// return number of seconds till desync should be done
+int COMChannel::GetSecTillDesyncDone () const
+{
+    return int(std::chrono::duration_cast<std::chrono::seconds>
+    (desyncDone - std::chrono::steady_clock::now()).count());
+}
+
+
 // compute complete parameter string for VLC
 std::string COMChannel::GetVlcParams()
 {
@@ -281,6 +342,19 @@ std::string COMChannel::GetVlcParams()
     str_replace(params, PARAM_REPL_DESYNC, std::to_string(dataRefs.GetDesyncPeriod()));
     str_replace(params, PARAM_REPL_URL, curr.playUrl);
     return params;
+}
+
+void COMChannel::TurnCurrToPrev()
+{
+    // if there's still a previous stream running kill it
+    if (IsPlaying(true))
+        StopStream(true);
+    
+    // move current pid aside so that current one becomes available
+    vlcPrev = vlcPid;
+    prev = curr;
+    vlcPid = NULL;
+    curr = LiveATCDataTy();
 }
 
 //
@@ -421,8 +495,8 @@ COMChannel::AirportStreamMapTy::iterator COMChannel::FindClosestAirport()
     
     if (closestAirport != mapAirportStream.end())
         LOG_MSG(logDEBUG,DBG_AP_CLOSEST,closestAirport->first.c_str(), closestDist_nm)
-    else
-        LOG_MSG(logDEBUG,DBG_AP_NO_CLOSEST,closestDist_nm)
+//    else
+//        LOG_MSG(logDEBUG,DBG_AP_NO_CLOSEST,closestDist_nm)
 
     return closestAirport;
 }

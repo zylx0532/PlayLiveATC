@@ -81,7 +81,7 @@ public:
 protected:
     XPLMPluginID pluginID       = 0;
     logLevelTy iLogLevel        = logWARN;
-    logLevelTy iMsgAreaLevel    = logWARN;
+    logLevelTy iMsgAreaLevel    = logINFO;
     std::string XPSystemPath;
     std::string PluginPath;                             // path to plugin directory
     std::string DirSeparator;
@@ -150,7 +150,7 @@ public:
 
     // return actual current observation, considering all options above
     bool ConsiderCom(int idx) const;
-    int GetDesyncPeriod () const;
+    long GetDesyncPeriod () const;
     
     // Get XP System Path
     inline std::string GetXPSystemPath() const  { return XPSystemPath; }

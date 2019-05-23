@@ -35,7 +35,7 @@
 //
 
 // DataRefs, Settings, and other global stuff
-DataRefs dataRefs(logWARN);
+DataRefs dataRefs(VERSION_BETA ? logDEBUG : logWARN);
 // Settings Dialog
 LTSettingsUI settingsUI;
 
@@ -187,11 +187,6 @@ bool RegisterCommandHandlers ()
 // callback called every second to identify COM frequency changes
 float SLAFlightLoopCB (float, float, int, void*)
 {
-    static int callCnt = 0;
-    
-    // increase call counter, reset to zero after 20 calls
-    if (++callCnt > 20)
-        callCnt = 0;
     
     // loop over all COM radios we support
     for (COMChannel& chn: gChn) {
@@ -199,12 +194,7 @@ float SLAFlightLoopCB (float, float, int, void*)
         // should we actually _act_ on that COM radio?
         if (dataRefs.ConsiderCom(idx)) {
             // yes, consider this COM radio
-            // get current frequency and check if this is considered a change
-            if (chn.doChange(dataRefs.GetComFreq(idx)))
-                chn.StartStreamAsync();
-            // every 20 calls check for distance to radio station
-            else if (!callCnt)
-                chn.CheckComDistance();
+            chn.RegularMaintenance();
         } else {
             // do _not_ consider this COM
             // stop if it is running
@@ -284,7 +274,7 @@ PLUGIN_API int XPluginStart(
 }
 
 PLUGIN_API void	XPluginStop(void)
-{    
+{
     // Cleanup dataRef registration
     dataRefs.Stop();
     // Save config

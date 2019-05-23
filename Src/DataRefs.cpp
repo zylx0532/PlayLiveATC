@@ -259,7 +259,7 @@ bool DataRefs::ConsiderCom(int idx) const
 
 // return actual current desync period, considering all config settings
 // return milliseconds
-int DataRefs::GetDesyncPeriod () const
+long DataRefs::GetDesyncPeriod () const
 {
     int ret = GetManualDesync();
     if (ShallDesyncWithLTDelay() && IsLTActive())
