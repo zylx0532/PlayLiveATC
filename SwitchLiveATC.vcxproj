@@ -11,13 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\CoordCalc.cpp" />
     <ClCompile Include="Src\DataRefs.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Src\SettingsUI.cpp" />
-    <ClCompile Include="Src\SLAFindLiveATC.cpp" />
-    <ClCompile Include="Src\SLARunVLC.cpp" />
+    <ClCompile Include="Src\SLACOMChannel.cpp" />
     <ClCompile Include="Src\SwitchLiveATC.cpp" />
     <ClCompile Include="Src\TextIO.cpp" />
     <ClCompile Include="Src\TFWidgets.cpp">
@@ -29,10 +29,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Constants.h" />
+    <ClInclude Include="Include\CoordCalc.h" />
     <ClInclude Include="Include\DataRefs.h" />
     <ClInclude Include="Include\SettingsUI.h" />
-    <ClInclude Include="Include\SLAFindLiveATC.h" />
-    <ClInclude Include="Include\SLARunVLC.h" />
+    <ClInclude Include="Include\SLACOMChannel.h" />
     <ClInclude Include="Include\SwitchLiveATC.h" />
     <ClInclude Include="Include\TextIO.h" />
     <ClInclude Include="Include\TFWidgets.h" />
@@ -96,8 +96,8 @@
       <Optimization>MaxSpeed</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>Include;Lib\XPSDK301\CHeaders\Widgets;Lib\XPSDK301\CHeaders\XPLM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;IBM=1;XPLM200=1;XPLM210=1;_CRT_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>Include;Lib\XPSDK301\CHeaders\Widgets;Lib\XPSDK301\CHeaders\XPLM;..\..\LibIncludes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;CURL_STATICLIB;IBM=1;XPLM200=1;XPLM210=1;_CRT_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -125,7 +125,7 @@
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>Lib\XPSDK301\Libraries\Win;..\..\Libs\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>XPLM_64.lib;XPWidgets_64.lib;libcurl.lib;ws2_32.lib;wldap32.lib;advapi32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>XPLM_64.lib;XPWidgets_64.lib;libcurl.lib;ws2_32.lib;wldap32.lib;advapi32.lib;crypt32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(IntDir)$(TargetName).pgd</ProfileGuidedDatabase>
@@ -150,8 +150,8 @@
       <Optimization>Disabled</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>Include;Lib\XPSDK301\CHeaders\Widgets;Lib\XPSDK301\CHeaders\XPLM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;IBM=1;XPLM200=1;XPLM210=1;_CRT_SECURE_NO_WARNINGS;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>Include;Lib\XPSDK301\CHeaders\Widgets;Lib\XPSDK301\CHeaders\XPLM;..\..\LibIncludes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;CURL_STATICLIB;IBM=1;XPLM200=1;XPLM210=1;_CRT_SECURE_NO_WARNINGS;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -181,7 +181,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>Lib\XPSDK301\Libraries\Win;..\..\Libs\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>XPLM_64.lib;XPWidgets_64.lib;libcurl.lib;ws2_32.lib;wldap32.lib;advapi32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>XPLM_64.lib;XPWidgets_64.lib;libcurl.lib;ws2_32.lib;wldap32.lib;advapi32.lib;crypt32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <Profile>true</Profile>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
