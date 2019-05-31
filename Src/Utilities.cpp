@@ -103,6 +103,16 @@ bool existsFile (const std::string& filename) {
     return (stat (filename.c_str(), &buffer) == 0);
 }
 
+// does a path specify a directory
+bool isDirectory (const std::string& path)
+{
+    struct stat buffer;
+    if (stat (path.c_str(), &buffer) != 0)
+        return false;
+    return (buffer.st_mode & S_IFDIR) == S_IFDIR;
+}
+
+
 #if IBM
 // returns text for the given error code, per default taken from GetLastError
 std::string GetErrorStr(DWORD err)
@@ -191,6 +201,99 @@ int str_replace (std::string& s,
 }
 
 //
+// MARK: Networking: Query LiveATC web page
+//
+
+// Disable revocation list? (if we need that once we'll always need it)
+bool bDisableRevocationList = false;
+
+/// @brief This CURL callback used by HttpGet() just collects all data.
+/// @param ptr points to the received network data
+/// @param nmemb Number of bytes received / to be processed
+/// @param userdata Expected to point to a `std::string` to be used as read buffer
+/// @return number of bytes processed, = `nmemb`
+size_t CB_StoreAll(char *ptr, size_t, size_t nmemb, void* userdata)
+{
+    // copy buffer to our readBuf
+    std::string& readBuf = *reinterpret_cast<std::string*>(userdata);
+    readBuf.append(ptr, nmemb);
+    
+    // all consumed
+    return nmemb;
+}
+
+/// Performs HTTP(S) GET on `url`, just dumps the entire response into `response`.
+/// @warning This function blocks! Idea is to call it in a thread like with std::async.
+bool HttpGet (const std::string& url,
+              std::string& response,
+              long* pHttpResponse)
+{
+    char curl_errtxt[CURL_ERROR_SIZE];
+
+    // init responses
+    if (pHttpResponse)
+        *pHttpResponse = 0;
+    response.clear();
+    response.reserve(READ_BUF_INIT_SIZE);
+
+    LOG_MSG(logDEBUG, DBG_QUERY_URL, url.c_str());
+    
+    // initialize the CURL handle
+    CURL *pCurl = curl_easy_init();
+    if (!pCurl) {
+        LOG_MSG(logERR,ERR_CURL_EASY_INIT);
+        return false;
+    }
+    
+    // prepare the handle with the right options
+    curl_easy_setopt(pCurl, CURLOPT_ERRORBUFFER, curl_errtxt);
+    curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, CB_StoreAll);
+    curl_easy_setopt(pCurl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(pCurl, CURLOPT_USERAGENT, HTTP_USER_AGENT);
+    curl_easy_setopt(pCurl, CURLOPT_URL, url.c_str());
+    if (bDisableRevocationList)
+        curl_easy_setopt(pCurl, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NO_REVOKE);
+    
+    // perform the HTTP get request
+    CURLcode cc = CURLE_OK;
+    if ( (cc=curl_easy_perform(pCurl)) != CURLE_OK )
+    {
+        // problem with querying revocation list?
+        if (strstr(curl_errtxt, ERR_CURL_REVOKE_MSG)) {
+            // try not to query revoke list
+            bDisableRevocationList = true;
+            curl_easy_setopt(pCurl, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NO_REVOKE);
+            LOG_MSG(logWARN, ERR_CURL_DISABLE_REV_QU, LIVE_ATC_DOMAIN);
+            // and just give it another try
+            cc = curl_easy_perform(pCurl);
+        }
+        
+        // if (still) error, then log error
+        if (cc != CURLE_OK)
+            SHOW_MSG(logERR, ERR_CURL_REQU_FAILED, url.c_str(), cc, curl_errtxt);
+    }
+    
+    // if CURL was OK also get HTTP response code
+    long httpResponse = 0;
+    if (cc == CURLE_OK) {
+        curl_easy_getinfo(pCurl, CURLINFO_RESPONSE_CODE, &httpResponse);
+        if (pHttpResponse)
+            *pHttpResponse = httpResponse;
+        // not HTTP_OK?
+        if (httpResponse != HTTP_OK) {
+            LOG_MSG(logERR, ERR_CURL_HTTP_RESP, url.c_str(), httpResponse);
+        }
+    }
+    
+    // cleanup CURL handle
+    curl_easy_cleanup(pCurl);
+    pCurl = NULL;
+    
+    // successful?
+    return cc == CURLE_OK && httpResponse == HTTP_OK;
+}
+
+//
 // MARK: Misc
 //
 
@@ -203,3 +306,8 @@ bool dequal ( const double d1, const double d2 )
 }
 
 
+std::string vlcErrMsg ()
+{
+    const char* s = libvlc_errmsg();
+    return s ? s : "";
+}

@@ -203,10 +203,6 @@ public:
     // convert between World and Local OpenGL coordinates
     positionTy& LocalToWorld ();
     positionTy& WorldToLocal ();
-    /* FIXME: Remove
-    // return an on-ground-status guess based on a from-status and a to-status
-    static onGrndE DeriveGrndStatus (onGrndE from, onGrndE to);
-     */
 };
 
 typedef std::deque<positionTy> dequePositionTy;

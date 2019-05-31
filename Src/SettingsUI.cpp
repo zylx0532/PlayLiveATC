@@ -59,19 +59,17 @@ enum UI_WIDGET_IDX_T {
     // "Basics" tab
     UI_BASICS_SUB_WND,
     UI_BASICS_BTN_COM1,
+    UI_BASICS_CAP_COM1_STATUS,
     UI_BASICS_BTN_COM2,
+    UI_BASICS_CAP_COM2_STATUS,
     UI_BASICS_BTN_PLAY_IF_SELECTED,
-    
-    UI_BASICS_CAP_PATH_TO_VLC,
-    UI_BASICS_TXT_PATH_TO_VLC,
-    UI_BASICS_CAP_VALIDATE_PATH,
     
     UI_BASICS_CAP_LIVE_TRAFFIC,
     UI_BASICS_BTN_LT_USE_BUF_PERIOD,
     UI_BASICS_BTN_KEEP_PREV_WHILE_DESYNC,
     UI_BASICS_CAP_DESYNC_ADJUST,
     UI_BASICS_TXT_DESYNC_ADJUST,
-
+    
     UI_BASICS_CAP_VERSION_TXT,
     UI_BASICS_CAP_VERSION,
     UI_BASICS_CAP_BETA_LIMIT,
@@ -90,6 +88,10 @@ enum UI_WIDGET_IDX_T {
     UI_ADVCD_BTN_MSGAREA_WARNING,
     UI_ADVCD_BTN_MSGAREA_INFO,
 
+    UI_ADVCD_CAP_PATH_TO_VLC,
+    UI_ADVCD_TXT_PATH_TO_VLC,
+    UI_ADVCD_CAP_VALIDATE_PATH,
+    
     UI_ADVCD_CAP_VLC_PARAMS,
     UI_ADVCD_TXT_VLC_PARAMS,
     
@@ -113,18 +115,16 @@ TFWidgetCreate_t SETTINGS_UI[] =
     // "Basics" tab
     {  10,  50, -10, -10, 0, "Basics",              0, UI_MAIN_WND, xpWidgetClass_SubWindow, {0,0, 0,0, 0,0} },
     {  10,  10,  10,  10, 1, "Watch COM1 frequency",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
+    { 170,   8,  -5,  10, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
     {  10,  25,  10,  10, 1, "Watch COM2 frequency",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
-    {  10,  45,  10,  10, 1, "Play only if COM radio is selected",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
+    { 170,  23,  -5,  10, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
+    {  10,  50,  10,  10, 1, "Play only if COM radio is selected",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
 
-    {   5,  70,  -5,  10, 1, "Path to VLC executable:",0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
-    {  10,  85,  -5,  15, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_TextField, {0,0, 0,0, 0,0} },
-    {   5, 100,  -5,  10, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
-
-    {   5, 125,  -5,  10, 1, "LiveTraffic integration (%s):",0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
-    {  10, 140,  10,  10, 1, "Delay audio by LiveTraffic's buffering period",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
-    {  10, 155,  10,  10, 1, "Continue previous frequ. while waiting for buffering",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
-    {   5, 170, 195,  10, 1, "Audio delay adjustment",0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
-    { 200, 170,  50,  15, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_TextField, {xpProperty_MaxCharacters,4, 0,0, 0,0} },
+    {   5, 100,  -5,  10, 1, "LiveTraffic integration (%s):",0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
+    {  10, 120,  10,  10, 1, "Delay audio by LiveTraffic's buffering period",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
+    {  10, 135,  10,  10, 1, "Continue previous frequ. while waiting for buffering",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
+    {   5, 150, 195,  10, 1, "Audio delay adjustment:",0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
+    { 200, 150,  50,  15, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_TextField, {xpProperty_MaxCharacters,4, 0,0, 0,0} },
 
     {   5, -15,  -5,  10, 1, "Version",             0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
     {  50, -15, 200,  10, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
@@ -143,11 +143,15 @@ TFWidgetCreate_t SETTINGS_UI[] =
     { 200,  30,  10,  10, 1, "Warning",             0, UI_ADVCD_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorRadioButton, 0,0} },
     { 270,  30,  10,  10, 1, "Info",                0, UI_ADVCD_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorRadioButton, 0,0} },
     
-    {   5,  60,  -5,  10, 1, "VLC Parameters (leave empty to return to defaults):",0, UI_ADVCD_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
+    {   5,  60,  -5,  10, 1, "VLC plugins path:",   0, UI_ADVCD_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
     {  10,  75,  -5,  15, 1, "",                    0, UI_ADVCD_SUB_WND, xpWidgetClass_TextField, {0,0, 0,0, 0,0} },
+    {   5,  90,  -5,  10, 1, "",                    0, UI_ADVCD_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
+    
+    {   5, 110,  -5,  10, 1, "VLC Parameters (leave empty to return to defaults):",0, UI_ADVCD_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
+    {  10, 125,  -5,  15, 1, "",                    0, UI_ADVCD_SUB_WND, xpWidgetClass_TextField, {0,0, 0,0, 0,0} },
 
-    {   5, 105, 195,  10, 1, "Max radio distance [nm]", 0, UI_ADVCD_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
-    { 200, 105,  50,  15, 1, "",                    0, UI_ADVCD_SUB_WND, xpWidgetClass_TextField, {xpProperty_MaxCharacters,3, 0,0, 0,0} },
+    {   5, 155, 195,  10, 1, "Max radio distance: [nm]", 0, UI_ADVCD_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
+    { 200, 155,  50,  15, 1, "",                    0, UI_ADVCD_SUB_WND, xpWidgetClass_TextField, {xpProperty_MaxCharacters,3, 0,0, 0,0} },
 };
 
 constexpr int NUM_WIDGETS = sizeof(SETTINGS_UI)/sizeof(SETTINGS_UI[0]);
@@ -190,9 +194,8 @@ void LTSettingsUI::Enable()
         btnBasicsCom[1].setId(widgetIds[UI_BASICS_BTN_COM2]);
         btnPlayIfSelected.setId(widgetIds[UI_BASICS_BTN_PLAY_IF_SELECTED]);
         btnPlayIfSelected.SetChecked(dataRefs.ShallRespectAudioSelect());
-        txtPathToVLC.setId(widgetIds[UI_BASICS_TXT_PATH_TO_VLC]);
-        txtPathToVLC.SetDescriptor(dataRefs.GetVLCPath());
-        capValidatePath.setId(widgetIds[UI_BASICS_CAP_VALIDATE_PATH]);
+        
+        // LiveTraffic integration / audio desync
         capLTIntegration.setId(widgetIds[UI_BASICS_CAP_LIVE_TRAFFIC]);
         capLTIntegFormatStr = capLTIntegration.GetDescriptor();
         btnLTUseBufPeriod.setId(widgetIds[UI_BASICS_BTN_LT_USE_BUF_PERIOD]);
@@ -202,6 +205,10 @@ void LTSettingsUI::Enable()
         txtDesyncAdjust.setId(widgetIds[UI_BASICS_TXT_DESYNC_ADJUST]);
         txtDesyncAdjust.tfFormat = TFTextFieldWidget::TFF_NEG_DIGITS;
         txtDesyncAdjust.SetDescriptor(dataRefs.GetManualDesync());
+        
+        // COM1/2 status
+        capCOM1Status.setId(widgetIds[UI_BASICS_CAP_COM1_STATUS]);
+        capCOM2Status.setId(widgetIds[UI_BASICS_CAP_COM2_STATUS]);
 
         // version number
         XPSetWidgetDescriptor(widgetIds[UI_BASICS_CAP_VERSION],
@@ -232,6 +239,10 @@ void LTSettingsUI::Enable()
         });
         HookButtonGroup(msgAreaLevelGrp);
         
+        txtPathToVLC.setId(widgetIds[UI_ADVCD_TXT_PATH_TO_VLC]);
+        txtPathToVLC.SetDescriptor(dataRefs.GetVLCPath());
+        capValidatePath.setId(widgetIds[UI_ADVCD_CAP_VALIDATE_PATH]);
+
         txtVLCParams.setId(widgetIds[UI_ADVCD_TXT_VLC_PARAMS]);
         txtVLCParams.SetDescriptor(dataRefs.GetVLCParams());
         txtMaxRadioDist.setId(widgetIds[UI_ADVCD_TXT_MAX_RADIO_DIST]);
@@ -280,13 +291,20 @@ void LTSettingsUI::UpdateValues ()
     char buf[100];
     
     // *** Basics ***
+    
+    // are COMs selected?
     for (int idx = 0; idx < COM_CNT; idx++)
         btnBasicsCom[idx].SetChecked(dataRefs.ShallActOnCom(idx));
     
+    // LiveTraffic's status
     snprintf(buf, sizeof(buf), capLTIntegFormatStr.c_str(),
              dataRefs.GetLTStatusText().c_str());
     capLTIntegration.SetDescriptor(buf);
     
+    // full status of COM1/2 channels
+    capCOM1Status.SetDescriptor(gChn[0].Summary());
+    capCOM2Status.SetDescriptor(gChn[1].Summary());
+
     // *** Advanced ***
     logLevelGrp.SetCheckedIndex(dataRefs.GetLogLevel());
     msgAreaLevelGrp.SetCheckedIndex(dataRefs.GetMsgAreaLevel() - 1);
@@ -296,12 +314,6 @@ void LTSettingsUI::UpdateValues ()
 bool LTSettingsUI::MsgTextFieldChanged (XPWidgetID textWidget, std::string text)
 {
     // *** Basic ***
-    if (txtPathToVLC == textWidget) {
-        ValidateUpdateVLCPath(text);
-        // processed
-        return true;
-    }
-    
     // audio desync adjust
     if (txtDesyncAdjust == textWidget) {
         dataRefs.SetManualDesync(std::stoi(txtDesyncAdjust.GetDescriptor()));
@@ -309,6 +321,12 @@ bool LTSettingsUI::MsgTextFieldChanged (XPWidgetID textWidget, std::string text)
     }
     
     // *** Advanced ***
+    if (txtPathToVLC == textWidget) {
+        ValidateUpdateVLCPath(text);
+        // processed
+        return true;
+    }
+    
     if (txtVLCParams == textWidget) {
         if (text.empty()) {                 // empty input == 'return to default'
             dataRefs.SetVLCParams(CFG_PARAMS_DEFAULT);
@@ -413,16 +431,21 @@ bool LTSettingsUI::TfwMsgMain1sTime ()
 // validate and update VLCPath
 void LTSettingsUI::ValidateUpdateVLCPath (const std::string newPath)
 {
-    // Check if the given path is an existing file
-    // (This is not _exactly_ required...VLC could also be just in the path,
-    //  but it is useful information nonetheless)
+    // isn't this a change?
+    if (dataRefs.GetVLCPath() == newPath)
+        return;
+    
+    // Check if the given path is an existing directory
+    // TODO: Better validation for an actual VLC plugin directory.
     if (newPath.empty())
         capValidatePath.SetDescriptor(MSG_VLC_NO_PATH);
-    else if (existsFile(newPath))
+    else if (isDirectory(newPath))
         capValidatePath.SetDescriptor(MSG_VLC_PATH_VERIFIED);
     else
-        capValidatePath.SetDescriptor(MSG_VLC_PATH_NO_FILE);
+        capValidatePath.SetDescriptor(MSG_VLC_PATH_NO_DIR);
     
-    // no matter what, we safe the result
+    // no matter what, we safe the result and try to re-init VLC
     dataRefs.SetVLCPath(newPath);
+    if (!COMChannel::InitAllVLC())
+        capValidatePath.SetDescriptor(capValidatePath.GetDescriptor() + MSG_VLC_INIT_FAILED);
 }

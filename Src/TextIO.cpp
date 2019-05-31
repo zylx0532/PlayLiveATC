@@ -122,7 +122,7 @@ void    draw_msg(XPLMWindowID in_window_id, void * /*in_refcon*/)
                 snprintf(buf, sizeof(buf), MSG_COM_COUNTDOWN,
                          chn.GetIdx()+1,
                          chn.GetSecTillDesyncDone(),
-                         chn.GetLiveATCData().streamName.c_str());
+                         chn.GetStreamCtrlData().streamName.c_str());
                 // draw text, take color based on msg level
                 XPLMDrawString(COL_LVL[logINFO], l, t,
                                buf,

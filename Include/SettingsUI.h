@@ -28,8 +28,9 @@
 #define SettingsUI_h
 
 #define MSG_VLC_NO_PATH             "No path to validate"
-#define MSG_VLC_PATH_VERIFIED       "Path seems to be valid."
-#define MSG_VLC_PATH_NO_FILE        "Path validation FAILED, not a file. Saved anyway."
+#define MSG_VLC_PATH_VERIFIED       "Path is a valid directory."
+#define MSG_VLC_PATH_NO_DIR         "Path is NOT a directory."
+#define MSG_VLC_INIT_FAILED         " FAILED to initialize VLC!"
 
 //
 // Settings UI Main window
@@ -52,6 +53,8 @@ protected:
     std::string capLTIntegFormatStr;
     TFButtonWidget btnLTUseBufPeriod, btnKeepPrevWhileDesync;
     TFTextFieldWidget txtDesyncAdjust;
+    
+    TFWidget capCOM1Status, capCOM2Status;
 
     // Advanced tab
     TFButtonGroup logLevelGrp;          // radio buttons to select logging level

@@ -198,7 +198,7 @@ float SLAFlightLoopCB (float, float, int, void*)
         } else {
             // do _not_ consider this COM
             // stop if it is running
-            if (chn.IsPlaying())
+            if (chn.IsDefined())
                 chn.ClearChannel();
         }
         
@@ -295,6 +295,9 @@ PLUGIN_API int  XPluginEnable(void)
     SHOW_MSG(logWARN, DBG_DEBUG_BUILD);
 #endif
     
+    // Initialize all VLC instances
+    COMChannel::InitAllVLC();
+    
     // start the actual processing
     XPLMRegisterFlightLoopCallback(SLAOneTimeCB, -1, NULL);
     return 1;
@@ -302,8 +305,8 @@ PLUGIN_API int  XPluginEnable(void)
 
 PLUGIN_API void XPluginDisable(void)
 {
-    // make sure all children are stopped
-    COMChannel::StopAll();
+    // make sure all children are stopped and cleanp up
+    COMChannel::CleanupAllVLC();
     
     // cleanup
     XPLMUnregisterFlightLoopCallback(SLAOneTimeCB, NULL);

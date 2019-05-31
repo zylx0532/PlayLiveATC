@@ -148,9 +148,9 @@ public:
     bool IsLTActive () const;
     int GetLTBufPeriod () const;
 
-    // return actual current observation, considering all options above
+    /// Consider COM `idx`, considering all configured options?
     bool ConsiderCom(int idx) const;
-    long GetDesyncPeriod () const;
+    long GetDesyncPeriod () const;      ///< audio desync time in seconds
     
     // Get XP System Path
     inline std::string GetXPSystemPath() const  { return XPSystemPath; }

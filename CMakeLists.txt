@@ -11,9 +11,11 @@ endif ()
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
+
 # Set include directories used by our code and dependencies.
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/Src")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/Include")
+include_directories("${CMAKE_SOURCE_DIR}/Include")
+include_directories("${CMAKE_SOURCE_DIR}/Lib/vlc/include")
 include_directories("${CMAKE_SOURCE_DIR}/Lib/XPSDK301/CHeaders/Widgets")
 include_directories("${CMAKE_SOURCE_DIR}/Lib/XPSDK301/CHeaders/Wrappers")
 include_directories("${CMAKE_SOURCE_DIR}/Lib/XPSDK301/CHeaders/XPLM")
@@ -127,6 +129,11 @@ endif( ZLIB_FOUND )
 #     target_link_libraries( SwitchLiveATC ${PNG_LIBRARIES} )
 # endif( PNG_FOUND )
 
+find_package(LIBVLC REQUIRED)  # sudo apt-get install libvlc-dev
+if ( LIBVLC_FOUND )
+    include_directories( ${LIBVLC_INCLUDE_DIRS} )
+    target_link_libraries( SwitchLiveATC ${LIBVLC_LIBRARIES} )
+endif( LIBVLC_FOUND )
 
 # ****************************************************
 # This workd correctly with cmake but not with docker

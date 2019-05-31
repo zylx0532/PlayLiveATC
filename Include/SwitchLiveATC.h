@@ -72,7 +72,15 @@
 // #define CURL_STATICLIB if linking with a static CURL lib!
 #include "curl/curl.h"              // for CURL*
 
-// C++
+// VLC
+#if LIN
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#endif
+#include <vlcpp/vlc.hpp>
+#if LIN
+#pragma GCC diagnostic pop
+#endif
 
 // X-Plane SDK
 #include "XPLMDataAccess.h"

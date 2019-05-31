@@ -358,23 +358,7 @@ positionTy& positionTy::WorldToLocal()
     }
     return *this;
 }
-/* FIXME: Remove
-// return an on-ground-status guess based on a from-status and a to-status
-positionTy::onGrndE positionTy::DeriveGrndStatus (positionTy::onGrndE from,
-                                                   positionTy::onGrndE to)
-{
-    static const onGrndE gndMatrix[GND_ON+1][GND_ON+1] = {
-    // from: GND_UNKNOWN, GND_LEAVING, GND_OFF,       GND_APPROACHING, GND_ON              to:
-        { GND_UNKNOWN, GND_UNKNOWN, GND_UNKNOWN,     GND_UNKNOWN,     GND_UNKNOWN },    // GND_UNKNOWN
-        { GND_UNKNOWN, GND_LEAVING, GND_UNKNOWN,     GND_UNKNOWN,     GND_LEAVING },    // GND_LEAVING
-        { GND_UNKNOWN, GND_LEAVING, GND_OFF ,        GND_UNKNOWN,     GND_LEAVING },    // GND_OFF
-        { GND_UNKNOWN, GND_UNKNOWN, GND_APPROACHING, GND_APPROACHING, GND_UNKNOWN },    // GND_APPROACHING
-        { GND_UNKNOWN, GND_UNKNOWN, GND_APPROACHING, GND_APPROACHING, GND_ON      },    // GND_ON
-    };
-    LOG_ASSERT(gndMatrix[to][from] != GND_UNKNOWN);
-    return gndMatrix[to][from];
-}
-*/
+
 //
 //MARK: dequePositionTy
 //

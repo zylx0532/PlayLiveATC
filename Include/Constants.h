@@ -103,13 +103,13 @@ constexpr int SLA_NEW_VER_CHECK_TIME = 48;   // [h] between two checks of a new
 #define CFG_VLC_PARAMS          "VLCParams"
 
 #if IBM                         // Windows default path and parameters
-#define CFG_PATH_DEFAULT        "c:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe"
+#define CFG_PATH_DEFAULT        "c:\\Program Files (x86)\\VideoLAN\\VLC\\plugins"
 #define CFG_PARAMS_DEFAULT      "--qt-start-minimized --audio-desync={desync} {url}"
 #elif LIN                       // Linux default path and parameters
-#define CFG_PATH_DEFAULT        "/usr/bin/vlc"
+#define CFG_PATH_DEFAULT        "/usr/lib/vlc/plugins"
 #define CFG_PARAMS_DEFAULT      "-Idummy --audio-desync={desync} {url}"
 #else                           // Mac OS default path and parameters
-#define CFG_PATH_DEFAULT        "/Applications/VLC.app/Contents/MacOS/VLC"
+#define CFG_PATH_DEFAULT        "/Applications/VLC.app/Contents/MacOS/plugins"
 #define CFG_PARAMS_DEFAULT      "-Idummy --audio-desync={desync} {url}"
 #endif
 

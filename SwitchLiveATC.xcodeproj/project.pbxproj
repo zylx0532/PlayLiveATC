@@ -17,6 +17,8 @@
 		254CCAB322666C2A003878B1 /* SwitchLiveATC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 254CCAB222666C2A003878B1 /* SwitchLiveATC.cpp */; };
 		255F2B88227A1C07003CAE65 /* mac.xpl in CopyFiles */ = {isa = PBXBuildFile; fileRef = D607B19909A556E400699BC3 /* mac.xpl */; };
 		255F2B8B227A1E1A003CAE65 /* SettingsUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */; };
+		256E4CBA229C65EC000A6B3B /* libvlccore.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 256E4CB8229C65EC000A6B3B /* libvlccore.9.dylib */; };
+		256E4CBB229C65EC000A6B3B /* libvlc.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 256E4CB9229C65EC000A6B3B /* libvlc.5.dylib */; };
 		256FBDF92291D996006AEF68 /* CoordCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 256FBDF82291D996006AEF68 /* CoordCalc.cpp */; };
 		25831F2E2258D08B002398D2 /* XPWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25831F2C2258D08B002398D2 /* XPWidgets.framework */; };
 		25831F2F2258D08B002398D2 /* XPLM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25831F2D2258D08B002398D2 /* XPLM.framework */; };
@@ -42,6 +44,69 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2526EAE3229DC99800927D11 /* XPLMPlanes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMPlanes.h; sourceTree = "<group>"; };
+		2526EAE4229DC99800927D11 /* XPLMDataAccess.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMDataAccess.h; sourceTree = "<group>"; };
+		2526EAE5229DC99800927D11 /* XPLMNavigation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMNavigation.h; sourceTree = "<group>"; };
+		2526EAE6229DC99800927D11 /* XPLMGraphics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMGraphics.h; sourceTree = "<group>"; };
+		2526EAE7229DC99800927D11 /* XPLMInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMInstance.h; sourceTree = "<group>"; };
+		2526EAE8229DC99800927D11 /* XPLMPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMPlugin.h; sourceTree = "<group>"; };
+		2526EAE9229DC99800927D11 /* XPLMDisplay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMDisplay.h; sourceTree = "<group>"; };
+		2526EAEA229DC99800927D11 /* XPLMProcessing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMProcessing.h; sourceTree = "<group>"; };
+		2526EAEB229DC99800927D11 /* XPLMUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMUtilities.h; sourceTree = "<group>"; };
+		2526EAEC229DC99800927D11 /* XPLMMenus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMMenus.h; sourceTree = "<group>"; };
+		2526EAED229DC99800927D11 /* XPLMCamera.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMCamera.h; sourceTree = "<group>"; };
+		2526EAEE229DC99800927D11 /* XPLMMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMMap.h; sourceTree = "<group>"; };
+		2526EAEF229DC99800927D11 /* XPLMDefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMDefs.h; sourceTree = "<group>"; };
+		2526EAF0229DC99800927D11 /* XPLMScenery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPLMScenery.h; sourceTree = "<group>"; };
+		2526EAF2229DC99800927D11 /* XPCWidgetAttachments.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCWidgetAttachments.h; sourceTree = "<group>"; };
+		2526EAF3229DC99800927D11 /* XPCDisplay.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XPCDisplay.cpp; sourceTree = "<group>"; };
+		2526EAF4229DC99800927D11 /* XPCWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XPCWidget.cpp; sourceTree = "<group>"; };
+		2526EAF5229DC99800927D11 /* XPCListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCListener.h; sourceTree = "<group>"; };
+		2526EAF6229DC99800927D11 /* XPCWidget.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCWidget.h; sourceTree = "<group>"; };
+		2526EAF7229DC99800927D11 /* XPCListener.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XPCListener.cpp; sourceTree = "<group>"; };
+		2526EAF8229DC99800927D11 /* XPCProcessing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCProcessing.h; sourceTree = "<group>"; };
+		2526EAF9229DC99800927D11 /* XPCWidgetAttachments.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XPCWidgetAttachments.cpp; sourceTree = "<group>"; };
+		2526EAFA229DC99800927D11 /* XPCProcessing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XPCProcessing.cpp; sourceTree = "<group>"; };
+		2526EAFB229DC99800927D11 /* XPCBroadcaster.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XPCBroadcaster.cpp; sourceTree = "<group>"; };
+		2526EAFC229DC99800927D11 /* XPCBroadcaster.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCBroadcaster.h; sourceTree = "<group>"; };
+		2526EAFD229DC99800927D11 /* XPCDisplay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCDisplay.h; sourceTree = "<group>"; };
+		2526EAFF229DC99800927D11 /* XPStandardWidgets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPStandardWidgets.h; sourceTree = "<group>"; };
+		2526EB00229DC99800927D11 /* XPWidgetUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPWidgetUtils.h; sourceTree = "<group>"; };
+		2526EB01229DC99800927D11 /* XPWidgets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPWidgets.h; sourceTree = "<group>"; };
+		2526EB02229DC99800927D11 /* XPUIGraphics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPUIGraphics.h; sourceTree = "<group>"; };
+		2526EB03229DC99800927D11 /* XPWidgetDefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPWidgetDefs.h; sourceTree = "<group>"; };
+		2526EB11229DC99800927D11 /* libvlc_dialog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libvlc_dialog.h; sourceTree = "<group>"; };
+		2526EB12229DC99800927D11 /* libvlc_renderer_discoverer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libvlc_renderer_discoverer.h; sourceTree = "<group>"; };
+		2526EB13229DC99800927D11 /* libvlc_media.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libvlc_media.h; sourceTree = "<group>"; };
+		2526EB14229DC99800927D11 /* libvlc_media_list_player.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libvlc_media_list_player.h; sourceTree = "<group>"; };
+		2526EB15229DC99800927D11 /* libvlc_media_player.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libvlc_media_player.h; sourceTree = "<group>"; };
+		2526EB16229DC99800927D11 /* libvlc_events.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libvlc_events.h; sourceTree = "<group>"; };
+		2526EB17229DC99800927D11 /* vlc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vlc.h; sourceTree = "<group>"; };
+		2526EB18229DC99800927D11 /* libvlc_media_discoverer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libvlc_media_discoverer.h; sourceTree = "<group>"; };
+		2526EB19229DC99800927D11 /* deprecated.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = deprecated.h; sourceTree = "<group>"; };
+		2526EB1A229DC99800927D11 /* libvlc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libvlc.h; sourceTree = "<group>"; };
+		2526EB1B229DC99800927D11 /* libvlc_media_list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libvlc_media_list.h; sourceTree = "<group>"; };
+		2526EB1C229DC99800927D11 /* libvlc_version.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libvlc_version.h; sourceTree = "<group>"; };
+		2526EB1D229DC99800927D11 /* libvlc_vlm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libvlc_vlm.h; sourceTree = "<group>"; };
+		2526EB1E229DC99800927D11 /* libvlc_media_library.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libvlc_media_library.h; sourceTree = "<group>"; };
+		2526EB20229DC99800927D11 /* Instance.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Instance.hpp; sourceTree = "<group>"; };
+		2526EB21229DC99800927D11 /* MediaList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MediaList.hpp; sourceTree = "<group>"; };
+		2526EB22229DC99800927D11 /* AUTHORS */ = {isa = PBXFileReference; lastKnownFileType = text; path = AUTHORS; sourceTree = "<group>"; };
+		2526EB23229DC99800927D11 /* vlc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = vlc.hpp; sourceTree = "<group>"; };
+		2526EB24229DC99800927D11 /* Internal.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Internal.hpp; sourceTree = "<group>"; };
+		2526EB25229DC99800927D11 /* MediaLibrary.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MediaLibrary.hpp; sourceTree = "<group>"; };
+		2526EB26229DC99800927D11 /* structures.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = structures.hpp; sourceTree = "<group>"; };
+		2526EB27229DC99800927D11 /* Dialog.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Dialog.hpp; sourceTree = "<group>"; };
+		2526EB28229DC99800927D11 /* COPYING */ = {isa = PBXFileReference; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
+		2526EB29229DC99800927D11 /* EventManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = EventManager.hpp; sourceTree = "<group>"; };
+		2526EB2A229DC99800927D11 /* RendererDiscoverer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RendererDiscoverer.hpp; sourceTree = "<group>"; };
+		2526EB2B229DC99800927D11 /* MediaDiscoverer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MediaDiscoverer.hpp; sourceTree = "<group>"; };
+		2526EB2C229DC99800927D11 /* Media.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Media.hpp; sourceTree = "<group>"; };
+		2526EB2D229DC99800927D11 /* MediaListPlayer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MediaListPlayer.hpp; sourceTree = "<group>"; };
+		2526EB2E229DC99800927D11 /* common.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = common.hpp; sourceTree = "<group>"; };
+		2526EB2F229DC99800927D11 /* Equalizer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Equalizer.hpp; sourceTree = "<group>"; };
+		2526EB30229DC99800927D11 /* MediaPlayer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MediaPlayer.hpp; sourceTree = "<group>"; };
+		2526EB31229DC99800927D11 /* Picture.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Picture.hpp; sourceTree = "<group>"; };
 		253FEF42228B616400A59BB9 /* VLC_command_line_options.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = VLC_command_line_options.txt; path = Doc/VLC_command_line_options.txt; sourceTree = "<group>"; };
 		253FEF43228DF21A00A59BB9 /* libcurl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libcurl.framework; path = "../../Frameworks-release/libcurl.framework"; sourceTree = "<group>"; };
 		253FEF45228DF35200A59BB9 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -50,8 +115,12 @@
 		253FEF4B228DF3B800A59BB9 /* libz.1.2.11.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.2.11.tbd; path = usr/lib/libz.1.2.11.tbd; sourceTree = SDKROOT; };
 		253FEF4D228F38CC00A59BB9 /* liveatc_search.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = liveatc_search.html; path = Doc/liveatc_search.html; sourceTree = "<group>"; };
 		254CCAB222666C2A003878B1 /* SwitchLiveATC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SwitchLiveATC.cpp; sourceTree = "<group>"; };
+		255751EB229DC28800D2F054 /* PlayLiveATC.doxygen */ = {isa = PBXFileReference; lastKnownFileType = text; path = PlayLiveATC.doxygen; sourceTree = "<group>"; };
+		255751EC229DC29A00D2F054 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = index.html; path = "build-doxy/html/index.html"; sourceTree = "<group>"; };
 		255F2B89227A1E12003CAE65 /* SettingsUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsUI.h; sourceTree = "<group>"; };
 		255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SettingsUI.cpp; sourceTree = "<group>"; };
+		256E4CB8229C65EC000A6B3B /* libvlccore.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libvlccore.9.dylib; path = Lib/vlc/lib/libvlccore.9.dylib; sourceTree = "<group>"; };
+		256E4CB9229C65EC000A6B3B /* libvlc.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libvlc.5.dylib; path = Lib/vlc/lib/libvlc.5.dylib; sourceTree = "<group>"; };
 		256FBDF72291D958006AEF68 /* CoordCalc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoordCalc.h; sourceTree = "<group>"; };
 		256FBDF82291D996006AEF68 /* CoordCalc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CoordCalc.cpp; sourceTree = "<group>"; };
 		25831F2C2258D08B002398D2 /* XPWidgets.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPWidgets.framework; path = Lib/XPSDK301/Libraries/Mac/XPWidgets.framework; sourceTree = "<group>"; };
@@ -72,6 +141,7 @@
 		25D6C0C72277965D0080E8B3 /* DataRefs.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DataRefs.cpp; sourceTree = "<group>"; };
 		25D6C0C9227796E10080E8B3 /* DataRefs.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = DataRefs.txt; path = "../../../Applications/X-Plane 10/Resources/plugins/DataRefs.txt"; sourceTree = "<group>"; };
 		25D6C0CA22779CC30080E8B3 /* Version.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Version.cpp; sourceTree = "<group>"; };
+		25E3C01E22A1B7F40052E645 /* FindLIBVLC.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; name = FindLIBVLC.cmake; path = CMake/FindLIBVLC.cmake; sourceTree = "<group>"; };
 		D607B19909A556E400699BC3 /* mac.xpl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = mac.xpl; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6A7BDA916A1DEA200D1426A /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		D6A7BDC016A1DEC000D1426A /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
@@ -91,12 +161,156 @@
 				D6A7BDAA16A1DEA200D1426A /* OpenGL.framework in Frameworks */,
 				25831F2F2258D08B002398D2 /* XPLM.framework in Frameworks */,
 				25831F2E2258D08B002398D2 /* XPWidgets.framework in Frameworks */,
+				256E4CBA229C65EC000A6B3B /* libvlccore.9.dylib in Frameworks */,
+				256E4CBB229C65EC000A6B3B /* libvlc.5.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2526EADF229DC99800927D11 /* Lib */ = {
+			isa = PBXGroup;
+			children = (
+				2526EAE0229DC99800927D11 /* XPSDK301 */,
+				2526EB0D229DC99800927D11 /* vlc */,
+			);
+			path = Lib;
+			sourceTree = "<group>";
+		};
+		2526EAE0229DC99800927D11 /* XPSDK301 */ = {
+			isa = PBXGroup;
+			children = (
+				2526EAE1229DC99800927D11 /* CHeaders */,
+			);
+			path = XPSDK301;
+			sourceTree = "<group>";
+		};
+		2526EAE1229DC99800927D11 /* CHeaders */ = {
+			isa = PBXGroup;
+			children = (
+				2526EAE2229DC99800927D11 /* XPLM */,
+				2526EAF1229DC99800927D11 /* Wrappers */,
+				2526EAFE229DC99800927D11 /* Widgets */,
+			);
+			path = CHeaders;
+			sourceTree = "<group>";
+		};
+		2526EAE2229DC99800927D11 /* XPLM */ = {
+			isa = PBXGroup;
+			children = (
+				2526EAE3229DC99800927D11 /* XPLMPlanes.h */,
+				2526EAE4229DC99800927D11 /* XPLMDataAccess.h */,
+				2526EAE5229DC99800927D11 /* XPLMNavigation.h */,
+				2526EAE6229DC99800927D11 /* XPLMGraphics.h */,
+				2526EAE7229DC99800927D11 /* XPLMInstance.h */,
+				2526EAE8229DC99800927D11 /* XPLMPlugin.h */,
+				2526EAE9229DC99800927D11 /* XPLMDisplay.h */,
+				2526EAEA229DC99800927D11 /* XPLMProcessing.h */,
+				2526EAEB229DC99800927D11 /* XPLMUtilities.h */,
+				2526EAEC229DC99800927D11 /* XPLMMenus.h */,
+				2526EAED229DC99800927D11 /* XPLMCamera.h */,
+				2526EAEE229DC99800927D11 /* XPLMMap.h */,
+				2526EAEF229DC99800927D11 /* XPLMDefs.h */,
+				2526EAF0229DC99800927D11 /* XPLMScenery.h */,
+			);
+			path = XPLM;
+			sourceTree = "<group>";
+		};
+		2526EAF1229DC99800927D11 /* Wrappers */ = {
+			isa = PBXGroup;
+			children = (
+				2526EAF2229DC99800927D11 /* XPCWidgetAttachments.h */,
+				2526EAF3229DC99800927D11 /* XPCDisplay.cpp */,
+				2526EAF4229DC99800927D11 /* XPCWidget.cpp */,
+				2526EAF5229DC99800927D11 /* XPCListener.h */,
+				2526EAF6229DC99800927D11 /* XPCWidget.h */,
+				2526EAF7229DC99800927D11 /* XPCListener.cpp */,
+				2526EAF8229DC99800927D11 /* XPCProcessing.h */,
+				2526EAF9229DC99800927D11 /* XPCWidgetAttachments.cpp */,
+				2526EAFA229DC99800927D11 /* XPCProcessing.cpp */,
+				2526EAFB229DC99800927D11 /* XPCBroadcaster.cpp */,
+				2526EAFC229DC99800927D11 /* XPCBroadcaster.h */,
+				2526EAFD229DC99800927D11 /* XPCDisplay.h */,
+			);
+			path = Wrappers;
+			sourceTree = "<group>";
+		};
+		2526EAFE229DC99800927D11 /* Widgets */ = {
+			isa = PBXGroup;
+			children = (
+				2526EAFF229DC99800927D11 /* XPStandardWidgets.h */,
+				2526EB00229DC99800927D11 /* XPWidgetUtils.h */,
+				2526EB01229DC99800927D11 /* XPWidgets.h */,
+				2526EB02229DC99800927D11 /* XPUIGraphics.h */,
+				2526EB03229DC99800927D11 /* XPWidgetDefs.h */,
+			);
+			path = Widgets;
+			sourceTree = "<group>";
+		};
+		2526EB0D229DC99800927D11 /* vlc */ = {
+			isa = PBXGroup;
+			children = (
+				2526EB0F229DC99800927D11 /* include */,
+			);
+			path = vlc;
+			sourceTree = "<group>";
+		};
+		2526EB0F229DC99800927D11 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				2526EB10229DC99800927D11 /* vlc */,
+				2526EB1F229DC99800927D11 /* vlcpp */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		2526EB10229DC99800927D11 /* vlc */ = {
+			isa = PBXGroup;
+			children = (
+				2526EB19229DC99800927D11 /* deprecated.h */,
+				2526EB11229DC99800927D11 /* libvlc_dialog.h */,
+				2526EB16229DC99800927D11 /* libvlc_events.h */,
+				2526EB18229DC99800927D11 /* libvlc_media_discoverer.h */,
+				2526EB1E229DC99800927D11 /* libvlc_media_library.h */,
+				2526EB14229DC99800927D11 /* libvlc_media_list_player.h */,
+				2526EB1B229DC99800927D11 /* libvlc_media_list.h */,
+				2526EB15229DC99800927D11 /* libvlc_media_player.h */,
+				2526EB13229DC99800927D11 /* libvlc_media.h */,
+				2526EB12229DC99800927D11 /* libvlc_renderer_discoverer.h */,
+				2526EB1C229DC99800927D11 /* libvlc_version.h */,
+				2526EB1D229DC99800927D11 /* libvlc_vlm.h */,
+				2526EB1A229DC99800927D11 /* libvlc.h */,
+				2526EB17229DC99800927D11 /* vlc.h */,
+			);
+			path = vlc;
+			sourceTree = "<group>";
+		};
+		2526EB1F229DC99800927D11 /* vlcpp */ = {
+			isa = PBXGroup;
+			children = (
+				2526EB22229DC99800927D11 /* AUTHORS */,
+				2526EB2E229DC99800927D11 /* common.hpp */,
+				2526EB28229DC99800927D11 /* COPYING */,
+				2526EB27229DC99800927D11 /* Dialog.hpp */,
+				2526EB2F229DC99800927D11 /* Equalizer.hpp */,
+				2526EB29229DC99800927D11 /* EventManager.hpp */,
+				2526EB20229DC99800927D11 /* Instance.hpp */,
+				2526EB24229DC99800927D11 /* Internal.hpp */,
+				2526EB2C229DC99800927D11 /* Media.hpp */,
+				2526EB2B229DC99800927D11 /* MediaDiscoverer.hpp */,
+				2526EB25229DC99800927D11 /* MediaLibrary.hpp */,
+				2526EB21229DC99800927D11 /* MediaList.hpp */,
+				2526EB2D229DC99800927D11 /* MediaListPlayer.hpp */,
+				2526EB30229DC99800927D11 /* MediaPlayer.hpp */,
+				2526EB31229DC99800927D11 /* Picture.hpp */,
+				2526EB2A229DC99800927D11 /* RendererDiscoverer.hpp */,
+				2526EB26229DC99800927D11 /* structures.hpp */,
+				2526EB23229DC99800927D11 /* vlc.hpp */,
+			);
+			path = vlcpp;
+			sourceTree = "<group>";
+		};
 		25D6C0B9227791EC0080E8B3 /* Src */ = {
 			isa = PBXGroup;
 			children = (
@@ -132,6 +346,9 @@
 		25D6C0C8227796BC0080E8B3 /* Links */ = {
 			isa = PBXGroup;
 			children = (
+				25E3C01E22A1B7F40052E645 /* FindLIBVLC.cmake */,
+				255751EC229DC29A00D2F054 /* index.html */,
+				255751EB229DC28800D2F054 /* PlayLiveATC.doxygen */,
 				253FEF4D228F38CC00A59BB9 /* liveatc_search.html */,
 				253FEF42228B616400A59BB9 /* VLC_command_line_options.txt */,
 				25D6C0C9227796E10080E8B3 /* DataRefs.txt */,
@@ -142,6 +359,7 @@
 		D607B15F09A5563000699BC3 = {
 			isa = PBXGroup;
 			children = (
+				2526EADF229DC99800927D11 /* Lib */,
 				25C0C9A02288326100427E72 /* CMakeLists.txt */,
 				25C0C99F2288326100427E72 /* README.md */,
 				25D6C0C8227796BC0080E8B3 /* Links */,
@@ -163,6 +381,8 @@
 		D6A7BDAD16A1DEA700D1426A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				256E4CB9229C65EC000A6B3B /* libvlc.5.dylib */,
+				256E4CB8229C65EC000A6B3B /* libvlccore.9.dylib */,
 				253FEF4B228DF3B800A59BB9 /* libz.1.2.11.tbd */,
 				253FEF47228DF36B00A59BB9 /* GSS.framework */,
 				253FEF48228DF36C00A59BB9 /* libgssapi_krb5.tbd */,
@@ -302,11 +522,13 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					Include,
+					Lib/vlc/include,
 					"$(XPSDK_ROOT)/CHeaders/Widgets",
 					"$(XPSDK_ROOT)/CHeaders/XPLM",
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				INSTALL_PATH = 64;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path /Applications/VLC.app/Contents/MacOS/lib";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
@@ -388,11 +610,13 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					Include,
+					Lib/vlc/include,
 					"$(XPSDK_ROOT)/CHeaders/Widgets",
 					"$(XPSDK_ROOT)/CHeaders/XPLM",
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				INSTALL_PATH = 64;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path /Applications/VLC.app/Contents/MacOS/lib";
 				LLVM_LTO = YES;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
@@ -426,6 +650,10 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Lib/XPSDK301/Libraries/Mac",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Lib/vlc/lib",
+				);
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
@@ -438,6 +666,10 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Lib/XPSDK301/Libraries/Mac",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Lib/vlc/lib",
 				);
 				VALID_ARCHS = x86_64;
 			};

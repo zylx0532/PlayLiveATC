@@ -257,14 +257,13 @@ bool DataRefs::ConsiderCom(int idx) const
     (!ShallRespectAudioSelect() || IsComSel(idx));
 }
 
-// return actual current desync period, considering all config settings
-// return milliseconds
+/// @return actual current audio desync period in seconds, >= 0
 long DataRefs::GetDesyncPeriod () const
 {
     int ret = GetManualDesync();
     if (ShallDesyncWithLTDelay() && IsLTActive())
         ret += GetLTBufPeriod();
-    return ret > 0 ? ret * 1000 : 0;
+    return ret > 0 ? ret : 0;
 }
 
 

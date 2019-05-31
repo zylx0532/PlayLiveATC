@@ -3,10 +3,13 @@ FROM ubuntu:18.04
 RUN sed -i -e 's/http:\/\/archive.ubuntu.com\/ubuntu\//mirror:\/\/mirrors.ubuntu.com\/mirrors.txt/' /etc/apt/sources.list && apt-get update
 
 # Install Linux toolchain (GCC).
-RUN apt-get install -y --no-install-recommends build-essential ninja-build sudo bash coreutils ca-certificates curl libcurl4-openssl-dev zlib1g-dev libpng-dev\
+RUN apt-get install -y --no-install-recommends build-essential ninja-build sudo bash coreutils ca-certificates curl libcurl4-openssl-dev zlib1g-dev libvlc-dev libpng-dev\
   && apt-get clean \
   && curl -sSL https://cmake.org/files/v3.12/cmake-3.12.3-Linux-x86_64.tar.gz \
      | tar -xz -C /usr/local/ --strip-components=1
+
+# Add missing link for libvlccore
+RUN ln -s /usr/lib/x86_64-linux-gnu/libvlccore.so.9.0.0 /usr/lib/x86_64-linux-gnu/libvlccore.so
 
 # Install Windows cross-compiling toolchain (MinGW).
 # RUN apt-get install -y --no-install-recommends mingw-w64 g++-mingw-w64 && apt-get clean

@@ -33,9 +33,12 @@
 #define LIVE_ATC_DOMAIN     "www.liveatc.net"
 #define LIVE_ATC_BASE       "https://" LIVE_ATC_DOMAIN
 #define LIVE_ATC_URL        LIVE_ATC_BASE "/search/f.php?freq=%s"
+#define LIVE_ATC_PLS        ".pls"
+
+#define ENV_VLC_PLUGIN_PATH "VLC_PLUGIN_PATH"
 
 #define MSG_COM_IS_NOW      "COM%d is now %s, tuning to '%s'"
-#define MSG_COM_IS_NOW_IN   "COM%d is now %s, tuning to '%s' with %ds delay"
+#define MSG_COM_IS_NOW_IN   "COM%d is now %s, tuning to '%s' with %lds delay"
 #define MSG_COM_COUNTDOWN   "COM%d: %ds till '%s' starts"
 #define MSG_AP_OUT_OF_REACH "'%s' now out of reach"
 #define DBG_QUERY_URL       "Sending query %s"
@@ -46,121 +49,212 @@
 #define DBG_AP_NOT_FOUND    "Could not find airport %s in X-Plane's nav database"
 #define DBG_AP_CLOSEST      "Closest airport is %s (%.1fnm)"
 #define DBG_AP_NO_CLOSEST   "No airport found within %.1fnm"
-#define DBG_RUN_CMD         "Will run: %s %s"
-#define DBG_FORK_PID        "pid is %d for url '%s'"
-#define DBG_KILL_PID        "killing pid %d for url %s"
+#define DBG_STREAM_STOP     "Stopping playback of '%s' (%s)"
 
-// 100 KB of storage initially
+/// 100 KB of network response storage initially
 constexpr std::string::size_type READ_BUF_INIT_SIZE = 100 * 1024;
-constexpr long ADD_COUNTDOWN_DELAY_MS = 500;
-#define ERR_CURL_INIT           "Could not initialize CURL: %s"
-#define ERR_CURL_EASY_INIT      "Could not initialize easy CURL"
-#define ERR_CURL_NO_LIVEATC     "Could not query LiveATC.net for version info: %d - %s"
-#define ERR_CURL_HTTP_RESP      "%s: HTTP response is not OK but %ld"
-#define ERR_CURL_REVOKE_MSG     "revocation"                // appears in error text if querying revocation list fails
-#define ERR_CURL_DISABLE_REV_QU "%s: Querying revocation list failed - have set CURLSSLOPT_NO_REVOKE and am trying again"
+constexpr long ADD_COUNTDOWN_DELAY_S = 1;   ///< [s] countdown delay (for query, buffering...)
 
-#define ERR_SHELL_FAILED    "ShellExecute failed with %lu - %s"
-#define ERR_FORK_FAILED     "Fork failed with %d - %s"
-#define ERR_EXEC_VLC        "Could not run: %s %s"
-#define ERR_ERRNO           "%d - %s"
-#define ERR_SIGNAL          "Signal %d"
+#define ERR_VLC_INIT        "Could not init VLC: %s"
+#define ERR_GET_LIVE_ATC    "Could not "
+#define ERR_VLC_PLAY        "Could not play '%s': %s"
 
-//
-// MARK: Class representing one COM channel, which can run a VLC stream
-//
+/// status of a stream
+enum StreamStatusTy {
+    STREAM_NOT_INIT = 0,            ///< startup status: not initialized
+    STREAM_NO_FREQU,                ///< no frequency set, not active
+    STREAM_NOT_PLAYING,             ///< frequency defined, but no stream playing
+    STREAM_SEARCHING,               ///< frequency defined, searching for matching stream
+    STREAM_BUFFERING,               ///< VLC started with stream, not yet emmitting sound
+    STREAM_PLAYING,                 ///< VLC playing a LiveATC stream
+};
 
-class COMChannel {
-protected:
-    int idx = -1;               // COM idx, starting from 0
-    // X-Plane data
-    int frequ = 0;              // currently tuned frequncy [Hz as returned by XP]
-    std::string frequString;    // frequncy as string in format ###.###
+/// @brief Stream's status as text
+/// @param s The status, which is to be converted to text.
+std::string GetStatusStr (StreamStatusTy s);
+
+/// Data returned by LiveATC
+struct LiveATCDataTy {
     // LiveATC data
-    struct LiveATCDataTy {
-        std::string airportIcao;    // airport of that URL, like "KSFO"
-        std::string streamName;     // like "Tower"
-        std::string playUrl;        // URL to play according to LiveATC
-        int nFacilities = 0;        // number of facilities table rows
-        std::string dbgOut () const { return airportIcao+'|'+streamName+'|'+std::to_string(nFacilities)+'|'+playUrl; }
-    };
-    LiveATCDataTy curr, prev;   // current in use / previous
-    positionTy currPos;         // position of current in-use airport
+    std::string airportIcao;    ///< Airport of that URL, like "KSFO"
+    positionTy  airportPos;     ///< Position of the airport for distance calculations
+    std::string streamName;     ///< Stream name, like "Tower"
+    std::string playUrl;        ///< URL to play according to LiveATC
+    int nFacilities = 0;        ///< Number of facilities table rows (the lower the better!)
+    
+    /// Copy from another object
+    void CopyFrom (const LiveATCDataTy& o) { *this = o; }
+
+    /// Textual summary (Icao if needed + stream name)
+    inline std::string Summary () const
+    { return startsWith(streamName, airportIcao) ? streamName : airportIcao+'|'+streamName; }
+    /// Textual debug output, e.g. for log file
+    inline std::string dbgStatus () const
+    { return Summary()+'|'+std::to_string(nFacilities)+'|'+playUrl; }
+};
+
+/// Map of data returned by LiveATC, key is airport ICAO
+typedef std::map<std::string,LiveATCDataTy> LiveATCDataMapTy;
+
+
+/// Adds frequency and VLC data
+struct StreamCtrlTy : public LiveATCDataTy {
+    // XP data
+    int frequ = 0;              ///< currently tuned frequency in Hz as returned by XP
+    std::string frequString;    ///< frequncy in kHz as string in format ###.###
+
+    // VLC control
+    std::unique_ptr<VLC::Instance>      pInst;  ///< VLC instance
+    std::unique_ptr<VLC::MediaPlayer>   pMP;    ///< VLC media player
+    std::unique_ptr<VLC::Media>         pMedia; ///< VLC media to be played, changes with new LiveATC streams
+    
+    /// Is VLC properly initialized?
+    inline bool IsValid() const { return pInst && pMP; }
+    /// stream's status
+    StreamStatusTy GetStatus() const;
+    /// Is COM channel defined, i.e. at least a frequency set?
+    bool IsDefined () const { return GetStatus() >= STREAM_NOT_PLAYING; }
+
+    /// Stops playback and clears all data
+    void StopAndClear ();
+    
+    /// Textual summary (stream and status)
+    inline std::string Summary () const
+    { return LiveATCDataTy::Summary() + " (" + GetStatusStr(GetStatus()) + ")"; }
+    /// Textual debug output, e.g. for log file
+    inline std::string dbgStatus () const
+    { return LiveATCDataTy::dbgStatus() + '|' + GetStatusStr(GetStatus()); }
+};
+
+/// Represents one COM channel, its frequency and playback streams.
+class COMChannel
+{
+protected:
+    int idx = -1;               ///< COM idx, starting from 0
+    
+    /// Two sets of data, one in use, one being phased out
+    StreamCtrlTy dataA, dataB;
+    /// Pointers indicating which of the two sets is active, which one is being phased out
+    StreamCtrlTy *curr = &dataA, *prev = &dataB;
+    /// Indicates if a stream is starting up right now
     std::atomic_flag flagStartingStream = ATOMIC_FLAG_INIT;
     
-    // VLC data
 protected:
-    // the actual process running VLC, needed to stop it:
-#if IBM
-    HANDLE vlcPid  = NULL;
-    HANDLE vlcPrev = NULL;      // previous VLC process during desync period
-#else
-    int vlcPid  = 0;
-    int vlcPrev = 0;            // previous VLC process during desync period
-#endif
+    /// Network read buffer for LiveATC response
+    std::string readBuf;
+    /// Stored future when using std::async, typically not used later on
     std::future<void> futVlcStart;
+    /// make StartStream() stop early
+    volatile bool bAbortStart = false;
+    /// Time point when audio desync should be finished (fair guess)
     std::chrono::time_point<std::chrono::steady_clock> desyncDone;
     
 public:
-    COMChannel(int i) : idx(i) {}
-    inline int GetIdx() const { return idx; }
-    // stop VLC, reset frequency
-    void ClearChannel();
+
+    /// @brief Constructor does not init VLC
+    /// @param i 0-based COM index, usually 0 or 1
+    COMChannel(int i);
+    
+    /// Destructor calls CleanupVLC()
+    ~COMChannel();
+    
+    /// Initialize the VLC smart pointers, can fail if wrong directory configured
+    bool InitVLC();
+    
+    /// Cleans up the VLC smart pointers in a proper order
+    void CleanupVLC();
+    
+    /// Is VLC properly initialized?
+    bool IsValid() const;
+    
+    /// COM index, typically just 0 or 1
+    inline int GetIdx() const { return idx; };
 
     // X-Plane data
-    inline int GetFrequ() const                   { return frequ; }
-    inline std::string GetFrequString() const     { return frequString; }
     
-    // if _new differs from frequ
-    // THEN we consider it a change to a new frequency
-    bool doChange(int _new);
+    /// Current Frequency in Hz as returned by XP
+    inline int GetFrequ() const                     { return curr->frequ; }
+    /// Current Frequency in kHz as formatted string with 3 digits */
+    inline std::string GetFrequString() const       { return curr->frequString; }
+    /// Current LiveATC data
+    const StreamCtrlTy& GetStreamCtrlData() const     { return *curr; }
+    
 
-    // LiveATC data
-    const LiveATCDataTy& GetLiveATCData() const { return curr; }
-
-    // VLC control
-    // asynchronous/non-blocking cllas, which encapsulate blocking calls in threads
-    void StartStreamAsync ();
-    void StopStreamAsync (bool bPrev);
-    // called every second: start new streams, stop out of reach ones...
+    /// Called every second: start new streams, stop out of reach ones...
     void RegularMaintenance ();
 
-    // blocking calls, called by above asynch threads
-    void StartStream ();
-    void StopStream (bool bPrev);
-    // stop still running VLC instances
-    static void StopAll();
-
+    /// Stop all playback, reset frequency and other data.
+    void ClearChannel();
+    
     // VLC status
-    inline bool IsPlaying (bool bPrev) const { return bPrev ? vlcPrev > 0 : vlcPid > 0; }
-    inline bool IsPlaying () const { return vlcPid > 0 || vlcPrev > 0; }
+    
+    /// COM channel's status, mostly depends on `curr->GetStatus()` but takes StartStream() into consideration
+    StreamStatusTy GetStatus() const;
+    /// Is COM channel defined / has frequency?
+    inline bool IsDefined() const { return GetStatus() >= STREAM_NOT_PLAYING; }
+
+    /// Seconds till audio desync is done
     int GetSecTillDesyncDone () const;
-    inline bool IsDesyncing() const { return vlcPid > 0 && GetSecTillDesyncDone() > 0; }
+    /// Is audio desync still under way?
+    inline bool IsDesyncing() const  { return GetSecTillDesyncDone() > 0; }
+    /// Is audio desync done?
     inline bool IsDesyncDone() const { return GetSecTillDesyncDone() <= 0; }
+    
+    /// @brief Textual status summary for end user
+    /// @param bFull Report both `curr` and `prev`? Default: just `curr`
+    std::string Summary (bool bFull = false) const;
+    /// @brief Textual status summary for debug purposes
+    /// @param bFull Report both `curr` and `prev`? Default: just `curr`
+    std::string dbgStatus (bool bFull = false) const;
+
+public:
+    // Static functions to act on *all* COM channel objects
+    
+    /// Initialize *all* VLC instances
+    static bool InitAllVLC();
+    
+    /// Stop *all* still running VLC playbacks of *all* COM channels
+    static void StopAll();
+    
+    /// Cleanup *all* VLC instances, also stops all playback
+    static void CleanupAllVLC();
+    
+protected:
+    /// @brief Checks for and performs change in frequency
+    /// @param _new New frequency in Hz as returned by XP.
+    bool doChange(int _new);
+
+    // VLC control
+    
+    /// Start the `curr` stream asynchronously by calling StartStream() via `std::async`
+    void StartStreamAsync ();
+    /// Blocking call to start the `curr` stream
+    void StartStream ();
+    /// @brief Stop `curr` or `prev` stream immediately
+    /// @param bPrev Stop `prev`? (Otherwise stop `curr`)
+    void StopStream (bool bPrev);
+    
+    /// Checks if an async StartStream() operation is in progress
+    bool IsAsyncRunning () const;
+    /// Aborts StartStream()) and waits for it to complete
+    void AbortAndWaitForAsync ();
 
     // compute complete parameter string for VLC
     std::string GetVlcParams();
     
     // *** Determination of stream URL to play ***
-protected:
-    // turn current stream to previous
+    /// Turn `curr` stream into `prev`
     void TurnCurrToPrev ();
-    // query LiveATC, parse result...come up with stream url to play
+    /// Query LiveATC, parse result, update `curr` with found stream if any
     bool FetchUrlForFrequ ();
     
-    // maps airport ICAO to (best) stream url for current frequency
-    typedef std::map<std::string,LiveATCDataTy> AirportStreamMapTy;
-    AirportStreamMapTy mapAirportStream;
+    /// maps airport ICAO to (best) stream url for current frequency
+    LiveATCDataMapTy mapAirportStream;
+    /// Parses `readBuf` for airports and relevant streams
     void ParseForAirportStreams ();
-    
-    // find closest airport in mapAirportStream
-    AirportStreamMapTy::iterator FindClosestAirport();
-    
-    // communication with LiveATC.net
-    std::string readBuf;
-    static bool bDisableRevocationList;
-    bool QueryLiveATC ();
-    static size_t CB_StoreAll (char *ptr, size_t, size_t nmemb, void* userdata);
+    /// @brief Find closest airport in `mapAirportStream`
+    /// @return Iterator pointing to airportStream data with updated airportPos
+    LiveATCDataMapTy::iterator FindClosestAirport();
 };
 
 //
