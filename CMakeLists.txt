@@ -1,8 +1,8 @@
-# SwitchLiveATC build script.
+# PlayLiveATC build script.
 #
 
 cmake_minimum_required(VERSION 3.9)
-project(SwitchLiveATC VERSION 0.01 DESCRIPTION "SwitchLiveATC X-Plane plugin")
+project(PlayLiveATC VERSION 0.01 DESCRIPTION "PlayLiveATC X-Plane plugin")
 
 # By default, use optimized release configuration.
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
@@ -64,8 +64,8 @@ set(Header_Files
     Include/CoordCalc.h
     Include/DataRefs.h
     Include/SettingsUI.h
-    Include/SLACOMChannel.h
-    Include/SwitchLiveATC.h
+    Include/PLACOMChannel.h
+    Include/PlayLiveATC.h
     Include/TextIO.h
     Include/TFWidgets.h
     Include/Utilities.h
@@ -76,8 +76,8 @@ set(Source_Files
     Src/CoordCalc.cpp
     Src/DataRefs.cpp
     Src/SettingsUI.cpp
-    Src/SLACOMChannel.cpp
-    Src/SwitchLiveATC.cpp
+    Src/PLACOMChannel.cpp
+    Src/PlayLiveATC.cpp
     Src/TextIO.cpp
     Src/TFWidgets.cpp
     Src/Utilities.cpp
@@ -87,52 +87,52 @@ source_group("Source Files" FILES ${Source_Files})
 
 set(ALL_FILES  ${Header_Files} ${Source_Files})
 
-add_library(SwitchLiveATC SHARED ${ALL_FILES})
+add_library(PlayLiveATC SHARED ${ALL_FILES})
 
-target_compile_features(SwitchLiveATC PUBLIC cxx_std_17)
+target_compile_features(PlayLiveATC PUBLIC cxx_std_17)
 
 if (APPLE)
     # X-Plane supports OS X 10.10+, so this should ensure FlyWithLua can run on
     # all supported versions.
-    target_compile_options(SwitchLiveATC PUBLIC -mmacosx-version-min=10.10)
-    target_link_libraries(SwitchLiveATC -mmacosx-version-min=10.10)
+    target_compile_options(PlayLiveATC PUBLIC -mmacosx-version-min=10.10)
+    target_link_libraries(PlayLiveATC -mmacosx-version-min=10.10)
 endif ()
 
 # Link OpenGL and OpenAL related libraries.
 find_package(OpenGL REQUIRED)  # apt install freeglut3-dev
 if ( OpenGL_FOUND )
     include_directories( ${OpenGL_INCLUDE_DIRS} )
-    target_link_libraries( SwitchLiveATC ${OpenGL_LIBRARIES} )
+    target_link_libraries( PlayLiveATC ${OpenGL_LIBRARIES} )
 endif( OpenGL_FOUND )
 
 find_package(OpenAL REQUIRED)  # apt install libopenal-dev
 if ( OpenAL_FOUND )
     include_directories( ${OpenAL_INCLUDE_DIRS} )
-    target_link_libraries( SwitchLiveATC ${OpenAL_LIBRARIES} )
+    target_link_libraries( PlayLiveATC ${OpenAL_LIBRARIES} )
 endif( OpenAL_FOUND )
 
 find_package(GLUT REQUIRED)  # apt install freeglut3-dev
 if ( GLUT_FOUND )
     include_directories( ${GLUT_INCLUDE_DIRS} )
-    target_link_libraries( SwitchLiveATC ${GLUT_LIBRARIES} )
+    target_link_libraries( PlayLiveATC ${GLUT_LIBRARIES} )
 endif( GLUT_FOUND )
 
 find_package(ZLIB REQUIRED)  # sudo apt-get install zlib1g-dev
 if ( ZLIB_FOUND )
     include_directories( ${ZLIB_INCLUDE_DIRS} )
-    target_link_libraries( SwitchLiveATC ${ZLIB_LIBRARIES} )
+    target_link_libraries( PlayLiveATC ${ZLIB_LIBRARIES} )
 endif( ZLIB_FOUND )
 
 # find_package(PNG REQUIRED)  # sudo apt-get install libpng-dev
 # if ( PNG_FOUND )
 #     include_directories( ${PNG_INCLUDE_DIRS} )
-#     target_link_libraries( SwitchLiveATC ${PNG_LIBRARIES} )
+#     target_link_libraries( PlayLiveATC ${PNG_LIBRARIES} )
 # endif( PNG_FOUND )
 
 find_package(LIBVLC REQUIRED)  # sudo apt-get install libvlc-dev
 if ( LIBVLC_FOUND )
     include_directories( ${LIBVLC_INCLUDE_DIRS} )
-    target_link_libraries( SwitchLiveATC ${LIBVLC_LIBRARIES} )
+    target_link_libraries( PlayLiveATC ${LIBVLC_LIBRARIES} )
 endif( LIBVLC_FOUND )
 
 # ****************************************************
@@ -140,7 +140,7 @@ endif( LIBVLC_FOUND )
 find_package(CURL REQUIRED)  # sudo apt-get install curl
 if ( CURL_FOUND )
    include_directories( ${CURL_INCLUDE_DIRS} )
-   target_link_libraries( SwitchLiveATC ${CURL_LIBRARIES} )
+   target_link_libraries( PlayLiveATC ${CURL_LIBRARIES} )
 endif( CURL_FOUND )
 
 
@@ -161,14 +161,14 @@ if (WIN32 OR APPLE)
 # if (WIN32)
     find_library(XPLM_LIBRARY NAMES XPLM XPLM_64.lib)
 	find_library(XPWIDGETS_LIBRARY NAMES XPWidgets XPWidgets_64.lib)
-    target_link_libraries(SwitchLiveATC ${XPLM_LIBRARY} ${XPWIDGETS_LIBRARY})
+    target_link_libraries(PlayLiveATC ${XPLM_LIBRARY} ${XPWIDGETS_LIBRARY})
 endif ()
 
 
 # Link library for dynamic loading of shared objects on UNIX systems.
 if (UNIX)
     find_library(DL_LIBRARY dl)
-    target_link_libraries(SwitchLiveATC ${DL_LIBRARY})
+    target_link_libraries(PlayLiveATC ${DL_LIBRARY})
 endif ()
 
 # Link OS X core system libraries.
@@ -179,22 +179,22 @@ if (APPLE)
     find_library(OpenGL_LIBRARY OpenGL)
     find_library(Cocoa_LIBRARY Cocoa)
 
-    target_link_libraries(SwitchLiveATC ${IOKIT_LIBRARY} ${CORE_FOUNDATION_LIBRARY} ${GLUT_LIBRARY})
-    target_link_libraries(SwitchLiveATC ${OpenGL_LIBRARY} ${Cocoa_LIBRARY})
+    target_link_libraries(PlayLiveATC ${IOKIT_LIBRARY} ${CORE_FOUNDATION_LIBRARY} ${GLUT_LIBRARY})
+    target_link_libraries(PlayLiveATC ${OpenGL_LIBRARY} ${Cocoa_LIBRARY})
 endif ()
 
 if (WIN32)
     # Unlike OS X and Linux we build standard libraries statically since X-Plane does not provide them.
-    target_link_libraries(SwitchLiveATC -static-libgcc -static-libstdc++ opengl32)
+    target_link_libraries(PlayLiveATC -static-libgcc -static-libstdc++ opengl32)
     # MSYS2 for some reason always links against winpthread, so we have to work around it by statically linking the
     # entire plugin. This allows building the plugin nativaly on Windows.
-    target_link_libraries(SwitchLiveATC -static)
+    target_link_libraries(PlayLiveATC -static)
 elseif (APPLE)
     # Restrict set of symbols exported from the plugin. This reduces changes of
     # conflict with other plugins, in particular ones with Lua interpreter
     # embedded.
-    target_link_libraries(SwitchLiveATC "-exported_symbols_list ${CMAKE_SOURCE_DIR}/Src/SwitchLiveATC.sym_mac")
-	target_link_libraries(SwitchLiveATC "-framework XPLM -framework XPWidgets -ldl")
+    target_link_libraries(PlayLiveATC "-exported_symbols_list ${CMAKE_SOURCE_DIR}/Src/PlayLiveATC.sym_mac")
+	target_link_libraries(PlayLiveATC "-framework XPLM -framework XPWidgets -ldl")
 elseif (UNIX)
     # Specify additional runtime search laths for dynamically-linked libraries.
     # Restrict set of symbols exported from the plugin. This reduces changes of
@@ -204,21 +204,21 @@ elseif (UNIX)
 
 #    list(APPEND CMAKE_LIBRARY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Lib/xplanemp")
 #    find_library(XPLANEMP_LIBRARY NAMES libxplanemp.a)
-#    target_link_libraries(SwitchLiveATC ${XPLANEMP_LIBRARY})
+#    target_link_libraries(PlayLiveATC ${XPLANEMP_LIBRARY})
 
-    target_link_libraries(SwitchLiveATC -Wl,--version-script -Wl,${CMAKE_SOURCE_DIR}/Src/SwitchLiveATC.sym)
+    target_link_libraries(PlayLiveATC -Wl,--version-script -Wl,${CMAKE_SOURCE_DIR}/Src/PlayLiveATC.sym)
 endif ()
 
-set_target_properties(SwitchLiveATC PROPERTIES PREFIX "")
+set_target_properties(PlayLiveATC PROPERTIES PREFIX "")
 if (WIN32)
-   set_target_properties(SwitchLiveATC PROPERTIES OUTPUT_NAME "win")
+   set_target_properties(PlayLiveATC PROPERTIES OUTPUT_NAME "win")
 elseif (APPLE)
-   set_target_properties(SwitchLiveATC PROPERTIES OUTPUT_NAME "mac")
+   set_target_properties(PlayLiveATC PROPERTIES OUTPUT_NAME "mac")
 elseif (UNIX)
-   set_target_properties(SwitchLiveATC PROPERTIES OUTPUT_NAME "lin")
+   set_target_properties(PlayLiveATC PROPERTIES OUTPUT_NAME "lin")
 endif ()
-set_target_properties(SwitchLiveATC PROPERTIES SUFFIX ".xpl")
+set_target_properties(PlayLiveATC PROPERTIES SUFFIX ".xpl")
 
-# set_target_properties(SwitchLiveATC PROPERTIES PREFIX "")
-# set_target_properties(SwitchLiveATC PROPERTIES OUTPUT_NAME "SwitchLiveATC")
-# set_target_properties(SwitchLiveATC PROPERTIES SUFFIX ".xpl")
+# set_target_properties(PlayLiveATC PROPERTIES PREFIX "")
+# set_target_properties(PlayLiveATC PROPERTIES OUTPUT_NAME "PlayLiveATC")
+# set_target_properties(PlayLiveATC PROPERTIES SUFFIX ".xpl")

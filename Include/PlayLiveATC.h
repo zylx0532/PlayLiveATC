@@ -1,6 +1,6 @@
 //
-//  SwitchLiveATC.h
-//  SwitchLiveATC
+//  PlayLiveATC.h
+//  PlayLiveATC
 //
 
 /*
@@ -25,8 +25,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef SwitchLiveATC_h
-#define SwitchLiveATC_h
+#ifndef PlayLiveATC_h
+#define PlayLiveATC_h
 
 #if !defined(XPLM200) || !defined(XPLM210)
 #error This is made to be compiled at least against the XPLM210 SDK (X-plane 10.30 and above)
@@ -91,7 +91,7 @@
 #include "XPLMGraphics.h"
 #include "XPLMNavigation.h"
 
-// SwitchLiveATC Includes
+// PlayLiveATC Includes
 #include "TFWidgets.h"
 #include "Constants.h"
 #include "Utilities.h"
@@ -99,12 +99,12 @@
 #include "TextIO.h"
 #include "DataRefs.h"
 #include "SettingsUI.h"
-#include "SLACOMChannel.h"
+#include "PLACOMChannel.h"
 
 // Global variables
-extern DataRefs dataRefs;           // in SwitchLiveATC.cpp
+extern DataRefs dataRefs;           // in PlayLiveATC.cpp
 
 // Global functions
 bool InitFullVersion ();
 
-#endif /* SwitchLiveATC_h */
+#endif /* PlayLiveATC_h */

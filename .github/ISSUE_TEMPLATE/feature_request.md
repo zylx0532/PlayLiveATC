@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for SwitchLiveATC
+about: Suggest an idea for PlayLiveATC
 title: ''
 labels: ''
 assignees: ''

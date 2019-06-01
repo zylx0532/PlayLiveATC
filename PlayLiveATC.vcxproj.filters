@@ -15,7 +15,7 @@
     <ClCompile Include="Src\SettingsUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Src\SwitchLiveATC.cpp">
+    <ClCompile Include="Src\PlayLiveATC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Src\TextIO.cpp">
@@ -47,7 +47,7 @@
     <ClInclude Include="Include\SettingsUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\SwitchLiveATC.h">
+    <ClInclude Include="Include\PlayLiveATC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\TextIO.h">

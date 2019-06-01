@@ -1,6 +1,6 @@
 //
 //  TextIO.cpp
-//  SwitchLiveATC
+//  PlayLiveATC
 
 /*
  * Copyright (c) 2019, Birger Hoppe
@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-#include "SwitchLiveATC.h"
+#include "PlayLiveATC.h"
 
 //
 // MARK: LiveTraffic Exception classes

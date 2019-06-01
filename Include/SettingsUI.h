@@ -1,6 +1,6 @@
 //
 //  SettingsUI.h
-//  SwitchLiveATC
+//  PlayLiveATC
 
 /*
  * Copyright (c) 2019, Birger Hoppe

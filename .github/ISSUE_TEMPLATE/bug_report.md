@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help SwitchLiveATC improve
+about: Create a report to help PlayLiveATC improve
 title: ''
 labels: ''
 assignees: ''
@@ -28,7 +28,7 @@ If applicable, add screenshots to help explain your problem.
 **Technical Info:**
  - OS: [Mac/Win/Linux]
  - X-Plane version: 
- - SwitchLiveATC version:
+ - PlayLiveATC version:
 
 **Log.txt**
 Attach your Log.txt file, if reproducible then please reproduce with log level (Settings/Advanced) set to 'Debug' first.

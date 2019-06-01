@@ -1,6 +1,6 @@
 //
 //  Constants.h
-//  SwitchLiveATC
+//  PlayLiveATC
 
 /*
  * Copyright (c) 2019, Birger Hoppe
@@ -69,19 +69,19 @@ constexpr double MDL_ALT_MIN =         -1500;   // [ft] minimum allowed altitude
 constexpr double MDL_ALT_MAX =          60000;  // [ft] maximum allowed altitude
 
 //MARK: Version Information
-extern char SLA_VERSION[];               // like "1.0"
-extern char SLA_VERSION_FULL[];          // like "1.0.181231" with last digits being build date
-extern char HTTP_USER_AGENT[];          // like "SwitchLiveATC/1.0"
-extern time_t SLA_BETA_VER_LIMIT;        // BETA versions are limited
-extern char SLA_BETA_VER_LIMIT_TXT[];
+extern char PLA_VERSION[];               // like "1.0"
+extern char PLA_VERSION_FULL[];          // like "1.0.181231" with last digits being build date
+extern char HTTP_USER_AGENT[];          // like "PlayLiveATC/1.0"
+extern time_t PLA_BETA_VER_LIMIT;        // BETA versions are limited
+extern char PLA_BETA_VER_LIMIT_TXT[];
 #define BETA_LIMITED_VERSION    "BETA limited to %s"
 #define BETA_LIMITED_EXPIRED    "BETA-Version limited to %s has EXPIRED -> SHUTTING DOWN! Get an up-to-date version from X-Plane.org."
-constexpr int SLA_NEW_VER_CHECK_TIME = 48;   // [h] between two checks of a new
+constexpr int PLA_NEW_VER_CHECK_TIME = 48;   // [h] between two checks of a new
 
 //MARK: Text Constants
-#define SWITCH_LIVE_ATC         "SwitchLiveATC"
-#define SLA_CFG_VERSION         "1.0"        // current version of config file format
-#define PLUGIN_SIGNATURE        "TwinFan.plugin.SwitchLiveATC"
+#define SWITCH_LIVE_ATC         "PlayLiveATC"
+#define PLA_CFG_VERSION         "1.0"        // current version of config file format
+#define PLUGIN_SIGNATURE        "TwinFan.plugin.PlayLiveATC"
 #define PLUGIN_DESCRIPTION      "Switch LiveATC channel based on COM radios."
 #define LT_UNAVAILABLE          "not available"
 #define LT_INACTIVE             "installed, but inactive"
@@ -126,12 +126,12 @@ constexpr int SLA_NEW_VER_CHECK_TIME = 48;   // [h] between two checks of a new
 
 //MARK: Help URLs
 // TODO: Set real URLs
-#define HELP_URL                "https://twinfan.gitbook.io/livetraffic/SwitchLiveATC"
-#define HELP_URL_SETTINGS       "https://twinfan.gitbook.io/livetraffic/SwitchLiveATC/Settings"
+#define HELP_URL                "https://twinfan.gitbook.io/livetraffic/PlayLiveATC"
+#define HELP_URL_SETTINGS       "https://twinfan.gitbook.io/livetraffic/PlayLiveATC/Settings"
 
 //MARK: File Paths
 // these are under X-Plane's root dir
-#define PATH_CONFIG_FILE        "Output/preferences/SwitchLiveATC.prf"
+#define PATH_CONFIG_FILE        "Output/preferences/PlayLiveATC.prf"
 
 //MARK: Error Texsts
 constexpr long HTTP_OK =            200;
@@ -170,8 +170,8 @@ constexpr int ERR_CFG_FILE_MAXWARN = 5;     // maximum number of warnings while 
 #define DBG_MENU_CREATED        "Menu created"
 #define DBG_WND_CREATED_UNTIL   "Created window, display until total running time %.2f, for text: %s"
 #define DBG_WND_DESTROYED       "Window destroyed"
-#define DBG_SLA_MAIN_INIT       "SwitchLiveATC initialized"
-#define DBG_SLA_MAIN_ENABLE     "SwitchLiveATC enabled"
+#define DBG_PLA_MAIN_INIT       "PlayLiveATC initialized"
+#define DBG_PLA_MAIN_ENABLE     "PlayLiveATC enabled"
 #define DBG_SENDING_HTTP        "%s: Sending HTTP: %s"
 #define DBG_RECEIVED_BYTES      "%s: Received %ld characters"
 #ifdef DEBUG

@@ -24,18 +24,18 @@
  * THE SOFTWARE.
  */
 
-#include "SwitchLiveATC.h"
+#include "PlayLiveATC.h"
 
 //
 // MARK: global variables referred to via extern declarations in Constants.h
 //
-char SLA_VERSION[10] = "";
-char SLA_VERSION_FULL[30] = "";
+char PLA_VERSION[10] = "";
+char PLA_VERSION_FULL[30] = "";
 char HTTP_USER_AGENT[50] = "";
 
 // BETA versions are limited for 30 days...people shall use release versions!
-time_t SLA_BETA_VER_LIMIT = 0;
-char SLA_BETA_VER_LIMIT_TXT[12] = "";
+time_t PLA_BETA_VER_LIMIT = 0;
+char PLA_BETA_VER_LIMIT_TXT[12] = "";
 
 bool CalcBetaVerTimeLimit()
 {
@@ -61,14 +61,14 @@ bool CalcBetaVerTimeLimit()
                 strcmp(buildDate,"Oct") == 0 ?  9 :
                 strcmp(buildDate,"Nov") == 0 ? 10 : 11;
     // Limit is: build date plus 30 days
-    SLA_BETA_VER_LIMIT = mktime(&tm) + 30 * SEC_per_D;
-    localtime_s(&tm, &SLA_BETA_VER_LIMIT);
+    PLA_BETA_VER_LIMIT = mktime(&tm) + 30 * SEC_per_D;
+    localtime_s(&tm, &PLA_BETA_VER_LIMIT);
     
     // tell the world we're limited
-    strftime(SLA_BETA_VER_LIMIT_TXT,sizeof(SLA_BETA_VER_LIMIT_TXT),"%d-%b-%Y",&tm);
+    strftime(PLA_BETA_VER_LIMIT_TXT,sizeof(PLA_BETA_VER_LIMIT_TXT),"%d-%b-%Y",&tm);
     // still within limit time frame?
-    if (time(NULL) > SLA_BETA_VER_LIMIT) {
-        LOG_MSG(logFATAL, BETA_LIMITED_EXPIRED, SLA_BETA_VER_LIMIT_TXT);
+    if (time(NULL) > PLA_BETA_VER_LIMIT) {
+        LOG_MSG(logFATAL, BETA_LIMITED_EXPIRED, PLA_BETA_VER_LIMIT_TXT);
         return false;
     }
 
@@ -83,8 +83,8 @@ bool CalcBetaVerTimeLimit()
 bool InitFullVersion ()
 {
     // fill char arrays
-    snprintf(SLA_VERSION, sizeof(SLA_VERSION), "%0.2f", VERSION_NR);
-    snprintf(HTTP_USER_AGENT, sizeof(HTTP_USER_AGENT), "%s/%s", SWITCH_LIVE_ATC, SLA_VERSION);
+    snprintf(PLA_VERSION, sizeof(PLA_VERSION), "%0.2f", VERSION_NR);
+    snprintf(HTTP_USER_AGENT, sizeof(HTTP_USER_AGENT), "%s/%s", SWITCH_LIVE_ATC, PLA_VERSION);
     
     // Example of __DATE__ string: "Nov 12 2018"
     //                              01234567890
@@ -96,8 +96,8 @@ bool InitFullVersion ()
     if (buildDate[4] == ' ')
         buildDate[4] = '0';
     
-    snprintf(SLA_VERSION_FULL, sizeof(SLA_VERSION_FULL), "%s.%s%s%s",
-             SLA_VERSION,
+    snprintf(PLA_VERSION_FULL, sizeof(PLA_VERSION_FULL), "%s.%s%s%s",
+             PLA_VERSION,
              // year (last 2 digits)
              buildDate + 9,
              // month converted to digits
@@ -118,7 +118,7 @@ bool InitFullVersion ()
            );
     
     // tell the world we are trying to start up
-    LOG_MSG(logMSG, MSG_STARTUP, SLA_VERSION_FULL);
+    LOG_MSG(logMSG, MSG_STARTUP, PLA_VERSION_FULL);
 
     // in case of a BETA version this is the place to check for its time limit
     if constexpr (VERSION_BETA) {

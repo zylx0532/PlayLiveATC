@@ -18,7 +18,7 @@
     </ClCompile>
     <ClCompile Include="Src\SettingsUI.cpp" />
     <ClCompile Include="Src\SLACOMChannel.cpp" />
-    <ClCompile Include="Src\SwitchLiveATC.cpp" />
+    <ClCompile Include="Src\PlayLiveATC.cpp" />
     <ClCompile Include="Src\TextIO.cpp" />
     <ClCompile Include="Src\TFWidgets.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -33,7 +33,7 @@
     <ClInclude Include="Include\DataRefs.h" />
     <ClInclude Include="Include\SettingsUI.h" />
     <ClInclude Include="Include\SLACOMChannel.h" />
-    <ClInclude Include="Include\SwitchLiveATC.h" />
+    <ClInclude Include="Include\PlayLiveATC.h" />
     <ClInclude Include="Include\TextIO.h" />
     <ClInclude Include="Include\TFWidgets.h" />
     <ClInclude Include="Include\Utilities.h" />
@@ -136,7 +136,7 @@
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(TargetName)$(TargetExt)" "D:\X-Plane 11\Resources\plugins\SwitchLiveATC\64"</Command>
+      <Command>copy /Y "$(TargetDir)$(TargetName)$(TargetExt)" "D:\X-Plane 11\Resources\plugins\PlayLiveATC\64"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copies the plugin into my X-Plane directory after build</Message>
@@ -192,7 +192,7 @@
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(TargetName)$(TargetExt)" "D:\X-Plane 11\Resources\plugins\SwitchLiveATC\64"</Command>
+      <Command>copy /Y "$(TargetDir)$(TargetName)$(TargetExt)" "D:\X-Plane 11\Resources\plugins\PlayLiveATC\64"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copies the plugin into my X-Plane directory after build</Message>

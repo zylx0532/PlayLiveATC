@@ -1,6 +1,6 @@
 //
-//  SLACOMChannel.h
-//  SwitchLiveATC
+//  PLACOMChannel.h
+//  PlayLiveATC
 //
 // Start and control VLC to play a LiveATC stream
 //
@@ -27,8 +27,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef SLACOMChannel_h
-#define SLACOMChannel_h
+#ifndef PLACOMChannel_h
+#define PLACOMChannel_h
 
 #define LIVE_ATC_DOMAIN     "www.liveatc.net"
 #define LIVE_ATC_BASE       "https://" LIVE_ATC_DOMAIN
@@ -263,4 +263,4 @@ protected:
 
 extern COMChannel gChn[COM_CNT];
 
-#endif /* SLACOMChannel_h */
+#endif /* PLACOMChannel_h */

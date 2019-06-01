@@ -1,6 +1,6 @@
 //
 //  Utilities.h
-//  SwitchLiveATC
+//  PlayLiveATC
 //
 // TCommon function that can in the long run be shared between plugins
 //

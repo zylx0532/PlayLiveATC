@@ -1,6 +1,6 @@
 //
 //  SettingsUI.cpp
-//  SwitchLiveATC
+//  PlayLiveATC
 
 /*
  * Copyright (c) 2019, Birger Hoppe
@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-#include "SwitchLiveATC.h"
+#include "PlayLiveATC.h"
 
 //
 //MARK: LTSettingsUI
@@ -106,7 +106,7 @@ enum UI_WIDGET_IDX_T {
 // window will be centered shortly before presenting it
 TFWidgetCreate_t SETTINGS_UI[] =
 {
-    {   0,   0, 400, 330, 0, "SwitchLiveATC Settings", 1, NO_PARENT, xpWidgetClass_MainWindow, {xpProperty_MainWindowHasCloseBoxes, 1, xpProperty_MainWindowType,xpMainWindowStyle_Translucent,0,0} },
+    {   0,   0, 400, 330, 0, "PlayLiveATC Settings", 1, NO_PARENT, xpWidgetClass_MainWindow, {xpProperty_MainWindowHasCloseBoxes, 1, xpProperty_MainWindowType,xpMainWindowStyle_Translucent,0,0} },
     // Buttons to select 'tabs'
     {  10,  30,  65,  10, 1, "Basics",              0, UI_MAIN_WND, xpWidgetClass_Button, {xpProperty_ButtonBehavior, xpButtonBehaviorRadioButton, 0,0, 0,0} },
     {  75,  30,  65,  10, 1, "Advanced",            0, UI_MAIN_WND, xpWidgetClass_Button, {xpProperty_ButtonBehavior, xpButtonBehaviorRadioButton, 0,0, 0,0} },
@@ -212,11 +212,11 @@ void LTSettingsUI::Enable()
 
         // version number
         XPSetWidgetDescriptor(widgetIds[UI_BASICS_CAP_VERSION],
-                              SLA_VERSION_FULL);
+                              PLA_VERSION_FULL);
         if constexpr (VERSION_BETA)
         {
             char betaLimit[100];
-            snprintf(betaLimit,sizeof(betaLimit), BETA_LIMITED_VERSION,SLA_BETA_VER_LIMIT_TXT);
+            snprintf(betaLimit,sizeof(betaLimit), BETA_LIMITED_VERSION,PLA_BETA_VER_LIMIT_TXT);
             XPSetWidgetDescriptor(widgetIds[UI_BASICS_CAP_BETA_LIMIT],
                                   betaLimit);
         }

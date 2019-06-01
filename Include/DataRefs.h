@@ -1,6 +1,6 @@
 //
 //  DataRefs.h
-//  SwitchLiveATC
+//  PlayLiveATC
 
 /*
  * Copyright (c) 2019, Birger Hoppe
@@ -27,7 +27,7 @@
 #ifndef DataRefs_h
 #define DataRefs_h
 
-// in SwitchLiveATC.xpp:
+// in PlayLiveATC.xpp:
 void MenuUpdateCheckmarks();
 
 //
@@ -58,11 +58,11 @@ enum dataRefsXP_LT {
 };
 constexpr dataRefsXP_LT DR_FIRST_LT_DR = DR_LT_AIRCRAFTS_DISPLAYED;
 
-// SLA commands to be offered
-enum cmdRefsSLA {
+// PLA commands to be offered
+enum cmdRefsPLA {
     CR_TOGGLE_ACT_COM1 = 0,
     CR_TOGGLE_ACT_COM2,
-    CNT_CMDREFS_SLA                     // always last, number of elements
+    CNT_CMDREFS_PLA                     // always last, number of elements
 };
 
 // number of Frequencies to listen to
@@ -75,7 +75,7 @@ class DataRefs
 protected:
     XPLMDataRef adrXP[CNT_DATAREFS_XP];                 // array of XP data refs to read from
 public:
-    XPLMCommandRef cmdSLA[CNT_CMDREFS_SLA];
+    XPLMCommandRef cmdPLA[CNT_CMDREFS_PLA];
 
 //MARK: Provided Data, i.e. global variables
 protected:

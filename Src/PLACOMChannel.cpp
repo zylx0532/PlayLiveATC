@@ -1,5 +1,5 @@
 //
-//  SLACOMChannel.cpp
+//  PLACOMChannel.cpp
 //
 // Fetch url to play from LiveTAC
 // Start and control VLC to play a LiveATC stream
@@ -26,7 +26,7 @@
  * THE SOFTWARE.
  */
 
-#include "SwitchLiveATC.h"
+#include "PlayLiveATC.h"
 
 //
 // MARK: Globals
@@ -133,12 +133,12 @@ bool COMChannel::InitVLC()
     // create VLC instance
     try {
         dataA.pInst     = std::make_unique<VLC::Instance>(vlcArgC, vlcArgs);
-        dataA.pInst->setAppId(PLUGIN_SIGNATURE, SLA_VERSION_FULL, "");
+        dataA.pInst->setAppId(PLUGIN_SIGNATURE, PLA_VERSION_FULL, "");
         dataA.pInst->setUserAgent(HTTP_USER_AGENT, HTTP_USER_AGENT);
         dataA.pMP       = std::make_unique<VLC::MediaPlayer>(*dataA.pInst);
         
         dataB.pInst     = std::make_unique<VLC::Instance>(vlcArgC, vlcArgs);
-        dataB.pInst->setAppId(PLUGIN_SIGNATURE, SLA_VERSION_FULL, "");
+        dataB.pInst->setAppId(PLUGIN_SIGNATURE, PLA_VERSION_FULL, "");
         dataB.pInst->setUserAgent(HTTP_USER_AGENT, HTTP_USER_AGENT);
         dataB.pMP       = std::make_unique<VLC::MediaPlayer>(*dataA.pInst);
         

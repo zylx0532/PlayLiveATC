@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-#include "SwitchLiveATC.h"
+#include "PlayLiveATC.h"
 
 #if IBM
 #include <objbase.h>        // for CoInitializeEx
@@ -44,7 +44,7 @@ LTSettingsUI settingsUI;
 //
 
 enum menuItems {
-    MENU_ID_SWITCHLIVEATC = 0,
+    MENU_ID_PlayLiveATC = 0,
     MENU_ID_TOGGLE_COM1,
     MENU_ID_TOGGLE_COM2,
     MENU_ID_SETTINGS_UI,
@@ -55,7 +55,7 @@ enum menuItems {
     CNT_MENU_ID                     // always last, number of elements
 };
 
-// ID of the "SwitchLiveATC" menu within the plugin menu; items numbers of its menu items
+// ID of the "PlayLiveATC" menu within the plugin menu; items numbers of its menu items
 XPLMMenuID menuID = 0;
 int aMenuItems[CNT_MENU_ID];
 
@@ -109,9 +109,9 @@ bool MenuRegisterItems ()
     memset(aMenuItems, 0, sizeof(aMenuItems));
     
     // Create menu item and menu
-    aMenuItems[MENU_ID_SWITCHLIVEATC] = XPLMAppendMenuItem(XPLMFindPluginsMenu(), SWITCH_LIVE_ATC, NULL, 1);
-    menuID = XPLMCreateMenu(SWITCH_LIVE_ATC, XPLMFindPluginsMenu(), aMenuItems[MENU_ID_SWITCHLIVEATC], MenuHandlerCB, NULL);
-    if ( !menuID ) { LOG_MSG(logERR,ERR_CREATE_MENU,MENU_ID_SWITCHLIVEATC); return false; }
+    aMenuItems[MENU_ID_PlayLiveATC] = XPLMAppendMenuItem(XPLMFindPluginsMenu(), SWITCH_LIVE_ATC, NULL, 1);
+    menuID = XPLMCreateMenu(SWITCH_LIVE_ATC, XPLMFindPluginsMenu(), aMenuItems[MENU_ID_PlayLiveATC], MenuHandlerCB, NULL);
+    if ( !menuID ) { LOG_MSG(logERR,ERR_CREATE_MENU,MENU_ID_PlayLiveATC); return false; }
     
     // Toggle acting upon change of which COM frequency?
     aMenuItems[MENU_ID_TOGGLE_COM1] =
@@ -155,7 +155,7 @@ bool MenuRegisterItems ()
 // (that is kinda contrary to what XPLMAppendMenuItemWithCommand intends to do...but the menu handler is there anyway and has even more)
 
 struct cmdMenuMap {
-    cmdRefsSLA cmd;
+    cmdRefsPLA cmd;
     menuItems menu;
 } CMD_MENU_MAP[] = {
     { CR_TOGGLE_ACT_COM1, MENU_ID_TOGGLE_COM1 },
@@ -174,7 +174,7 @@ int CommandHandlerMenuItems (XPLMCommandRef       /*inCommand*/,
 bool RegisterCommandHandlers ()
 {
     for (cmdMenuMap i: CMD_MENU_MAP)
-        XPLMRegisterCommandHandler(dataRefs.cmdSLA[i.cmd],
+        XPLMRegisterCommandHandler(dataRefs.cmdPLA[i.cmd],
                                    CommandHandlerMenuItems,
                                    1, (void*)i.menu);
     return true;
@@ -185,7 +185,7 @@ bool RegisterCommandHandlers ()
 //
 
 // callback called every second to identify COM frequency changes
-float SLAFlightLoopCB (float, float, int, void*)
+float PLAFlightLoopCB (float, float, int, void*)
 {
     
     // loop over all COM radios we support
@@ -210,12 +210,12 @@ float SLAFlightLoopCB (float, float, int, void*)
 
 
 // a one-time callback for initialization stuff after all plugins loaded and initialized
-float SLAOneTimeCB (float, float, int, void*)
+float PLAOneTimeCB (float, float, int, void*)
 {
     // fetch dataRefs we might need
     if (dataRefs.LateInit()) {
         // start the regular callback
-        XPLMRegisterFlightLoopCallback(SLAFlightLoopCB, 1, NULL);
+        XPLMRegisterFlightLoopCallback(PLAFlightLoopCB, 1, NULL);
     }
     
     // don't call me again
@@ -241,7 +241,7 @@ PLUGIN_API int XPluginStart(
     XPLMEnableFeature("XPLM_USE_NATIVE_PATHS",1);
     
     // init our version number
-    // (also outputs the "SwitchLiveATC ... starting up" log message)
+    // (also outputs the "PlayLiveATC ... starting up" log message)
     if (!InitFullVersion ()) { DestroyWindow(); return 0; }
     
     // init DataRefs
@@ -290,7 +290,7 @@ PLUGIN_API int  XPluginEnable(void)
 {
     // Warn about beta and debug versions
     if constexpr (VERSION_BETA)
-        SHOW_MSG(logWARN, BETA_LIMITED_VERSION, SLA_BETA_VER_LIMIT_TXT);
+        SHOW_MSG(logWARN, BETA_LIMITED_VERSION, PLA_BETA_VER_LIMIT_TXT);
 #ifdef DEBUG
     SHOW_MSG(logWARN, DBG_DEBUG_BUILD);
 #endif
@@ -299,7 +299,7 @@ PLUGIN_API int  XPluginEnable(void)
     COMChannel::InitAllVLC();
     
     // start the actual processing
-    XPLMRegisterFlightLoopCallback(SLAOneTimeCB, -1, NULL);
+    XPLMRegisterFlightLoopCallback(PLAOneTimeCB, -1, NULL);
     return 1;
 }
 
@@ -309,8 +309,8 @@ PLUGIN_API void XPluginDisable(void)
     COMChannel::CleanupAllVLC();
     
     // cleanup
-    XPLMUnregisterFlightLoopCallback(SLAOneTimeCB, NULL);
-    XPLMUnregisterFlightLoopCallback(SLAFlightLoopCB, NULL);
+    XPLMUnregisterFlightLoopCallback(PLAOneTimeCB, NULL);
+    XPLMUnregisterFlightLoopCallback(PLAFlightLoopCB, NULL);
     LOG_MSG(logMSG, MSG_DISABLED);
 }
 

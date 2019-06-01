@@ -1,6 +1,6 @@
 //
 //  DataRefs.cpp
-//  SwitchLiveATC
+//  PlayLiveATC
 
 /*
  * Copyright (c) 2019, Birger Hoppe
@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-#include "SwitchLiveATC.h"
+#include "PlayLiveATC.h"
 
 //
 // MARK: X-Plane Datarefs
@@ -53,17 +53,17 @@ static_assert(sizeof(DATA_REFS_XP) / sizeof(DATA_REFS_XP[0]) == CNT_DATAREFS_XP,
     "dataRefsXP and DATA_REFS_XP[] differ in number of elements");
 
 //
-// MARK: SwitchLiveATC Command Refs
+// MARK: PlayLiveATC Command Refs
 //
 struct cmdRefDescrTy {
     const char* cmdName;
     const char* cmdDescr;
-} CMD_REFS_SLA[] = {
-    {"SwitchLiveATC/Toggle_ActOn_COM1", "Toggle acting on COM1 frequency change"},
-    {"SwitchLiveATC/Toggle_ActOn_COM2", "Toggle acting on COM2 frequency change"},
+} CMD_REFS_PLA[] = {
+    {"PlayLiveATC/Toggle_ActOn_COM1", "Toggle acting on COM1 frequency change"},
+    {"PlayLiveATC/Toggle_ActOn_COM2", "Toggle acting on COM2 frequency change"},
 };
 
-static_assert(sizeof(CMD_REFS_SLA) / sizeof(CMD_REFS_SLA[0]) == CNT_CMDREFS_SLA,
+static_assert(sizeof(CMD_REFS_PLA) / sizeof(CMD_REFS_PLA[0]) == CNT_CMDREFS_PLA,
               "cmdRefsLT and CMD_REFS_LT[] differ in number of elements");
 
 //
@@ -77,7 +77,7 @@ iLogLevel (initLogLevel)
 #ifdef DEBUG
     iLogLevel = logDEBUG;
 #else
-    if ( SLA_BETA_VER_LIMIT )
+    if ( PLA_BETA_VER_LIMIT )
         iLogLevel = logDEBUG;
 #endif
     
@@ -103,7 +103,7 @@ bool DataRefs::Init ()
     PluginPath = aszPath;
     LOG_ASSERT(!PluginPath.empty());
     
-    // PluginPath is now something like "...:Resources:plugins:SwitchLiveATC:64:mac.xpl"
+    // PluginPath is now something like "...:Resources:plugins:PlayLiveATC:64:mac.xpl"
     // we now reduce the path to the beginning of the plugin:
     // remove the file name
     std::string::size_type pos = PluginPath.rfind(DirSeparator);
@@ -178,13 +178,13 @@ bool DataRefs::RegisterCommands()
 {
     bool bRet = true;
     // loop over all data ref definitions
-    for (int i=0; i < CNT_CMDREFS_SLA; i++)
+    for (int i=0; i < CNT_CMDREFS_PLA; i++)
     {
         // register command
-        if ( (cmdSLA[i] =
-              XPLMCreateCommand(CMD_REFS_SLA[i].cmdName,
-                                CMD_REFS_SLA[i].cmdDescr)) == NULL )
-        { LOG_MSG(logERR,ERR_CREATE_COMMAND,CMD_REFS_SLA[i].cmdName); bRet = false; }
+        if ( (cmdPLA[i] =
+              XPLMCreateCommand(CMD_REFS_PLA[i].cmdName,
+                                CMD_REFS_PLA[i].cmdDescr)) == NULL )
+        { LOG_MSG(logERR,ERR_CREATE_COMMAND,CMD_REFS_PLA[i].cmdName); bRet = false; }
     }
     return bRet;
 }
@@ -300,14 +300,14 @@ bool DataRefs::LoadConfigFile()
     std::string lnBuf;
     if (!safeGetline(fIn, lnBuf) ||                     // read a line
         (ln = str_tokenize(lnBuf, " ")).size() != 2 ||  // split into two words
-        ln[0] != SWITCH_LIVE_ATC)                          // 1. is SwitchLiveATC
+        ln[0] != SWITCH_LIVE_ATC)                          // 1. is PlayLiveATC
     {
         LOG_MSG(logERR, ERR_CFG_FILE_VER, sFileName.c_str(), lnBuf.c_str());
         return false;
     }
     
     // 2. is version / test for only know current version
-    if (ln[1] == SLA_CFG_VERSION)            conv = CFG_NO_CONV;
+    if (ln[1] == PLA_CFG_VERSION)            conv = CFG_NO_CONV;
     else {
         SHOW_MSG(logERR, ERR_CFG_FILE_VER, sFileName.c_str(), lnBuf.c_str());
         return false;
@@ -407,7 +407,7 @@ bool DataRefs::SaveConfigFile()
     // *** VERSION ***
     // save application and version first...maybe we need to know it in
     // future versions for conversion efforts - who knows?
-    fOut << SWITCH_LIVE_ATC << ' ' << SLA_CFG_VERSION << '\n';
+    fOut << SWITCH_LIVE_ATC << ' ' << PLA_CFG_VERSION << '\n';
     
     // *** Config Entries ***
     

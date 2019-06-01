@@ -1,6 +1,6 @@
 //
 //  TextIO.h
-//  SwitchLiveATC
+//  PlayLiveATC
 //
 // Error handling logic
 // Text output to XPlane window and into its log file
