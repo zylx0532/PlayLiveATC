@@ -48,11 +48,52 @@ const char* vlcArgs[] = {
 /// Number of `vlcArgs`
 const int vlcArgC = sizeof(vlcArgs)/sizeof(vlcArgs[0]);
 
+/// The one and only VLC instance
+std::unique_ptr<VLC::Instance> gInst;
+
 //
 // MARK: Helper structs
 //
 
-// static function to return a status text
+/// Creates the global VLC instance object, if it doesn't exist yet
+/// @warning Fails if VLC plugins cannot be found.
+bool CreateVLCInstance ()
+{
+    if (!gInst) {
+        // tell VLC where to find the plugins
+        // (In Windows, this has no effect.)
+        // TODO: Verify if there is any effect in MacOS. If not: remove.
+        setenv(ENV_VLC_PLUGIN_PATH, dataRefs.GetVLCPath().c_str(), 1);
+
+        // create VLC instance
+        try {
+            gInst = std::make_unique<VLC::Instance>(vlcArgC, vlcArgs);
+            gInst->setAppId(PLUGIN_SIGNATURE, PLA_VERSION_FULL, "");
+            gInst->setUserAgent(HTTP_USER_AGENT, HTTP_USER_AGENT);
+        }
+        catch (std::runtime_error e)
+        {
+            LOG_MSG(logERR, ERR_VLC_INIT, e.what());
+            return false;
+        }
+        catch (...)
+        {
+            LOG_MSG(logERR, ERR_VLC_INIT, "?");
+            return false;
+        }
+    }
+    return true;
+}
+
+/// Removes the global VLC instance object
+void CleanupVLCInstance ()
+{
+    gInst = nullptr;
+}
+
+/// Static function to convert a status enum to a status text
+/// @param s The status to be converted.
+/// @return A text representing the passed in status `s`
 std::string GetStatusStr (StreamStatusTy s)
 {
     switch (s) {
@@ -61,14 +102,14 @@ std::string GetStatusStr (StreamStatusTy s)
         case STREAM_NOT_PLAYING:return "not playing";
         case STREAM_SEARCHING:  return "searching";
         case STREAM_BUFFERING:  return "buffering";
+        case STREAM_DESYNCING:  return "desyncing";
+        case STREAM_MUTED:      return "muted";
         case STREAM_PLAYING:    return "playing";
         default: return "?";        // must not happen
     }
 }
 
-
-
-/// Stream's status, cannot decide all but STREAM_SEARCHING (see COMChannel::GetStatus())
+/// Stream's status, decides all but STREAM_SEARCHING (see COMChannel::GetStatus())
 StreamStatusTy StreamCtrlTy::GetStatus() const
 {
     // not initialized at all?
@@ -127,38 +168,16 @@ COMChannel::~COMChannel()
 // Initialize the VLC smart pointers, can fail if wrong directory configured
 bool COMChannel::InitVLC()
 {
-    // tell VLC where to find the plugins
-    // (In Windows, this has no effect.)
-    // TODO: Verify if there is any effect in MacOS. If not: remove.
-    setenv(ENV_VLC_PLUGIN_PATH, dataRefs.GetVLCPath().c_str(), 1);
+    // must have an instance
+    LOG_ASSERT(gInst);
     
     // just in case - cleanup in proper order
     CleanupVLC();
 
-    // create VLC instance
-    try {
-        dataA.pInst     = std::make_unique<VLC::Instance>(vlcArgC, vlcArgs);
-        dataA.pInst->setAppId(PLUGIN_SIGNATURE, PLA_VERSION_FULL, "");
-        dataA.pInst->setUserAgent(HTTP_USER_AGENT, HTTP_USER_AGENT);
-        dataA.pMP       = std::make_unique<VLC::MediaPlayer>(*dataA.pInst);
-        
-        dataB.pInst     = std::make_unique<VLC::Instance>(vlcArgC, vlcArgs);
-        dataB.pInst->setAppId(PLUGIN_SIGNATURE, PLA_VERSION_FULL, "");
-        dataB.pInst->setUserAgent(HTTP_USER_AGENT, HTTP_USER_AGENT);
-        dataB.pMP       = std::make_unique<VLC::MediaPlayer>(*dataA.pInst);
-        
-        return true;
-    }
-    catch (std::runtime_error e)
-    {
-        LOG_MSG(logERR, ERR_VLC_INIT, e.what());
-    }
-    catch (...)
-    {
-        LOG_MSG(logERR, ERR_VLC_INIT, "?");
-    }
-    CleanupVLC();
-    return false;
+    // (re)create media player
+    dataA.pMP = std::make_unique<VLC::MediaPlayer>(*gInst);
+    dataB.pMP = std::make_unique<VLC::MediaPlayer>(*gInst);
+    return true;
 }
 
 // Cleans up the VLC smart pointers in a proper order
@@ -177,10 +196,8 @@ void COMChannel::CleanupVLC()
     // these are smart pointers, i.e. assigning nullptr destroys an assigned object properly
     dataB.pMedia    = nullptr;
     dataB.pMP       = nullptr;
-    dataB.pInst     = nullptr;
     dataA.pMedia    = nullptr;
     dataA.pMP       = nullptr;
-    dataA.pInst     = nullptr;
 }
 
 // Is VLC properly initialized?
@@ -210,6 +227,9 @@ void COMChannel::RegularMaintenance ()
         StartStreamAsync();
         return;
     }
+    
+    // check for mute status
+    SetVolumeMute();
     
     // *** only every 10th call do the expensive stuff ***
     static int callCnt = 0;
@@ -298,6 +318,11 @@ std::string COMChannel::dbgStatus (bool bFull) const
 // Initialize *all* VLC instances
 bool COMChannel::InitAllVLC()
 {
+    // create global VLC instance
+    if (!CreateVLCInstance())
+        return false;
+    
+    // create channels
     for (COMChannel& chn: gChn) {
         if (!chn.InitVLC())
             return false;
@@ -318,8 +343,12 @@ void COMChannel::StopAll()
 // Cleanup *all* VLC instances, also stops all playback
 void COMChannel::CleanupAllVLC()
 {
+    // cleanup the channels
     for (COMChannel& chn: gChn)
         chn.CleanupVLC();
+    
+    // cleanup the central VLC instance object
+    CleanupVLCInstance();
 }
 
 // Set the volume of all playback streams
@@ -336,13 +365,21 @@ void COMChannel::SetAllVolume(int vol)
 // (un)Mute all playback streams
 void COMChannel::MuteAll(bool bDoMute)
 {
-    const int track = bDoMute ? -1 : 1;
     for (COMChannel& chn : gChn) {
         if (chn.dataA.pMP)
-            chn.dataA.pMP->setAudioTrack(track);
+            chn.dataA.pMP->setMute(bDoMute);
         if (chn.dataB.pMP)
-            chn.dataB.pMP->setAudioTrack(track);
+            chn.dataB.pMP->setMute(bDoMute);
     }
+}
+
+// checks if there is any active stream playing ATIS
+bool COMChannel::AnyATISPlaying()
+{
+    for (const COMChannel& chn : gChn)
+        if (chn.curr->IsATIS())
+            return true;
+    return false;
 }
 
 //
@@ -376,7 +413,9 @@ bool COMChannel::doChange(int _new)
 
 void COMChannel::StartStreamAsync ()
 {
-    // we don't need control over the thread, it lasts for 2s only
+    // Don't want to run multiple threads in parallel...this might block!
+    AbortAndWaitForAsync();
+    // Start the stream asynchronously
     futVlcStart = std::async(std::launch::async, &COMChannel::StartStream, this);
 }
 
@@ -417,16 +456,6 @@ void COMChannel::StartStream ()
     
     // curr is now updated and contains the to-be stream
     
-    // tell the world we work on a frequency
-    if (desyncSecs > 0) {
-        SHOW_MSG(logINFO, MSG_COM_IS_NOW_IN, idx+1, curr->frequString.c_str(),
-                 curr->streamName.c_str(),
-                 desyncSecs);
-    } else {
-        SHOW_MSG(logINFO, MSG_COM_IS_NOW, idx+1, curr->frequString.c_str(),
-                 curr->streamName.c_str());
-    }
-    
     // in most cases the initial URL points to a .pls file,
     // which is a simple playlist format.
     // To avoid running LUA scripts for parsing HTTP responses in the VLC instance
@@ -458,14 +487,45 @@ void COMChannel::StartStream ()
         }
     }
     
+    // *** ATIS handling ***
+    // If curr is an ATIS stream then we don't desync!
+    if (curr->IsATIS()) {
+        desyncSecs = 0;             // no desync period
+        desyncDone = std::chrono::time_point<std::chrono::steady_clock>();
+        StopStream(true);           // latest now kill pushed-aside previous stream
+        if (dataRefs.PreferLiveATCAtis()) {
+            // we will play LiveATC, so suppress X-Plane's internal ATIS
+            dataRefs.EnableXPsATIS(false);
+        } else {
+            // X-Plane's ATIS preferred! So we do not play LiveATC's stream
+            dataRefs.EnableXPsATIS(true);
+            LOG_MSG(logINFO, MSG_COM_IS_NOW_IN, idx+1, curr->frequString.c_str(),
+                     curr->streamName.c_str());
+            // return
+            bAbortStart = true;
+        }
+    }
+    
     // abort early?
     if (bAbortStart) {
         flagStartingStream.clear();
         return;
     }
-
+    
+    // tell the world we work on a frequency
+    if (desyncSecs > 0) {
+        SHOW_MSG(logINFO, MSG_COM_IS_NOW_IN, idx+1, curr->frequString.c_str(),
+                 curr->streamName.c_str(),
+                 desyncSecs);
+    } else {
+        SHOW_MSG(logINFO, MSG_COM_IS_NOW, idx+1, curr->frequString.c_str(),
+                 curr->streamName.c_str());
+    }
+    
     // Create and play the media
-    curr->pMedia = std::make_unique<VLC::Media>(*curr->pInst, curr->playUrl, VLC::Media::FromLocation);
+    curr->pMedia = std::make_unique<VLC::Media>(*gInst,
+                                                curr->playUrl,
+                                                VLC::Media::FromLocation);
     curr->pMP->setMedia(*curr->pMedia);
     if (!curr->pMP->play()) {
         // playback failed
@@ -483,9 +543,7 @@ void COMChannel::StartStream ()
         }
 
         // set volume
-        curr->pMP->setVolume(dataRefs.GetVolume());
-        if (dataRefs.IsMuted())
-            curr->pMP->setAudioTrack(-1);
+        SetVolumeMute();
     }
     
     // done starting this stream
@@ -506,6 +564,21 @@ void COMChannel::StopStream (bool bPrev)
     // stop any timer if stopping the current stream
     if (!bPrev)
         desyncDone = std::chrono::time_point<std::chrono::steady_clock>();
+}
+
+/// determines and sets proper volum/mute status
+void COMChannel::SetVolumeMute ()
+{
+    // globally muted? Or this channel muted?
+    if (dataRefs.IsMuted() || dataRefs.ShallMuteCom(idx)) {
+        dataA.pMP->setMute(true);
+        dataB.pMP->setMute(true);
+    } else {
+        dataA.pMP->setMute(false);
+        dataB.pMP->setMute(false);
+        dataA.pMP->setVolume(dataRefs.GetVolume());
+        dataB.pMP->setVolume(dataRefs.GetVolume());
+    }
 }
 
 // Checks if an async StartStream() operation is in progress
@@ -533,6 +606,16 @@ void COMChannel::TurnCurrToPrev()
     
     // now swap curr<->prev, so that curr then is an initialized fresh object
     std::swap(curr, prev);
+    
+    // if the -now- previous stream is playing then start the desync countdown
+    // (will be set again in StartStream, but if we don't
+    //  set anything now then it might be stopped early by
+    //  RegularMainteanance(), which runs in main thread)
+    // save time when audio desync should be finished
+    long desyncSecs = dataRefs.GetDesyncPeriod();
+    if (desyncSecs > 0)
+        desyncDone = std::chrono::steady_clock::now() +
+        std::chrono::seconds(desyncSecs + ADD_COUNTDOWN_DELAY_S);
 }
 
 //

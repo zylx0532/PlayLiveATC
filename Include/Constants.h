@@ -115,6 +115,7 @@ constexpr float PLA_STARTUP_DELAY = 5.0f;    // [s] before starting to check for
 #define CFG_LT_DESYNC_BUF       "LTDesyncByBufPeriod"
 #define CFG_DESYNC_MANUAL_ADJ   "DesyncManualAdjust"
 #define CFG_PREV_WHILE_DESYNC   "ContPrevFrequWhileDesync"
+#define CFG_ATIS_PREF_LIVEATC   "AtisPreferLiveATC"
 #define CFG_MAX_RADIO_DIST      "MaxRadioDist"
 
 #define CFG_LOG_LEVEL           "LogLevel"

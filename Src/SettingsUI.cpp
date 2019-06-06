@@ -300,7 +300,8 @@ void LTSettingsUI::UpdateValues ()
         btnBasicsCom[idx].SetChecked(dataRefs.ShallActOnCom(idx));
 
     // Volume
-    txtVolume.SetDescriptor(dataRefs.GetVolume());
+    if (!txtVolume.HaveKeyboardFocus())
+        txtVolume.SetDescriptor(dataRefs.GetVolume());
     btnMute.SetChecked(dataRefs.IsMuted());
     
     // LiveTraffic's status

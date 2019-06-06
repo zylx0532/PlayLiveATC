@@ -37,6 +37,7 @@
 
 #define ENV_VLC_PLUGIN_PATH "VLC_PLUGIN_PATH"
 
+#define MSG_COM_IS_ATIS     "COM%d is now %s, referring to %s, suppressed in favour of XP's ATIS"
 #define MSG_COM_IS_NOW      "COM%d is now %s, tuning to '%s'"
 #define MSG_COM_IS_NOW_IN   "COM%d is now %s, tuning to '%s' with %lds delay"
 #define MSG_COM_COUNTDOWN   "COM%d: %ds till '%s' starts"
@@ -66,6 +67,8 @@ enum StreamStatusTy {
     STREAM_NOT_PLAYING,             ///< frequency defined, but no stream playing
     STREAM_SEARCHING,               ///< frequency defined, searching for matching stream
     STREAM_BUFFERING,               ///< VLC started with stream, not yet emmitting sound
+    STREAM_DESYNCING,               ///< VLC is buffering the audio desync period
+    STREAM_MUTED,                   ///< VLC would be playing but is muted
     STREAM_PLAYING,                 ///< VLC playing a LiveATC stream
 };
 
@@ -84,6 +87,10 @@ struct LiveATCDataTy {
     
     /// Copy from another object
     void CopyFrom (const LiveATCDataTy& o) { *this = o; }
+    
+    /// Is this an ATIS channel / has "ATIS" in its name?
+    inline bool IsATIS () const
+    { return streamName.find("ATIS") != std::string::npos; }
 
     /// Textual summary (Icao if needed + stream name)
     inline std::string Summary () const
@@ -104,12 +111,11 @@ struct StreamCtrlTy : public LiveATCDataTy {
     std::string frequString;    ///< frequncy in kHz as string in format ###.###
 
     // VLC control
-    std::unique_ptr<VLC::Instance>      pInst;  ///< VLC instance
     std::unique_ptr<VLC::MediaPlayer>   pMP;    ///< VLC media player
     std::unique_ptr<VLC::Media>         pMedia; ///< VLC media to be played, changes with new LiveATC streams
     
     /// Is VLC properly initialized?
-    inline bool IsValid() const { return pInst && pMP; }
+    inline bool IsValid() const { return bool(pMP); }
     /// stream's status
     StreamStatusTy GetStatus() const;
     /// Is COM channel defined, i.e. at least a frequency set?
@@ -225,6 +231,9 @@ public:
     /// (un)Mute all playback streams
     static void MuteAll(bool bDoMute = true);
     
+    /// checks if there is any active stream playing ATIS
+    static bool AnyATISPlaying();
+    
 protected:
     /// @brief Checks for and performs change in frequency
     /// @param _new New frequency in Hz as returned by XP.
@@ -239,6 +248,9 @@ protected:
     /// @brief Stop `curr` or `prev` stream immediately
     /// @param bPrev Stop `prev`? (Otherwise stop `curr`)
     void StopStream (bool bPrev);
+    
+    /// determines and sets proper volum/mute status
+    void SetVolumeMute ();
     
     /// Checks if an async StartStream() operation is in progress
     bool IsAsyncRunning () const;

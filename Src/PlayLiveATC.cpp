@@ -192,7 +192,7 @@ float PLAFlightLoopCB (float, float, int, void*)
     for (COMChannel& chn: gChn) {
         const int idx = chn.GetIdx();
         // should we actually _act_ on that COM radio?
-        if (dataRefs.ConsiderCom(idx)) {
+        if (dataRefs.ShallActOnCom(idx)) {
             // yes, consider this COM radio
             chn.RegularMaintenance();
         } else {
@@ -203,6 +203,10 @@ float PLAFlightLoopCB (float, float, int, void*)
         }
         
     }
+    
+    // if there is no ATIS channel playing then make sure XP can play ATIS
+    if (!COMChannel::AnyATISPlaying())
+        dataRefs.EnableXPsATIS(true);
     
     // call me again in a second
     return 1.0f;

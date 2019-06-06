@@ -37,11 +37,11 @@ void MenuUpdateCheckmarks();
 // XP standard and LiveTraffic Datarefs being accessed
 enum dataRefsXP_LT {
     // XP standard
-    DR_XP_RADIO_COM1_FREQ = 0,          // sim/cockpit/radios/com1_freq_hz
-    DR_XP_RADIO_COM2_FREQ,              // sim/cockpit/radios/com2_freq_hz
-    DR_XP_RADIO_COM1_SEL,               // sim/cockpit2/radios/actuators/audio_selection_com1
-    DR_XP_RADIO_COM2_SEL,               // sim/cockpit2/radios/actuators/audio_selection_com2
-    DR_PLANE_LAT,                       // user's plane's position
+    DR_XP_RADIO_COM1_FREQ = 0,          ///< sim/cockpit/radios/com1_freq_hz
+    DR_XP_RADIO_COM2_FREQ,              ///< sim/cockpit/radios/com2_freq_hz
+    DR_XP_RADIO_COM1_SEL,               ///< sim/cockpit2/radios/actuators/audio_selection_com1
+    DR_XP_RADIO_COM2_SEL,               ///< sim/cockpit2/radios/actuators/audio_selection_com2
+    DR_PLANE_LAT,                       ///< user's plane's position
     DR_PLANE_LON,
     DR_PLANE_ELEV,
     DR_PLANE_PITCH,
@@ -50,12 +50,17 @@ enum dataRefsXP_LT {
     DR_PLANE_TRACK,
     DR_PLANE_TRUE_AIRSPEED,
     DR_PLANE_ONGRND,
+    // X-Plane 11 only
+    DR_XP_ATIS_ENABLED,                 ///< sim/atc/atis_enabled
     // LiveTraffic
-    DR_LT_AIRCRAFTS_DISPLAYED,          // is LiveTraffic active?
-    DR_LT_FD_BUF_PERIOD,                // LiveTraffic's buffering period
-    // always last, number of elements
+    DR_LT_AIRCRAFTS_DISPLAYED,          ///< is LiveTraffic active?
+    DR_LT_FD_BUF_PERIOD,                ///< LiveTraffic's buffering period
+    
+    /// always last, number of elements
     CNT_DATAREFS_XP
 };
+
+constexpr dataRefsXP_LT DR_FIRST_XP11_DR = DR_XP_ATIS_ENABLED;
 constexpr dataRefsXP_LT DR_FIRST_LT_DR = DR_LT_AIRCRAFTS_DISPLAYED;
 
 // PLA commands to be offered
@@ -65,7 +70,7 @@ enum cmdRefsPLA {
     CNT_CMDREFS_PLA                     // always last, number of elements
 };
 
-// number of Frequencies to listen to
+/// number of Frequencies to listen to
 constexpr int COM_CNT = 2;
 
 
@@ -73,35 +78,36 @@ class DataRefs
 {
 //MARK: DataRefs
 protected:
-    XPLMDataRef adrXP[CNT_DATAREFS_XP];                 // array of XP data refs to read from
+    XPLMDataRef adrXP[CNT_DATAREFS_XP];         ///< array of XP data refs to read from
 public:
-    XPLMCommandRef cmdPLA[CNT_CMDREFS_PLA];
+    XPLMCommandRef cmdPLA[CNT_CMDREFS_PLA];     ///< array of commands PLA offers
 
 //MARK: Provided Data, i.e. global variables
 protected:
-    XPLMPluginID pluginID       = 0;
-    logLevelTy iLogLevel        = logWARN;
-    logLevelTy iMsgAreaLevel    = logINFO;
-    std::string XPSystemPath;
-    std::string PluginPath;                             // path to plugin directory
-    std::string DirSeparator;
+    XPLMPluginID pluginID       = 0;            ///< my own plugin id
+    logLevelTy iLogLevel        = logWARN;      ///< logging level
+    logLevelTy iMsgAreaLevel    = logINFO;      ///< message are level
+    std::string XPSystemPath;                   ///< path to X-Plane's main directory
+    std::string PluginPath;                     ///< path to plugin directory
+    std::string DirSeparator;                   ///< directory separation character
     
-    bool bActOnCom[COM_CNT] = {true,true};      // which frequency to act upon?
-    bool bRespectAudioSelect = false;           // only start VLC for selected radio
-    std::string VLCPluginPath;                  // Path to VLC plugins
+    bool bActOnCom[COM_CNT] = {true,true};      ///< which frequency to act upon?
+    bool bRespectAudioSelect = true;            ///< only play VLC stream for selected radio
+    std::string VLCPluginPath;                  ///< Path to VLC plugins
     int iVolume = 50;                           ///< volume VLC play at (0-100)
     bool bMute = false;                         ///< temporarily muted? (not stored in config file)
-    bool bDesyncLiveTrafficDelay = true;        // audio-desync with LiveTraffic's delay?
-    int desyncManual = -10;                     // [s] (additional) manual audio-desync
-    bool bPrevFrequRunsTilDesync = true;        // have the previous radio frequency continue till new one reaches desync period
-    int maxRadioDist = 300;                     // [nm] max distance a radio can be received
+    bool bDesyncLiveTrafficDelay = true;        ///< audio-desync with LiveTraffic's delay?
+    int desyncManual = -10;                     ///< [s] (additional) manual audio-desync
+    bool bPrevFrequRunsTilDesync = true;        ///< have the previous radio frequency continue till new one reaches desync period
+    bool bAtisPreferLiveATC = true;             ///< if playing a LiveATC-ATIS-stream suppress XP's output (XP11 only)
+    int maxRadioDist = 300;                     ///< [nm] max distance a radio can be received
     
 //MARK: Constructor
 public:
-    DataRefs ( logLevelTy initLogLevel );       // Constructor doesn't do much
-    bool Init();                                // Early init DataRefs, return "OK?"
-    bool LateInit();                            // Late init like other plugin's dataRefs
-    void Stop();                                // unregister what's needed
+    DataRefs ( logLevelTy initLogLevel );       ///< Constructor doesn't do much
+    bool Init();                                ///< Early init DataRefs, return "OK?"
+    bool LateInit();                            ///< Late init like other plugin's dataRefs
+    void Stop();                                ///< unregister what's needed
 
     inline XPLMPluginID GetMyPluginId() const { return pluginID; }
 
@@ -131,6 +137,13 @@ public:
     void SetVolume(int iNewVolume);                 ///< sets new volume, also applies it to current playback
     bool IsMuted() const { return bMute; }          ///< Currently muted?
     void Mute(bool bDoMute = true);                 ///< (Un)Mute, also applies it to current playback
+    
+    /// Prefer LiveATC's ATIS over XP's ATIS
+    bool PreferLiveATCAtis () const { return bAtisPreferLiveATC; }
+    /// Set ATIS channel preference
+    void SetPreferLiveATCAtis (bool bPrefLiveATC) { bAtisPreferLiveATC = bPrefLiveATC; }
+    /// Tell XP our ATIS preference
+    void EnableXPsATIS (bool bEnable);
 
     // Desync
     inline bool ShallDesyncWithLTDelay () const { return bDesyncLiveTrafficDelay; }
@@ -152,8 +165,8 @@ public:
     bool IsLTActive () const;
     int GetLTBufPeriod () const;
 
-    /// Consider COM `idx`, considering all configured options?
-    bool ConsiderCom(int idx) const;
+    /// Should this COM channel be muted because not active?
+    bool ShallMuteCom(int idx) const;
     long GetDesyncPeriod () const;      ///< audio desync time in seconds
     
     // Get XP System Path

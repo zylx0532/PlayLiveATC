@@ -44,6 +44,8 @@ const char* DATA_REFS_XP[] = {
     "sim/flightmodel/position/hpath",
     "sim/flightmodel/position/true_airspeed",
     "sim/flightmodel/failures/onground_any",
+    // X-Plane 11 only
+    "sim/atc/atis_enabled",                                 // int    y    boolean    Is the ATIS system enabled? If not, no ATIS text or audio will appear even when tuned to a proper frequency."
     // LiveTraffic
     "livetraffic/cfg/aircrafts_displayed",
     "livetraffic/cfg/fd_buf_period",
@@ -156,11 +158,11 @@ bool DataRefs::FindDataRefs (bool bEarly)
         if ( (adrXP[i] = XPLMFindDataRef (DATA_REFS_XP[i])) == NULL )
         {
             // XP standard stuff must exist
-            if (bEarly) {
+            if (bEarly && i < DR_FIRST_XP11_DR) {
                 LOG_MSG(logFATAL,ERR_DATAREF_FIND,DATA_REFS_XP[i]);
                 return false;
             }
-            // other plugin's stuff is optional
+            // XP11 or other plugin's stuff is optional
             LOG_MSG(logDEBUG,ERR_DATAREF_FIND,DATA_REFS_XP[i]);
         }
     }
@@ -200,6 +202,14 @@ void DataRefs::Mute(bool bDoMute)
 {
     COMChannel::MuteAll(bMute = bDoMute);
 }
+
+// Tell XP our ATIS preference
+void DataRefs::EnableXPsATIS (bool bEnable)
+{
+    if (adrXP[DR_XP_ATIS_ENABLED])
+        XPLMSetDatai(adrXP[DR_XP_ATIS_ENABLED], int(bEnable));
+}
+
 
 //
 // MARK: Configurations and Data Access
@@ -261,12 +271,11 @@ int DataRefs::GetLTBufPeriod () const
 // MARK: Actual Current Observations
 //
 
-// consider given COM only if configured to do so and check for selection
-bool DataRefs::ConsiderCom(int idx) const
+// should this COM channel be muted because not active?
+bool DataRefs::ShallMuteCom(int idx) const
 {
     return
-    ShallActOnCom(idx) &&
-    (!ShallRespectAudioSelect() || IsComSel(idx));
+    (ShallRespectAudioSelect() && !IsComSel(idx));
 }
 
 /// @return actual current audio desync period in seconds, >= 0
@@ -375,6 +384,7 @@ bool DataRefs::LoadConfigFile()
         else if (sCfgName == CFG_LT_DESYNC_BUF)     bDesyncLiveTrafficDelay = bVal;
         else if (sCfgName == CFG_DESYNC_MANUAL_ADJ) desyncManual = (int)lVal;
         else if (sCfgName == CFG_PREV_WHILE_DESYNC) bPrevFrequRunsTilDesync = bVal;
+        else if (sCfgName == CFG_ATIS_PREF_LIVEATC) bAtisPreferLiveATC = bVal;
         else if (sCfgName == CFG_MAX_RADIO_DIST)    maxRadioDist = (int)lVal;
         else if (sCfgName == CFG_LOG_LEVEL)         iLogLevel = logLevelTy(lVal);
         else if (sCfgName == CFG_MSG_AREA_LEVEL)    iMsgAreaLevel = logLevelTy(lVal);
@@ -438,6 +448,7 @@ bool DataRefs::SaveConfigFile()
     fOut << CFG_LT_DESYNC_BUF       << ' ' << bDesyncLiveTrafficDelay   << '\n';
     fOut << CFG_DESYNC_MANUAL_ADJ   << ' ' << desyncManual              << '\n';
     fOut << CFG_PREV_WHILE_DESYNC   << ' ' << bPrevFrequRunsTilDesync   << '\n';
+    fOut << CFG_ATIS_PREF_LIVEATC   << ' ' << bAtisPreferLiveATC        << '\n';
     fOut << CFG_MAX_RADIO_DIST      << ' ' << maxRadioDist              << '\n';
     fOut << CFG_LOG_LEVEL           << ' ' << iLogLevel                 << '\n';
     fOut << CFG_MSG_AREA_LEVEL      << ' ' << iMsgAreaLevel             << '\n';
