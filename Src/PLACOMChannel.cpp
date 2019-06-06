@@ -39,11 +39,14 @@ COMChannel gChn[COM_CNT] = {
 
 /// Static arguments passed to the VLC initialization
 const char* vlcArgs[] = {
-    "--no-lua"
+#ifdef _DEBUG
+    "-vvv",
+#endif
+    "--no-lua"              // this reduces the number of plugins required, but also necessitates our parsing of the .pls URL
 };
 
 /// Number of `vlcArgs`
-constexpr size_t vlcArgC = sizeof(vlcArgs)/sizeof(vlcArgs[0]);
+const int vlcArgC = sizeof(vlcArgs)/sizeof(vlcArgs[0]);
 
 //
 // MARK: Helper structs
@@ -125,6 +128,8 @@ COMChannel::~COMChannel()
 bool COMChannel::InitVLC()
 {
     // tell VLC where to find the plugins
+    // (In Windows, this has no effect.)
+    // TODO: Verify if there is any effect in MacOS. If not: remove.
     setenv(ENV_VLC_PLUGIN_PATH, dataRefs.GetVLCPath().c_str(), 1);
     
     // just in case - cleanup in proper order
@@ -317,6 +322,29 @@ void COMChannel::CleanupAllVLC()
         chn.CleanupVLC();
 }
 
+// Set the volume of all playback streams
+void COMChannel::SetAllVolume(int vol)
+{
+    for (COMChannel& chn : gChn) {
+        if (chn.dataA.pMP)
+            chn.dataA.pMP->setVolume(vol);
+        if (chn.dataB.pMP)
+            chn.dataB.pMP->setVolume(vol);
+    }
+}
+
+// (un)Mute all playback streams
+void COMChannel::MuteAll(bool bDoMute)
+{
+    const int track = bDoMute ? -1 : 1;
+    for (COMChannel& chn : gChn) {
+        if (chn.dataA.pMP)
+            chn.dataA.pMP->setAudioTrack(track);
+        if (chn.dataB.pMP)
+            chn.dataB.pMP->setAudioTrack(track);
+    }
+}
+
 //
 // MARK: Protected functions
 //
@@ -453,6 +481,11 @@ void COMChannel::StartStream ()
             desyncDone = std::chrono::steady_clock::now() +
             std::chrono::seconds(desyncSecs);
         }
+
+        // set volume
+        curr->pMP->setVolume(dataRefs.GetVolume());
+        if (dataRefs.IsMuted())
+            curr->pMP->setAudioTrack(-1);
     }
     
     // done starting this stream
@@ -469,6 +502,10 @@ void COMChannel::StopStream (bool bPrev)
                 atcData.streamName.c_str(), atcData.frequString.c_str());
     }
     atcData.StopAndClear();
+
+    // stop any timer if stopping the current stream
+    if (!bPrev)
+        desyncDone = std::chrono::time_point<std::chrono::steady_clock>();
 }
 
 // Checks if an async StartStream() operation is in progress
@@ -485,15 +522,6 @@ void COMChannel::AbortAndWaitForAsync()
         bAbortStart = true;         // let StartStream() abort as soon as possible
         futVlcStart.get();
     }
-}
-
-// compute complete parameter string for VLC
-std::string COMChannel::GetVlcParams()
-{
-    std::string params = dataRefs.GetVLCParams();
-    str_replace(params, PARAM_REPL_DESYNC, std::to_string(dataRefs.GetDesyncPeriod()));
-    str_replace(params, PARAM_REPL_URL, curr->playUrl);
-    return params;
 }
 
 /// If `prev` is still active it is stopped first, which would block

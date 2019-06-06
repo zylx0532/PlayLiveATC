@@ -51,6 +51,11 @@ std::string GetErrorStr(DWORD err = -1);
 
 // https://stackoverflow.com/a/21767578
 HWND FindMainWindow(HANDLE hProcess);
+
+/// @brief Windows-replacement wrapper for setenv
+/// @see http://man7.org/linux/man-pages/man3/setenv.3.html
+int setenv(const char *name, const char *value, int overwrite);
+
 #endif
 
 // MARK: String helpers

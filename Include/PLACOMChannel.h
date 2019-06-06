@@ -218,6 +218,12 @@ public:
     
     /// Cleanup *all* VLC instances, also stops all playback
     static void CleanupAllVLC();
+
+    /// Set the volume of all playback streams
+    static void SetAllVolume(int vol);
+
+    /// (un)Mute all playback streams
+    static void MuteAll(bool bDoMute = true);
     
 protected:
     /// @brief Checks for and performs change in frequency
@@ -239,9 +245,6 @@ protected:
     /// Aborts StartStream()) and waits for it to complete
     void AbortAndWaitForAsync ();
 
-    // compute complete parameter string for VLC
-    std::string GetVlcParams();
-    
     // *** Determination of stream URL to play ***
     /// Turn `curr` stream into `prev`
     void TurnCurrToPrev ();

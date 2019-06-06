@@ -46,8 +46,8 @@ protected:
     // Basics tab
     TFButtonWidget btnBasicsCom[COM_CNT]; // toggle act on COM1/2
     TFButtonWidget btnPlayIfSelected;
-    TFTextFieldWidget txtPathToVLC;
-    TFWidget capValidatePath;
+    TFTextFieldWidget txtVolume;
+    TFButtonWidget btnMute;
     
     TFWidget capLTIntegration;
     std::string capLTIntegFormatStr;
@@ -59,7 +59,8 @@ protected:
     // Advanced tab
     TFButtonGroup logLevelGrp;          // radio buttons to select logging level
     TFButtonGroup msgAreaLevelGrp;      // radio buttons to select msg area level
-    TFTextFieldWidget txtVLCParams;
+    TFTextFieldWidget txtPathToVLC;
+    TFWidget capValidatePath;
     TFTextFieldWidget txtMaxRadioDist;
 
 public:

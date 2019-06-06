@@ -123,15 +123,11 @@ bool DataRefs::Init ()
 
     // pre-fill VLC path with a good guess
     if (existsFile(CFG_PATH_DEFAULT))
-        VLCPath = CFG_PATH_DEFAULT;
+        VLCPluginPath = CFG_PATH_DEFAULT;
 
     // read configuration file if any
     if (!LoadConfigFile())
         return false;
-    
-    // make sure there is some parameters, won't work without
-    if (VLCParams.empty())
-        VLCParams = CFG_PARAMS_DEFAULT;
     
     return true;
 }
@@ -187,6 +183,22 @@ bool DataRefs::RegisterCommands()
         { LOG_MSG(logERR,ERR_CREATE_COMMAND,CMD_REFS_PLA[i].cmdName); bRet = false; }
     }
     return bRet;
+}
+
+void DataRefs::SetVolume(int iNewVolume)
+{
+    // Range: 0..100
+    if (iNewVolume < 0) iNewVolume = 0;
+    if (iNewVolume > 100) iNewVolume = 100;
+
+    // save and set all playbacks' volume
+    COMChannel::SetAllVolume(iVolume = iNewVolume);
+}
+
+
+void DataRefs::Mute(bool bDoMute)
+{
+    COMChannel::MuteAll(bMute = bDoMute);
 }
 
 //
@@ -357,9 +369,9 @@ bool DataRefs::LoadConfigFile()
         }
         
         // other entries
-             if (sCfgName == CFG_VLC_PATH)          VLCPath = sRestOfLine;
-        else if (sCfgName == CFG_VLC_PARAMS)        VLCParams = sRestOfLine;
+             if (sCfgName == CFG_VLC_PATH)          VLCPluginPath = sRestOfLine;
         else if (sCfgName == CFG_RESPECT_COM_SEL)   bRespectAudioSelect = bVal;
+        else if (sCfgName == CFG_VOLUME)            iVolume = (int)lVal;
         else if (sCfgName == CFG_LT_DESYNC_BUF)     bDesyncLiveTrafficDelay = bVal;
         else if (sCfgName == CFG_DESYNC_MANUAL_ADJ) desyncManual = (int)lVal;
         else if (sCfgName == CFG_PREV_WHILE_DESYNC) bPrevFrequRunsTilDesync = bVal;
@@ -419,11 +431,10 @@ bool DataRefs::SaveConfigFile()
     }
     
     // other entries
-    if (!VLCPath.empty())
-        fOut << CFG_VLC_PATH        << ' ' << VLCPath                   << '\n';
-    if (!VLCParams.empty())
-        fOut << CFG_VLC_PARAMS      << ' ' << VLCParams                 << '\n';
+    if (!VLCPluginPath.empty())
+        fOut << CFG_VLC_PATH        << ' ' << VLCPluginPath             << '\n';
     fOut << CFG_RESPECT_COM_SEL     << ' ' << bRespectAudioSelect       << '\n';
+    fOut << CFG_VOLUME              << ' ' << iVolume                   << '\n';
     fOut << CFG_LT_DESYNC_BUF       << ' ' << bDesyncLiveTrafficDelay   << '\n';
     fOut << CFG_DESYNC_MANUAL_ADJ   << ' ' << desyncManual              << '\n';
     fOut << CFG_PREV_WHILE_DESYNC   << ' ' << bPrevFrequRunsTilDesync   << '\n';

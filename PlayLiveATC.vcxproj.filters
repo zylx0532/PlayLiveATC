@@ -7,6 +7,15 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{ac8e2409-59f1-4436-ab37-257bca0c37bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vlc">
+      <UniqueIdentifier>{ba0cc747-a9d4-44dd-8b44-ca4bb90ddf3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vlc\vlcpp">
+      <UniqueIdentifier>{d66d143c-9472-46cd-9b1a-c15a9e4570cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vlc\vlc">
+      <UniqueIdentifier>{163e8e0e-e9b6-45b4-889c-8dd83124b7d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DataRefs.cpp">
@@ -33,7 +42,7 @@
     <ClCompile Include="Src\CoordCalc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Src\SLACOMChannel.cpp">
+    <ClCompile Include="Src\PLACOMChannel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,8 +71,98 @@
     <ClInclude Include="Include\CoordCalc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\SLACOMChannel.h">
+    <ClInclude Include="Include\PLACOMChannel.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\common.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\Dialog.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\Equalizer.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\EventManager.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\Instance.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\Internal.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\Media.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\MediaDiscoverer.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\MediaLibrary.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\MediaList.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\MediaListPlayer.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\MediaPlayer.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\Picture.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\RendererDiscoverer.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\structures.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlcpp\vlc.hpp">
+      <Filter>vlc\vlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\deprecated.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\libvlc.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\libvlc_dialog.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\libvlc_events.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\libvlc_media.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\libvlc_media_discoverer.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\libvlc_media_library.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\libvlc_media_list.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\libvlc_media_list_player.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\libvlc_media_player.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\libvlc_renderer_discoverer.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\libvlc_version.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\libvlc_vlm.h">
+      <Filter>vlc\vlc</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\vlc\include\vlc\vlc.h">
+      <Filter>vlc\vlc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

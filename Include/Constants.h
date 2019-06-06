@@ -78,6 +78,8 @@ extern char PLA_BETA_VER_LIMIT_TXT[];
 #define BETA_LIMITED_EXPIRED    "BETA-Version limited to %s has EXPIRED -> SHUTTING DOWN! Get an up-to-date version from X-Plane.org."
 constexpr int PLA_NEW_VER_CHECK_TIME = 48;   // [h] between two checks of a new
 
+constexpr float PLA_STARTUP_DELAY = 5.0f;    // [s] before starting to check for COM changes, gives LT time to startup first
+
 //MARK: Text Constants
 #define SWITCH_LIVE_ATC         "PlayLiveATC"
 #define PLA_CFG_VERSION         "1.0"        // current version of config file format
@@ -99,22 +101,16 @@ constexpr int PLA_NEW_VER_CHECK_TIME = 48;   // [h] between two checks of a new
 //MARK: Config File Entries
 #define CFG_TOGGLE_COM          "ActOnChangeOfCOM%d"
 #define CFG_RESPECT_COM_SEL     "PlayComSelected"
+#define CFG_VOLUME              "Volume"
 #define CFG_VLC_PATH            "VLCPath"
-#define CFG_VLC_PARAMS          "VLCParams"
 
 #if IBM                         // Windows default path and parameters
-#define CFG_PATH_DEFAULT        "c:\\Program Files (x86)\\VideoLAN\\VLC\\plugins"
-#define CFG_PARAMS_DEFAULT      "--qt-start-minimized --audio-desync={desync} {url}"
+#define CFG_PATH_DEFAULT        "c:\\Program Files\\VideoLAN\\VLC\\plugins"
 #elif LIN                       // Linux default path and parameters
 #define CFG_PATH_DEFAULT        "/usr/lib/vlc/plugins"
-#define CFG_PARAMS_DEFAULT      "-Idummy --audio-desync={desync} {url}"
 #else                           // Mac OS default path and parameters
 #define CFG_PATH_DEFAULT        "/Applications/VLC.app/Contents/MacOS/plugins"
-#define CFG_PARAMS_DEFAULT      "-Idummy --audio-desync={desync} {url}"
 #endif
-
-#define PARAM_REPL_DESYNC       "{desync}"
-#define PARAM_REPL_URL          "{url}"
 
 #define CFG_LT_DESYNC_BUF       "LTDesyncByBufPeriod"
 #define CFG_DESYNC_MANUAL_ADJ   "DesyncManualAdjust"

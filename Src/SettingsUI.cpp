@@ -63,6 +63,10 @@ enum UI_WIDGET_IDX_T {
     UI_BASICS_BTN_COM2,
     UI_BASICS_CAP_COM2_STATUS,
     UI_BASICS_BTN_PLAY_IF_SELECTED,
+
+    UI_BASICS_CAP_VOLUME,
+    UI_BASICS_TXT_VOLUME,
+    UI_BASICS_BTN_MUTE,
     
     UI_BASICS_CAP_LIVE_TRAFFIC,
     UI_BASICS_BTN_LT_USE_BUF_PERIOD,
@@ -92,9 +96,6 @@ enum UI_WIDGET_IDX_T {
     UI_ADVCD_TXT_PATH_TO_VLC,
     UI_ADVCD_CAP_VALIDATE_PATH,
     
-    UI_ADVCD_CAP_VLC_PARAMS,
-    UI_ADVCD_TXT_VLC_PARAMS,
-    
     UI_ADVCD_CAP_MAX_RADIO_DIST,
     UI_ADVCD_TXT_MAX_RADIO_DIST,
 
@@ -118,7 +119,11 @@ TFWidgetCreate_t SETTINGS_UI[] =
     { 170,   8,  -5,  10, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
     {  10,  25,  10,  10, 1, "Watch COM2 frequency",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
     { 170,  23,  -5,  10, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
-    {  10,  50,  10,  10, 1, "Play only if COM radio is selected",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
+    {  10,  50,  10,  10, 1, "Mute if COM radio is deselected",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
+
+    {   5,  70, 100,  10, 1, "Volume:",             0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
+    { 200,  70,  50,  15, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_TextField, {xpProperty_MaxCharacters,3, 0,0, 0,0} },
+    {  10,  90,  10,  10, 1, "Mute",                0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
 
     {   5, 100,  -5,  10, 1, "LiveTraffic integration (%s):",0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
     {  10, 120,  10,  10, 1, "Delay audio by LiveTraffic's buffering period",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
@@ -147,11 +152,8 @@ TFWidgetCreate_t SETTINGS_UI[] =
     {  10,  75,  -5,  15, 1, "",                    0, UI_ADVCD_SUB_WND, xpWidgetClass_TextField, {0,0, 0,0, 0,0} },
     {   5,  90,  -5,  10, 1, "",                    0, UI_ADVCD_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
     
-    {   5, 110,  -5,  10, 1, "VLC Parameters (leave empty to return to defaults):",0, UI_ADVCD_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
-    {  10, 125,  -5,  15, 1, "",                    0, UI_ADVCD_SUB_WND, xpWidgetClass_TextField, {0,0, 0,0, 0,0} },
-
-    {   5, 155, 195,  10, 1, "Max radio distance: [nm]", 0, UI_ADVCD_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
-    { 200, 155,  50,  15, 1, "",                    0, UI_ADVCD_SUB_WND, xpWidgetClass_TextField, {xpProperty_MaxCharacters,3, 0,0, 0,0} },
+    {   5, 110, 195,  10, 1, "Max radio distance: [nm]", 0, UI_ADVCD_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
+    { 200, 110,  50,  15, 1, "",                    0, UI_ADVCD_SUB_WND, xpWidgetClass_TextField, {xpProperty_MaxCharacters,3, 0,0, 0,0} },
 };
 
 constexpr int NUM_WIDGETS = sizeof(SETTINGS_UI)/sizeof(SETTINGS_UI[0]);
@@ -194,7 +196,10 @@ void LTSettingsUI::Enable()
         btnBasicsCom[1].setId(widgetIds[UI_BASICS_BTN_COM2]);
         btnPlayIfSelected.setId(widgetIds[UI_BASICS_BTN_PLAY_IF_SELECTED]);
         btnPlayIfSelected.SetChecked(dataRefs.ShallRespectAudioSelect());
-        
+        txtVolume.setId(widgetIds[UI_BASICS_TXT_VOLUME]);
+        txtVolume.tfFormat = TFTextFieldWidget::TFF_DIGITS;
+        btnMute.setId(widgetIds[UI_BASICS_BTN_MUTE]);
+
         // LiveTraffic integration / audio desync
         capLTIntegration.setId(widgetIds[UI_BASICS_CAP_LIVE_TRAFFIC]);
         capLTIntegFormatStr = capLTIntegration.GetDescriptor();
@@ -243,8 +248,6 @@ void LTSettingsUI::Enable()
         txtPathToVLC.SetDescriptor(dataRefs.GetVLCPath());
         capValidatePath.setId(widgetIds[UI_ADVCD_CAP_VALIDATE_PATH]);
 
-        txtVLCParams.setId(widgetIds[UI_ADVCD_TXT_VLC_PARAMS]);
-        txtVLCParams.SetDescriptor(dataRefs.GetVLCParams());
         txtMaxRadioDist.setId(widgetIds[UI_ADVCD_TXT_MAX_RADIO_DIST]);
         txtMaxRadioDist.tfFormat = TFTextFieldWidget::TFF_DIGITS;
         txtMaxRadioDist.SetDescriptor(dataRefs.GetMaxRadioDist());
@@ -295,6 +298,10 @@ void LTSettingsUI::UpdateValues ()
     // are COMs selected?
     for (int idx = 0; idx < COM_CNT; idx++)
         btnBasicsCom[idx].SetChecked(dataRefs.ShallActOnCom(idx));
+
+    // Volume
+    txtVolume.SetDescriptor(dataRefs.GetVolume());
+    btnMute.SetChecked(dataRefs.IsMuted());
     
     // LiveTraffic's status
     snprintf(buf, sizeof(buf), capLTIntegFormatStr.c_str(),
@@ -316,7 +323,12 @@ bool LTSettingsUI::MsgTextFieldChanged (XPWidgetID textWidget, std::string text)
     // *** Basic ***
     // audio desync adjust
     if (txtDesyncAdjust == textWidget) {
-        dataRefs.SetManualDesync(std::stoi(txtDesyncAdjust.GetDescriptor()));
+        dataRefs.SetManualDesync(std::stoi(text));
+        return true;
+    }
+
+    if (txtVolume == textWidget) {
+        dataRefs.SetVolume(std::stoi(text));
         return true;
     }
     
@@ -324,17 +336,6 @@ bool LTSettingsUI::MsgTextFieldChanged (XPWidgetID textWidget, std::string text)
     if (txtPathToVLC == textWidget) {
         ValidateUpdateVLCPath(text);
         // processed
-        return true;
-    }
-    
-    if (txtVLCParams == textWidget) {
-        if (text.empty()) {                 // empty input == 'return to default'
-            dataRefs.SetVLCParams(CFG_PARAMS_DEFAULT);
-            txtVLCParams.SetDescriptor(CFG_PARAMS_DEFAULT);
-        }
-        else {
-            dataRefs.SetVLCParams(text);
-        }
         return true;
     }
     
@@ -384,6 +385,8 @@ bool LTSettingsUI::MsgButtonStateChanged (XPWidgetID buttonWidget, bool bNowChec
     
     // Play only if selected
     if (btnPlayIfSelected == buttonWidget) { dataRefs.SetRespectAudioSelect(bNowChecked); return true; }
+    // Mute
+    if (btnMute == buttonWidget) { dataRefs.Mute(bNowChecked); return true; }
     // Audio delay as per LT's buffering period
     if (btnLTUseBufPeriod == buttonWidget) { dataRefs.SetDesyncWithLTDelay(bNowChecked); return true; }
     // Play only if selected

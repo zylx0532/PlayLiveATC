@@ -215,7 +215,7 @@ float PLAOneTimeCB (float, float, int, void*)
     // fetch dataRefs we might need
     if (dataRefs.LateInit()) {
         // start the regular callback
-        XPLMRegisterFlightLoopCallback(PLAFlightLoopCB, 1, NULL);
+        XPLMRegisterFlightLoopCallback(PLAFlightLoopCB, PLA_STARTUP_DELAY, NULL);
     }
     
     // don't call me again

@@ -157,7 +157,17 @@ HWND FindMainWindow(HANDLE hProcess)
 }
 
 
-#endif
+/// @see https://stackoverflow.com/a/23616164
+int setenv(const char *name, const char *value, int /*overwrite*/)
+{
+    if (!SetEnvironmentVariableA(name, value)) {
+        LOG_MSG(logERR, "Could not set env var %s=%s: %s",
+            name, value, GetErrorStr().c_str());
+        return 1;
+    }
+    return 0;
+}
+#endif // IBM
 
 // separates string into tokens
 std::vector<std::string> str_tokenize (const std::string s,
