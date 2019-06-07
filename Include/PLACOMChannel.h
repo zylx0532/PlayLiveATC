@@ -125,8 +125,8 @@ struct StreamCtrlTy : public LiveATCDataTy {
     void StopAndClear ();
     
     /// Textual summary (stream and status)
-    inline std::string Summary () const
-    { return LiveATCDataTy::Summary() + " (" + GetStatusStr(GetStatus()) + ")"; }
+    inline std::string Summary (StreamStatusTy eStatus = STREAM_NOT_INIT) const
+    { return LiveATCDataTy::Summary() + " (" + GetStatusStr(eStatus ? eStatus : GetStatus()) + ")"; }
     /// Textual debug output, e.g. for log file
     inline std::string dbgStatus () const
     { return LiveATCDataTy::dbgStatus() + '|' + GetStatusStr(GetStatus()); }

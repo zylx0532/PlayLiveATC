@@ -94,7 +94,7 @@ protected:
     bool bActOnCom[COM_CNT] = {true,true};      ///< which frequency to act upon?
     bool bRespectAudioSelect = true;            ///< only play VLC stream for selected radio
     std::string VLCPluginPath;                  ///< Path to VLC plugins
-    int iVolume = 50;                           ///< volume VLC play at (0-100)
+    int iVolume = 100;                          ///< volume VLC play at (0-100)
     bool bMute = false;                         ///< temporarily muted? (not stored in config file)
     bool bDesyncLiveTrafficDelay = true;        ///< audio-desync with LiveTraffic's delay?
     int desyncManual = -10;                     ///< [s] (additional) manual audio-desync

@@ -117,7 +117,8 @@ void    draw_msg(XPLMWindowID in_window_id, void * /*in_refcon*/)
     bool bNeedWndForCountdown = false;
     if (dataRefs.GetMsgAreaLevel() <= logINFO)
         for (COMChannel& chn: gChn)
-            if (chn.IsDesyncing()) {
+            if (chn.IsDesyncing() && !chn.GetStreamCtrlData().streamName.empty())
+            {
                 char buf[50];
                 snprintf(buf, sizeof(buf), MSG_COM_COUNTDOWN,
                          chn.GetIdx()+1,

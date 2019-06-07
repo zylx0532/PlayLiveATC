@@ -117,8 +117,9 @@ StreamStatusTy StreamCtrlTy::GetStatus() const
         return STREAM_NOT_INIT;
     
     // playing a stream, i.e. emmitting sound?
-    if (pMP->isPlaying())
-        return STREAM_PLAYING;
+    if (pMP->isPlaying()) {
+        return pMP->mute() ? STREAM_MUTED : STREAM_PLAYING;
+    }
     
     // media defined? Then let's assume VLC is instructed to play and will soon
     if (pMedia)
@@ -281,11 +282,18 @@ StreamStatusTy COMChannel::GetStatus() const
 {
     // it actually _is_ the stream's status in all but one cases
     StreamStatusTy streamStatus = curr->GetStatus();
-    if (streamStatus != STREAM_NOT_PLAYING)
-        return streamStatus;
     
-    // if steam is NOT_PLAYING then we might just be searching
-    return IsAsyncRunning() ? STREAM_SEARCHING : STREAM_NOT_PLAYING;
+    // There are some override cases:
+    
+    // If we are not playing then we might be actively searching:
+    if (streamStatus == STREAM_NOT_PLAYING)
+        return IsAsyncRunning() ? STREAM_SEARCHING : STREAM_NOT_PLAYING;
+
+    // If we seem to be buffering/playing we might still be desyncing
+    if (streamStatus >= STREAM_BUFFERING && IsDesyncing())
+        return STREAM_DESYNCING;
+    
+    return streamStatus;
 }
 
 // return number of seconds till desync should be done
@@ -299,8 +307,8 @@ int COMChannel::GetSecTillDesyncDone () const
 std::string COMChannel::Summary (bool bFull) const
 {
     return bFull ?
-    curr->Summary() + "\nPrev: " + prev->Summary() :
-    curr->Summary();
+    curr->Summary(GetStatus()) + "\nPrev: " + prev->Summary() :
+    curr->Summary(GetStatus());
 }
 
 // Textual status summary for debug purposes
@@ -441,17 +449,25 @@ void COMChannel::StartStream ()
     // if there is no audio desync or we shall not wait for it
     // then kill the pushed-aside process right away
     if (desyncSecs <= 0 || !dataRefs.ShallRunPrevFrequTillDesync()) {
+        desyncDone = std::chrono::time_point<std::chrono::steady_clock>();
         StopStream(true);
     }
+    
+    // Temporarily deactivate XP's ATIS.
+    // We only know if the new frequency is an ATIS frequency
+    // once we queried LiveATC. That can take 1 or 2 seconds or even longer.
+    // During this delay XP might already start chattering its own ATIS.
+    // We stop that here and re-enable later if the channel happened not to be
+    // an ATIS channel.
+    if (dataRefs.PreferLiveATCAtis())
+        dataRefs.EnableXPsATIS(false);
 
     // playUrl might have been filled by RegularMaintenance
     // when an airport came in reach
     if (curr->playUrl.empty()) {
         // find a new URL of a stream to play -> playUrl
-        if (!FetchUrlForFrequ() || bAbortStart) {
-            flagStartingStream.clear();
-            return;
-        }
+        if (!FetchUrlForFrequ())
+            bAbortStart = true;
     }
     
     // curr is now updated and contains the to-be stream
@@ -469,7 +485,7 @@ void COMChannel::StartStream ()
     //      Title1=KJFK Ground
     //      Length1=-1
     
-    if (endsWith(curr->playUrl, LIVE_ATC_PLS)) {
+    if (!bAbortStart && endsWith(curr->playUrl, LIVE_ATC_PLS)) {
         std::string playlist;
         if (HttpGet(curr->playUrl, playlist))
         {
@@ -489,7 +505,7 @@ void COMChannel::StartStream ()
     
     // *** ATIS handling ***
     // If curr is an ATIS stream then we don't desync!
-    if (curr->IsATIS()) {
+    if (!bAbortStart && curr->IsATIS()) {
         desyncSecs = 0;             // no desync period
         desyncDone = std::chrono::time_point<std::chrono::steady_clock>();
         StopStream(true);           // latest now kill pushed-aside previous stream
@@ -508,6 +524,8 @@ void COMChannel::StartStream ()
     
     // abort early?
     if (bAbortStart) {
+        StopStream(true);           // latest now kill pushed-aside previous stream
+        desyncDone = std::chrono::time_point<std::chrono::steady_clock>();
         flagStartingStream.clear();
         return;
     }

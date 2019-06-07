@@ -68,6 +68,8 @@ enum UI_WIDGET_IDX_T {
     UI_BASICS_TXT_VOLUME,
     UI_BASICS_BTN_MUTE,
     
+    UI_BASICS_BTN_ATISPREFLIVEATC,
+    
     UI_BASICS_CAP_LIVE_TRAFFIC,
     UI_BASICS_BTN_LT_USE_BUF_PERIOD,
     UI_BASICS_BTN_KEEP_PREV_WHILE_DESYNC,
@@ -123,13 +125,15 @@ TFWidgetCreate_t SETTINGS_UI[] =
 
     {   5,  70, 100,  10, 1, "Volume:",             0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
     { 200,  70,  50,  15, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_TextField, {xpProperty_MaxCharacters,3, 0,0, 0,0} },
-    {  10,  90,  10,  10, 1, "Mute",                0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
+    {  10,  87,  10,  10, 1, "Mute all streams now",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
+    
+    {  10, 110,  10,  10, 1, "ATIS: Prefer LiveATC",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
 
-    {   5, 100,  -5,  10, 1, "LiveTraffic integration (%s):",0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
-    {  10, 120,  10,  10, 1, "Delay audio by LiveTraffic's buffering period",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
-    {  10, 135,  10,  10, 1, "Continue previous frequ. while waiting for buffering",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
-    {   5, 150, 195,  10, 1, "Audio delay adjustment:",0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
-    { 200, 150,  50,  15, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_TextField, {xpProperty_MaxCharacters,4, 0,0, 0,0} },
+    {   5, 130,  -5,  10, 1, "LiveTraffic integration (%s):",0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
+    {  10, 150,  10,  10, 1, "Delay audio by LiveTraffic's buffering period",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
+    {  10, 165,  10,  10, 1, "Continue previous frequ. while waiting for buffering",0, UI_BASICS_SUB_WND, xpWidgetClass_Button, {xpProperty_ButtonType, xpRadioButton, xpProperty_ButtonBehavior, xpButtonBehaviorCheckBox, 0,0} },
+    {   5, 180, 195,  10, 1, "Audio delay adjustment:",0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
+    { 200, 180,  50,  15, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_TextField, {xpProperty_MaxCharacters,4, 0,0, 0,0} },
 
     {   5, -15,  -5,  10, 1, "Version",             0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
     {  50, -15, 200,  10, 1, "",                    0, UI_BASICS_SUB_WND, xpWidgetClass_Caption, {0,0, 0,0, 0,0} },
@@ -199,6 +203,8 @@ void LTSettingsUI::Enable()
         txtVolume.setId(widgetIds[UI_BASICS_TXT_VOLUME]);
         txtVolume.tfFormat = TFTextFieldWidget::TFF_DIGITS;
         btnMute.setId(widgetIds[UI_BASICS_BTN_MUTE]);
+        btnATISPreferLiveATC.setId(widgetIds[UI_BASICS_BTN_ATISPREFLIVEATC]);
+        btnATISPreferLiveATC.SetChecked(dataRefs.PreferLiveATCAtis());
 
         // LiveTraffic integration / audio desync
         capLTIntegration.setId(widgetIds[UI_BASICS_CAP_LIVE_TRAFFIC]);
@@ -388,6 +394,8 @@ bool LTSettingsUI::MsgButtonStateChanged (XPWidgetID buttonWidget, bool bNowChec
     if (btnPlayIfSelected == buttonWidget) { dataRefs.SetRespectAudioSelect(bNowChecked); return true; }
     // Mute
     if (btnMute == buttonWidget) { dataRefs.Mute(bNowChecked); return true; }
+    // ATIS: Prefer LiveATC
+    if (btnATISPreferLiveATC == buttonWidget) { dataRefs.SetPreferLiveATCAtis(bNowChecked); return true; }
     // Audio delay as per LT's buffering period
     if (btnLTUseBufPeriod == buttonWidget) { dataRefs.SetDesyncWithLTDelay(bNowChecked); return true; }
     // Play only if selected

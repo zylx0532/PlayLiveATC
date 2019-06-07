@@ -48,6 +48,7 @@ protected:
     TFButtonWidget btnPlayIfSelected;
     TFTextFieldWidget txtVolume;
     TFButtonWidget btnMute;
+    TFButtonWidget btnATISPreferLiveATC;
     
     TFWidget capLTIntegration;
     std::string capLTIntegFormatStr;
