@@ -257,7 +257,10 @@ void COMChannel::RegularMaintenance ()
         if (apIter != mapAirportStream.end()) {
             // found an airport, so if we just start the stream now we will find and play that one:
             curr->CopyFrom(apIter->second);
-            StartStreamAsync();
+
+            // ATIS handling: Only play this newly found stream if it is not ATIS or if LiveATC's ATIS is preferred
+            if (dataRefs.PreferLiveATCAtis() || !curr->IsATIS())
+                StartStreamAsync();
         }
     }
 }
