@@ -39,6 +39,8 @@ enum dataRefsXP_LT {
     // XP standard
     DR_XP_RADIO_COM1_FREQ = 0,          ///< sim/cockpit/radios/com1_freq_hz
     DR_XP_RADIO_COM2_FREQ,              ///< sim/cockpit/radios/com2_freq_hz
+    DR_XP_RADIO_COM1_STANDBY_FREQ,      ///< sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833
+    DR_XP_RADIO_COM2_STANDBY_FREQ,      ///< sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833
     DR_XP_RADIO_COM1_SEL,               ///< sim/cockpit2/radios/actuators/audio_selection_com1
     DR_XP_RADIO_COM2_SEL,               ///< sim/cockpit2/radios/actuators/audio_selection_com2
     DR_PLANE_LAT,                       ///< user's plane's position
@@ -93,12 +95,15 @@ protected:
     
     bool bActOnCom[COM_CNT] = {true,true};      ///< which frequency to act upon?
     bool bRespectAudioSelect = true;            ///< only play VLC stream for selected radio
+#if !(IBM)
     std::string VLCPluginPath;                  ///< Path to VLC plugins
+#endif
     int iVolume = 100;                          ///< volume VLC play at (0-100)
     bool bMute = false;                         ///< temporarily muted? (not stored in config file)
     bool bDesyncLiveTrafficDelay = true;        ///< audio-desync with LiveTraffic's delay?
     int desyncManual = -10;                     ///< [s] (additional) manual audio-desync
     bool bPrevFrequRunsTilDesync = true;        ///< have the previous radio frequency continue till new one reaches desync period
+    bool bPreBufferStandbyFrequ = true;         ///< Pre-buffer stand-by frequency once it has been changed
     bool bAtisPreferLiveATC = true;             ///< if playing a LiveATC-ATIS-stream suppress XP's output (XP11 only)
     int maxRadioDist = 300;                     ///< [nm] max distance a radio can be received
     
@@ -130,8 +135,10 @@ public:
     inline bool ShallRespectAudioSelect() const { return bRespectAudioSelect; }
     void SetRespectAudioSelect (bool b) { bRespectAudioSelect = b; }
     
+#if !(IBM)
     inline const std::string& GetVLCPath() const { return VLCPluginPath; }
     void SetVLCPath (const std::string newPath) { VLCPluginPath = newPath; }
+#endif
 
     int GetVolume() const { return iVolume; }       ///< Volume
     void SetVolume(int iNewVolume);                 ///< sets new volume, also applies it to current playback
@@ -153,8 +160,14 @@ public:
     int GetManualDesync () const { return desyncManual; }
     void SetManualDesync (int i) { desyncManual = i; }
     
+    /// Shall we pre-buffer the stand-by frequency?
+    inline bool ShallPreBufferStandbyFrequ () const { return bPreBufferStandbyFrequ; }
+    /// Set pre-buffering of stand-by frequency
+    inline void SetPreBufferSTandbyFrequ (bool b) { bPreBufferStandbyFrequ = b; }
+    
     // specific access
     inline int   GetComFreq(int idx) const  { return 0<=idx&&idx<COM_CNT ? XPLMGetDatai(adrXP[int(DR_XP_RADIO_COM1_FREQ)+idx]) : 0; }
+    inline int   GetComStandbyFreq(int idx) const  { return 0<=idx&&idx<COM_CNT ? XPLMGetDatai(adrXP[int(DR_XP_RADIO_COM1_STANDBY_FREQ)+idx]) : 0; }
     inline int   IsComSel(int idx) const    { return 0<=idx&&idx<COM_CNT ? XPLMGetDatai(adrXP[int(DR_XP_RADIO_COM1_SEL)+idx]) : 0; }
     positionTy GetUsersPlanePos() const;
     int GetMaxRadioDist () const { return maxRadioDist; }

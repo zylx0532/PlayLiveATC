@@ -99,22 +99,22 @@ constexpr float PLA_STARTUP_DELAY = 5.0f;    // [s] before starting to check for
 #endif
 
 //MARK: Config File Entries
-#define CFG_TOGGLE_COM          "ActOnChangeOfCOM%d"
-#define CFG_RESPECT_COM_SEL     "PlayComSelected"
+#define CFG_MONITOR_COM         "MonitorCOM%d"
+#define CFG_RESPECT_COM_SELECT  "RespectComSelect"
 #define CFG_VOLUME              "Volume"
-#define CFG_VLC_PATH            "VLCPath"
 
-#if IBM                         // Windows default path and parameters
-#define CFG_PATH_DEFAULT        "c:\\Program Files\\VideoLAN\\VLC\\plugins"
-#elif LIN                       // Linux default path and parameters
+#if LIN                         // Linux default path and parameters
+#define CFG_VLC_PATH            "VLCPath"
 #define CFG_PATH_DEFAULT        "/usr/lib/vlc/plugins"
-#else                           // Mac OS default path and parameters
+#elif APL                       // Mac OS default path and parameters
+#define CFG_VLC_PATH            "VLCPath"
 #define CFG_PATH_DEFAULT        "/Applications/VLC.app/Contents/MacOS/plugins"
 #endif
 
 #define CFG_LT_DESYNC_BUF       "LTDesyncByBufPeriod"
 #define CFG_DESYNC_MANUAL_ADJ   "DesyncManualAdjust"
 #define CFG_PREV_WHILE_DESYNC   "ContPrevFrequWhileDesync"
+#define CFG_PREBUFFER_STANDBY   "PreBufferStandbyFrequ"
 #define CFG_ATIS_PREF_LIVEATC   "AtisPreferLiveATC"
 #define CFG_MAX_RADIO_DIST      "MaxRadioDist"
 

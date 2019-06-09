@@ -125,6 +125,7 @@
 		256FBDF82291D996006AEF68 /* CoordCalc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CoordCalc.cpp; sourceTree = "<group>"; };
 		25831F2C2258D08B002398D2 /* XPWidgets.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPWidgets.framework; path = Lib/XPSDK301/Libraries/Mac/XPWidgets.framework; sourceTree = "<group>"; };
 		25831F2D2258D08B002398D2 /* XPLM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPLM.framework; path = Lib/XPSDK301/Libraries/Mac/XPLM.framework; sourceTree = "<group>"; };
+		259CF10122AD8E8800F99CA5 /* MainPage.dox */ = {isa = PBXFileReference; lastKnownFileType = text; path = MainPage.dox; sourceTree = "<group>"; };
 		25A1EFBE227CDF5F00F940E3 /* PLACOMChannel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLACOMChannel.h; sourceTree = "<group>"; };
 		25A1EFC0227CDFCA00F940E3 /* PLACOMChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PLACOMChannel.cpp; sourceTree = "<group>"; };
 		25C0C99F2288326100427E72 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -323,6 +324,7 @@
 				25D6C0BD227792300080E8B3 /* TFWidgets.cpp */,
 				25C55C1A2278D00F0030D47D /* Utilities.cpp */,
 				25D6C0CA22779CC30080E8B3 /* Version.cpp */,
+				259CF10122AD8E8800F99CA5 /* MainPage.dox */,
 			);
 			path = Src;
 			sourceTree = "<group>";

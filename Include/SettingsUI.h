@@ -52,16 +52,21 @@ protected:
     
     TFWidget capLTIntegration;
     std::string capLTIntegFormatStr;
-    TFButtonWidget btnLTUseBufPeriod, btnKeepPrevWhileDesync;
+    TFButtonWidget btnLTUseBufPeriod;
     TFTextFieldWidget txtDesyncAdjust;
     
-    TFWidget capCOM1Status, capCOM2Status;
+    TFWidget capCOM1Status, capCOM1StatusStby;
+    TFWidget capCOM2Status, capCOM2StatusStby;
 
     // Advanced tab
     TFButtonGroup logLevelGrp;          // radio buttons to select logging level
     TFButtonGroup msgAreaLevelGrp;      // radio buttons to select msg area level
+#if !(IBM)
     TFTextFieldWidget txtPathToVLC;
+#endif
     TFWidget capValidatePath;
+    TFButtonWidget btnKeepPrevWhileDesync;
+    TFButtonWidget btnPreBufferStandbyFrequ;
     TFTextFieldWidget txtMaxRadioDist;
 
 public:
@@ -91,8 +96,10 @@ protected:
     // update states of buttons/fields, that can change elsewhere
     virtual bool TfwMsgMain1sTime ();
     
+#if !(IBM)
     // validate and update VLCPath
     void ValidateUpdateVLCPath (const std::string newPath);
+#endif
 };
 
 #endif /* SettingsUI_h */

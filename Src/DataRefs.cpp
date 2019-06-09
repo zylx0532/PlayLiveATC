@@ -31,11 +31,13 @@
 //
 const char* DATA_REFS_XP[] = {
     // XP standard
-    "sim/cockpit2/radios/actuators/com1_frequency_hz_833",  // int    y    hertz    Com radio 1 frequency, hz, supports 8.3 khz spacing
-    "sim/cockpit2/radios/actuators/com2_frequency_hz_833",  // int    y    hertz    Com radio 2 frequency, hz, supports 8.3 khz spacing
-    "sim/cockpit2/radios/actuators/audio_selection_com1",   // int    y    boolean    is com1 selected for listening
-    "sim/cockpit2/radios/actuators/audio_selection_com2",   // int    y    boolean    is com2 selected for listening
-    "sim/flightmodel/position/latitude",                    // user's plane's position
+    "sim/cockpit2/radios/actuators/com1_frequency_hz_833",          // int    y    hertz    Com radio 1 frequency, hz, supports 8.3 khz spacing
+    "sim/cockpit2/radios/actuators/com2_frequency_hz_833",          // int    y    hertz    Com radio 2 frequency, hz, supports 8.3 khz spacing
+    "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833",  // int    y    hertz    Com radio 1 standby frequency, hz, supports 8.3 khz spacing
+    "sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833",  // int    y    hertz    Com radio 2 standby frequency, hz, supports 8.3 khz spacing
+    "sim/cockpit2/radios/actuators/audio_selection_com1",           // int    y    boolean    is com1 selected for listening
+    "sim/cockpit2/radios/actuators/audio_selection_com2",           // int    y    boolean    is com2 selected for listening
+    "sim/flightmodel/position/latitude",                            // user's plane's position
     "sim/flightmodel/position/longitude",
     "sim/flightmodel/position/elevation",
     "sim/flightmodel/position/true_theta",
@@ -123,9 +125,11 @@ bool DataRefs::Init ()
     // register all self-provided commands, errors aren't critical here
     RegisterCommands();
 
+#if !(IBM)
     // pre-fill VLC path with a good guess
     if (existsFile(CFG_PATH_DEFAULT))
         VLCPluginPath = CFG_PATH_DEFAULT;
+#endif
 
     // read configuration file if any
     if (!LoadConfigFile())
@@ -370,7 +374,7 @@ bool DataRefs::LoadConfigFile()
         // toggle "act on COM#"
         for (int i = 0; i < COM_CNT; i++) {
             char buf[50];
-            snprintf(buf,sizeof(buf),CFG_TOGGLE_COM,i+1);
+            snprintf(buf,sizeof(buf),CFG_MONITOR_COM,i+1);
             if (sCfgName == buf) {
                 bActOnCom[i] = bVal;
                 break;
@@ -378,16 +382,19 @@ bool DataRefs::LoadConfigFile()
         }
         
         // other entries
-             if (sCfgName == CFG_VLC_PATH)          VLCPluginPath = sRestOfLine;
-        else if (sCfgName == CFG_RESPECT_COM_SEL)   bRespectAudioSelect = bVal;
+             if (sCfgName == CFG_RESPECT_COM_SELECT)   bRespectAudioSelect = bVal;
         else if (sCfgName == CFG_VOLUME)            iVolume = (int)lVal;
         else if (sCfgName == CFG_LT_DESYNC_BUF)     bDesyncLiveTrafficDelay = bVal;
         else if (sCfgName == CFG_DESYNC_MANUAL_ADJ) desyncManual = (int)lVal;
         else if (sCfgName == CFG_PREV_WHILE_DESYNC) bPrevFrequRunsTilDesync = bVal;
+        else if (sCfgName == CFG_PREBUFFER_STANDBY) bPreBufferStandbyFrequ = bVal;
         else if (sCfgName == CFG_ATIS_PREF_LIVEATC) bAtisPreferLiveATC = bVal;
         else if (sCfgName == CFG_MAX_RADIO_DIST)    maxRadioDist = (int)lVal;
         else if (sCfgName == CFG_LOG_LEVEL)         iLogLevel = logLevelTy(lVal);
         else if (sCfgName == CFG_MSG_AREA_LEVEL)    iMsgAreaLevel = logLevelTy(lVal);
+#if !(IBM)
+        else if (sCfgName == CFG_VLC_PATH)          VLCPluginPath = sRestOfLine;
+#endif
     }
 
     // problem was not just eof?
@@ -436,18 +443,21 @@ bool DataRefs::SaveConfigFile()
     // toggle "act on COM#"
     for (int i = 0; i < COM_CNT; i++) {
         char buf[50];
-        snprintf(buf,sizeof(buf),CFG_TOGGLE_COM,i+1);
+        snprintf(buf,sizeof(buf),CFG_MONITOR_COM,i+1);
         fOut << buf << ' ' << bActOnCom[i] << '\n';
     }
     
     // other entries
+#if !(IBM)
     if (!VLCPluginPath.empty())
         fOut << CFG_VLC_PATH        << ' ' << VLCPluginPath             << '\n';
-    fOut << CFG_RESPECT_COM_SEL     << ' ' << bRespectAudioSelect       << '\n';
+#endif
+    fOut << CFG_RESPECT_COM_SELECT  << ' ' << bRespectAudioSelect       << '\n';
     fOut << CFG_VOLUME              << ' ' << iVolume                   << '\n';
     fOut << CFG_LT_DESYNC_BUF       << ' ' << bDesyncLiveTrafficDelay   << '\n';
     fOut << CFG_DESYNC_MANUAL_ADJ   << ' ' << desyncManual              << '\n';
     fOut << CFG_PREV_WHILE_DESYNC   << ' ' << bPrevFrequRunsTilDesync   << '\n';
+    fOut << CFG_PREBUFFER_STANDBY   << ' ' << bPreBufferStandbyFrequ    << '\n';
     fOut << CFG_ATIS_PREF_LIVEATC   << ' ' << bAtisPreferLiveATC        << '\n';
     fOut << CFG_MAX_RADIO_DIST      << ' ' << maxRadioDist              << '\n';
     fOut << CFG_LOG_LEVEL           << ' ' << iLogLevel                 << '\n';

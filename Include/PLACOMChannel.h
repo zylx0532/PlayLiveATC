@@ -40,8 +40,12 @@
 #define MSG_COM_IS_ATIS     "COM%d is now %s, referring to %s, suppressed in favour of XP's ATIS"
 #define MSG_COM_IS_NOW      "COM%d is now %s, tuning to '%s'"
 #define MSG_COM_IS_NOW_IN   "COM%d is now %s, tuning to '%s' with %lds delay"
+#define MSG_STBY_IS_NOW_IN  "COM%d stand-by is now %s, pre-buffering '%s' with %lds delay"
 #define MSG_COM_COUNTDOWN   "COM%d: %ds till '%s' starts"
-#define MSG_AP_OUT_OF_REACH "'%s' now out of reach"
+#define MSG_AP_CHANGE       "COM%d: Tuning to '%s' as this is closest now"
+#define MSG_AP_OUT_OF_REACH "COM%d: '%s' now out of reach"
+#define MSG_AP_STDBY_CHANGE "COM%d stand-by: Tuning to '%s' as this is closest now"
+#define MSG_AP_STDBY_OUT_OF_REACH "COM%d stand-by: '%s' now out of reach"
 #define DBG_QUERY_URL       "Sending query %s"
 #define WARN_RE_ICAO        "Could not find %s in LiveATC reply"
 #define DBG_STREAM_NOT_UP   "Stream %s skipped as it is not UP but '%s'"
@@ -106,21 +110,65 @@ typedef std::map<std::string,LiveATCDataTy> LiveATCDataMapTy;
 
 /// Adds frequency and VLC data
 struct StreamCtrlTy : public LiveATCDataTy {
+    
+protected:
     // XP data
     int frequ = 0;              ///< currently tuned frequency in Hz as returned by XP
     std::string frequString;    ///< frequncy in kHz as string in format ###.###
+    bool bStandbyPrebuf = false;///< pre-buffering the stand-by frequency?
+    /// maps of all _potential_ airport streams for current `frequ`
+    LiveATCDataMapTy mapAirportStream;
+    /// Network read buffer for LiveATC response
+    std::string readBuf;
+    /// Time point when audio desync should be finished (fair guess)
+    std::chrono::time_point<std::chrono::steady_clock> desyncDone;
 
+public:
     // VLC control
     std::unique_ptr<VLC::MediaPlayer>   pMP;    ///< VLC media player
     std::unique_ptr<VLC::Media>         pMedia; ///< VLC media to be played, changes with new LiveATC streams
+    
+public:
+    /// @brief Set frequency including frequency string
+    /// @param f Frequenc in Hz as returned by XP
+    void SetFrequ (int f);
+    /// Get frequency in Hz
+    inline int GetFrequ () const { return frequ; }
+    inline std::string GetFrequStr () const { return frequString; }
     
     /// Is VLC properly initialized?
     inline bool IsValid() const { return bool(pMP); }
     /// stream's status
     StreamStatusTy GetStatus() const;
     /// Is COM channel defined, i.e. at least a frequency set?
-    bool IsDefined () const { return GetStatus() >= STREAM_NOT_PLAYING; }
+    inline bool IsDefined () const { return GetStatus() >= STREAM_NOT_PLAYING; }
+    /// Pre-buffering the stand-by frequency?
+    inline bool IsStandbyPrebuf() const { return bStandbyPrebuf && IsDefined(); }
+    /// Set as pre-buffering
+    inline void SetStandbyPrebuf(bool b) { bStandbyPrebuf=b; }
 
+    /// Query LiveATC, parse result, update `curr` with found stream if any
+    bool FetchUrlForFrequ ();
+    /// Parses `readBuf` for airports and relevant streams
+    void ParseForAirportStreams ();
+    /// @brief Find closest airport in `mapAirportStream`
+    /// @return Iterator pointing to airportStream data with updated airportPos
+    LiveATCDataMapTy::iterator FindClosestAirport();
+    /// The end iterator is needed to work with the above result
+    inline LiveATCDataMapTy::iterator AirportStreamsEnd() { return mapAirportStream.end(); }
+
+    /// @brief Set audio desync, also sets the time when done
+    /// @param sec Seconds to delay the audio playback for desync
+    void SetAudioDesync (long sec);
+    /// Seconds till audio desync is done
+    int GetSecTillDesyncDone () const;
+    /// Is audio desync still under way?
+    inline bool IsDesyncing() const  { return GetSecTillDesyncDone() > 0; }
+    /// Is audio desync done?
+    inline bool IsDesyncDone() const { return GetSecTillDesyncDone() <= 0; }
+    /// Clears the desync timer (and only the timer, does not change VLC's desync setting)
+    inline void ClearDesyncTimer () { desyncDone = std::chrono::time_point<std::chrono::steady_clock>(); }
+    
     /// Stops playback and clears all data
     void StopAndClear ();
     
@@ -146,14 +194,10 @@ protected:
     std::atomic_flag flagStartingStream = ATOMIC_FLAG_INIT;
     
 protected:
-    /// Network read buffer for LiveATC response
-    std::string readBuf;
     /// Stored future when using std::async, typically not used later on
     std::future<void> futVlcStart;
     /// make StartStream() stop early
     volatile bool bAbortStart = false;
-    /// Time point when audio desync should be finished (fair guess)
-    std::chrono::time_point<std::chrono::steady_clock> desyncDone;
     
 public:
 
@@ -178,10 +222,6 @@ public:
 
     // X-Plane data
     
-    /// Current Frequency in Hz as returned by XP
-    inline int GetFrequ() const                     { return curr->frequ; }
-    /// Current Frequency in kHz as formatted string with 3 digits */
-    inline std::string GetFrequString() const       { return curr->frequString; }
     /// Current LiveATC data
     const StreamCtrlTy& GetStreamCtrlData() const     { return *curr; }
     
@@ -199,19 +239,12 @@ public:
     /// Is COM channel defined / has frequency?
     inline bool IsDefined() const { return GetStatus() >= STREAM_NOT_PLAYING; }
 
-    /// Seconds till audio desync is done
-    int GetSecTillDesyncDone () const;
-    /// Is audio desync still under way?
-    inline bool IsDesyncing() const  { return GetSecTillDesyncDone() > 0; }
-    /// Is audio desync done?
-    inline bool IsDesyncDone() const { return GetSecTillDesyncDone() <= 0; }
-    
     /// @brief Textual status summary for end user
-    /// @param bFull Report both `curr` and `prev`? Default: just `curr`
-    std::string Summary (bool bFull = false) const;
+    /// @param bPrev Report `prev` instead of `curr`?
+    std::string Summary (bool bPrev = false) const;
     /// @brief Textual status summary for debug purposes
-    /// @param bFull Report both `curr` and `prev`? Default: just `curr`
-    std::string dbgStatus (bool bFull = false) const;
+    /// @param bPrev Report `prev` instead of `curr`?
+    std::string dbgStatus (bool bPrev = false) const;
 
 public:
     // Static functions to act on *all* COM channel objects
@@ -235,16 +268,31 @@ public:
     static bool AnyATISPlaying();
     
 protected:
+    /// @brief Initial stand-by frequency when frequencies were swapped
+    /// Stored to detect that the stand-by frequency has been changed away
+    /// from an initial value as only then pre-buffering applies.
+    int initFrequStandBy = 0;
+    
+    /// @brief Last seen dialed-in stand-by frequency.
+    /// Stored to detect a stable _change_ to a new stand-by frequency
+    int lastFrequStandby = 0;
+    
     /// @brief Checks for and performs change in frequency
     /// @param _new New frequency in Hz as returned by XP.
     bool doChange(int _new);
+    
+    /// @brief Checks for and starts pre-buffering of the standby frequency.
+    /// @param _new Current standby frequency in Hz as returned by XP.
+    bool doStandbyPrebuf(int _new);
 
     // VLC control
     
-    /// Start the `curr` stream asynchronously by calling StartStream() via `std::async`
-    void StartStreamAsync ();
-    /// Blocking call to start the `curr` stream
-    void StartStream ();
+    /// @brief Start a stream asynchronously by calling StartStream() via `std::async`
+    /// @param bStandby Start the stand-by frequncy stream for pre-buffering? Otherwise start `curr`
+    void StartStreamAsync (bool bStandby);
+    /// @brief Blocking call to start a stream
+    /// @param bStandby Start the stand-by frequncy stream for pre-buffering? Otherwise start `curr`
+    void StartStream (bool bStandby);
     /// @brief Stop `curr` or `prev` stream immediately
     /// @param bPrev Stop `prev`? (Otherwise stop `curr`)
     void StopStream (bool bPrev);
@@ -260,16 +308,6 @@ protected:
     // *** Determination of stream URL to play ***
     /// Turn `curr` stream into `prev`
     void TurnCurrToPrev ();
-    /// Query LiveATC, parse result, update `curr` with found stream if any
-    bool FetchUrlForFrequ ();
-    
-    /// maps airport ICAO to (best) stream url for current frequency
-    LiveATCDataMapTy mapAirportStream;
-    /// Parses `readBuf` for airports and relevant streams
-    void ParseForAirportStreams ();
-    /// @brief Find closest airport in `mapAirportStream`
-    /// @return Iterator pointing to airportStream data with updated airportPos
-    LiveATCDataMapTy::iterator FindClosestAirport();
 };
 
 //

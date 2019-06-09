@@ -116,14 +116,15 @@ void    draw_msg(XPLMWindowID in_window_id, void * /*in_refcon*/)
     // display desync countdown?
     bool bNeedWndForCountdown = false;
     if (dataRefs.GetMsgAreaLevel() <= logINFO)
-        for (COMChannel& chn: gChn)
-            if (chn.IsDesyncing() && !chn.GetStreamCtrlData().streamName.empty())
+        for (COMChannel& chn: gChn) {
+            const StreamCtrlTy& strm = chn.GetStreamCtrlData();
+            if (strm.IsDesyncing() && !strm.streamName.empty())
             {
                 char buf[50];
                 snprintf(buf, sizeof(buf), MSG_COM_COUNTDOWN,
                          chn.GetIdx()+1,
-                         chn.GetSecTillDesyncDone(),
-                         chn.GetStreamCtrlData().streamName.c_str());
+                         strm.GetSecTillDesyncDone(),
+                         strm.streamName.c_str());
                 // draw text, take color based on msg level
                 XPLMDrawString(COL_LVL[logINFO], l, t,
                                buf,
@@ -131,6 +132,7 @@ void    draw_msg(XPLMWindowID in_window_id, void * /*in_refcon*/)
                 t -= WIN_ROW_HEIGHT;
                 bNeedWndForCountdown = true;
             }
+        }
 
     // for each line of text to be displayed
     std::chrono::time_point<std::chrono::steady_clock> currTime = std::chrono::steady_clock::now();
