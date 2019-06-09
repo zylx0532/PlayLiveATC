@@ -225,31 +225,26 @@ XPLMWindowID CreateMsgWindow(float fTimeToDisplay, logLevelTy lvl, const char* s
     
     // Otherwise: Create the message window
     XPLMCreateWindow_t params;
-    // XPLM301 only:    params.structSize = IS_XPLM301 ? sizeof(params) : XPLMCreateWindow_s_210;
-    params.structSize = sizeof(params);
+    params.structSize = IS_XPLM301 ? sizeof(params) : XPLMCreateWindow_s_210;
     params.visible = 1;
     params.drawWindowFunc = draw_msg;
     // Note on "dummy" handlers:
     // Even if we don't want to handle these events, we have to register a "do-nothing" callback for them
     params.handleMouseClickFunc = dummy_mouse_handler;
-    // XPLM301 only:   params.handleRightClickFunc = dummy_mouse_handler;
+    params.handleRightClickFunc = dummy_mouse_handler;
     params.handleMouseWheelFunc = dummy_wheel_handler;
     params.handleKeyFunc = dummy_key_handler;
     params.handleCursorFunc = dummy_cursor_status_handler;
     params.refcon = NULL;
-    // XPLM301 only:    params.layer = xplm_WindowLayerFloatingWindows;
+    params.layer = xplm_WindowLayerFloatingWindows;
     // No decoration...this is just message output and shall stay where it is
-    // params.decorateAsFloatingWindow = xplm_WindowDecorationNone;
+    params.decorateAsFloatingWindow = xplm_WindowDecorationNone;
     
     // Set the window's initial bounds
     // Note that we're not guaranteed that the main monitor's lower left is at (0, 0)...
     // We'll need to query for the global desktop bounds!
-    // LT_GetScreenSize(params.left, params.top, params.right, params.bottom,
-       //              LT_SCR_RIGHT_TOP_MOST);
-    
-    // In XPLM210 this is simplified:
-    params.left = params.bottom = 0;
-    XPLMGetScreenSize(&params.right,&params.top);
+    LT_GetScreenSize(params.left, params.top, params.right, params.bottom,
+                     LT_SCR_RIGHT_TOP_MOST);
     
     // define a window in the top right corner,
     // WIN_FROM_TOP point down from the top, WIN_WIDTH points wide,

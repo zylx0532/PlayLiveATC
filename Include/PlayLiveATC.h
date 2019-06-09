@@ -92,6 +92,7 @@
 #include "XPLMNavigation.h"
 
 // PlayLiveATC Includes
+#include "XPCompatibility.h"
 #include "TFWidgets.h"
 #include "Constants.h"
 #include "Utilities.h"

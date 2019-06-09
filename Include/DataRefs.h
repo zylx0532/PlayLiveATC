@@ -54,6 +54,7 @@ enum dataRefsXP_LT {
     DR_PLANE_ONGRND,
     // X-Plane 11 only
     DR_XP_ATIS_ENABLED,                 ///< sim/atc/atis_enabled
+    DR_VR_ENABLED,                      ///< sim/graphics/VR/enabled
     // LiveTraffic
     DR_LT_AIRCRAFTS_DISPLAYED,          ///< is LiveTraffic active?
     DR_LT_FD_BUF_PERIOD,                ///< LiveTraffic's buffering period
@@ -65,11 +66,13 @@ enum dataRefsXP_LT {
 constexpr dataRefsXP_LT DR_FIRST_XP11_DR = DR_XP_ATIS_ENABLED;
 constexpr dataRefsXP_LT DR_FIRST_LT_DR = DR_LT_AIRCRAFTS_DISPLAYED;
 
-// PLA commands to be offered
+/// PlayLiveATC commands to be offered
 enum cmdRefsPLA {
-    CR_TOGGLE_ACT_COM1 = 0,
-    CR_TOGGLE_ACT_COM2,
-    CNT_CMDREFS_PLA                     // always last, number of elements
+    CR_MONITOR_COM1 = 0,                ///< Monitor change of COM1
+    CR_MONITOR_COM2,                    ///< Monitor change of COM2
+    
+    /// always last, number of elements
+    CNT_CMDREFS_PLA
 };
 
 /// number of Frequencies to listen to
@@ -83,6 +86,9 @@ protected:
     XPLMDataRef adrXP[CNT_DATAREFS_XP];         ///< array of XP data refs to read from
 public:
     XPLMCommandRef cmdPLA[CNT_CMDREFS_PLA];     ///< array of commands PLA offers
+#ifdef DEBUG
+    bool bSimVREntered = false;                 ///< for me to simulate some aspects of VR
+#endif
 
 //MARK: Provided Data, i.e. global variables
 protected:
@@ -94,7 +100,7 @@ protected:
     std::string DirSeparator;                   ///< directory separation character
     
     bool bActOnCom[COM_CNT] = {true,true};      ///< which frequency to act upon?
-    bool bRespectAudioSelect = true;            ///< only play VLC stream for selected radio
+    bool bRespectAudioSelect = false;           ///< only play VLC stream for selected radio
 #if !(IBM)
     std::string VLCPluginPath;                  ///< Path to VLC plugins
 #endif
@@ -172,6 +178,12 @@ public:
     positionTy GetUsersPlanePos() const;
     int GetMaxRadioDist () const { return maxRadioDist; }
     void SetMaxRadioDist (int i) { maxRadioDist = i; }
+    
+    inline bool  IsVREnabled() const            { return
+#ifdef DEBUG
+        bSimVREntered ? true :                  // simulate some aspects of VR
+#endif
+        adrXP[DR_VR_ENABLED] ? XPLMGetDatai(adrXP[DR_VR_ENABLED]) != 0 : false; }  // for XP10 compatibility we accept not having this dataRef
 
     // LiveTraffic specifics
     std::string GetLTStatusText () const;

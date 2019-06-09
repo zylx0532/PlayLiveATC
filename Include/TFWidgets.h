@@ -56,6 +56,9 @@ enum TFWndMode {
 #endif
 };
 
+/// default window open mode depends on XP10/11 and VR
+TFWndMode GetDefaultWndOpenMode ();
+
 //
 //MARK: replacement/enhancement for XPUCreateWidgets
 //

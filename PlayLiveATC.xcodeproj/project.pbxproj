@@ -23,6 +23,7 @@
 		25831F2E2258D08B002398D2 /* XPWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25831F2C2258D08B002398D2 /* XPWidgets.framework */; };
 		25831F2F2258D08B002398D2 /* XPLM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25831F2D2258D08B002398D2 /* XPLM.framework */; };
 		25A1EFC2227CDFCA00F940E3 /* PLACOMChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25A1EFC0227CDFCA00F940E3 /* PLACOMChannel.cpp */; };
+		25B407F522ADBDA500C9EB42 /* XPCompatibility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25B407F422ADBDA500C9EB42 /* XPCompatibility.cpp */; };
 		25C55C1B2278D00F0030D47D /* Utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25C55C1A2278D00F0030D47D /* Utilities.cpp */; };
 		25D6C0BF227792300080E8B3 /* TFWidgets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D6C0BD227792300080E8B3 /* TFWidgets.cpp */; };
 		25D6C0C0227792300080E8B3 /* TextIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D6C0BE227792300080E8B3 /* TextIO.cpp */; };
@@ -128,6 +129,8 @@
 		259CF10122AD8E8800F99CA5 /* MainPage.dox */ = {isa = PBXFileReference; lastKnownFileType = text; path = MainPage.dox; sourceTree = "<group>"; };
 		25A1EFBE227CDF5F00F940E3 /* PLACOMChannel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLACOMChannel.h; sourceTree = "<group>"; };
 		25A1EFC0227CDFCA00F940E3 /* PLACOMChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PLACOMChannel.cpp; sourceTree = "<group>"; };
+		25B407F322ADBD9C00C9EB42 /* XPCompatibility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCompatibility.h; sourceTree = "<group>"; };
+		25B407F422ADBDA500C9EB42 /* XPCompatibility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPCompatibility.cpp; sourceTree = "<group>"; };
 		25C0C99F2288326100427E72 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		25C0C9A02288326100427E72 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		25C55C1A2278D00F0030D47D /* Utilities.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Utilities.cpp; sourceTree = "<group>"; };
@@ -317,14 +320,15 @@
 			children = (
 				256FBDF82291D996006AEF68 /* CoordCalc.cpp */,
 				25D6C0C72277965D0080E8B3 /* DataRefs.cpp */,
-				255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */,
+				259CF10122AD8E8800F99CA5 /* MainPage.dox */,
 				25A1EFC0227CDFCA00F940E3 /* PLACOMChannel.cpp */,
 				254CCAB222666C2A003878B1 /* PlayLiveATC.cpp */,
+				255F2B8A227A1E1A003CAE65 /* SettingsUI.cpp */,
 				25D6C0BE227792300080E8B3 /* TextIO.cpp */,
 				25D6C0BD227792300080E8B3 /* TFWidgets.cpp */,
 				25C55C1A2278D00F0030D47D /* Utilities.cpp */,
 				25D6C0CA22779CC30080E8B3 /* Version.cpp */,
-				259CF10122AD8E8800F99CA5 /* MainPage.dox */,
+				25B407F422ADBDA500C9EB42 /* XPCompatibility.cpp */,
 			);
 			path = Src;
 			sourceTree = "<group>";
@@ -332,15 +336,16 @@
 		25D6C0BA227791FD0080E8B3 /* Include */ = {
 			isa = PBXGroup;
 			children = (
-				256FBDF72291D958006AEF68 /* CoordCalc.h */,
 				25D6C0C1227792830080E8B3 /* Constants.h */,
+				256FBDF72291D958006AEF68 /* CoordCalc.h */,
 				25D6C0C6227796540080E8B3 /* DataRefs.h */,
-				255F2B89227A1E12003CAE65 /* SettingsUI.h */,
 				25A1EFBE227CDF5F00F940E3 /* PLACOMChannel.h */,
 				25D6C0C52277941E0080E8B3 /* PlayLiveATC.h */,
+				255F2B89227A1E12003CAE65 /* SettingsUI.h */,
 				25D6C0BB227792270080E8B3 /* TextIO.h */,
 				25D6C0BC227792280080E8B3 /* TFWidgets.h */,
 				25C55C1C2278D0550030D47D /* Utilities.h */,
+				25B407F322ADBD9C00C9EB42 /* XPCompatibility.h */,
 			);
 			path = Include;
 			sourceTree = "<group>";
@@ -453,6 +458,7 @@
 				254CCAB322666C2A003878B1 /* PlayLiveATC.cpp in Sources */,
 				254BE2B62279CBFD00D1DC25 /* Version.cpp in Sources */,
 				25D6C0BF227792300080E8B3 /* TFWidgets.cpp in Sources */,
+				25B407F522ADBDA500C9EB42 /* XPCompatibility.cpp in Sources */,
 				256FBDF92291D996006AEF68 /* CoordCalc.cpp in Sources */,
 				254BE2B72279D70400D1DC25 /* DataRefs.cpp in Sources */,
 				25C55C1B2278D00F0030D47D /* Utilities.cpp in Sources */,
@@ -511,6 +517,9 @@
 					"LIN=0",
 					"XPLM200=1",
 					"XPLM210=1",
+					"XPLM300=1",
+					"XPLM301=1",
+					"XUTILS_EXCLUDE_MAC_CRAP=1",
 					"CURL_STATICLIB=1",
 					"DEBUG=1",
 				);
@@ -600,6 +609,9 @@
 					"LIN=0",
 					"XPLM200=1",
 					"XPLM210=1",
+					"XPLM300=1",
+					"XPLM301=1",
+					"XUTILS_EXCLUDE_MAC_CRAP=1",
 					"CURL_STATICLIB=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;

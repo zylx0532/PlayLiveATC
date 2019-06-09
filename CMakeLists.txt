@@ -2,7 +2,7 @@
 #
 
 cmake_minimum_required(VERSION 3.9)
-project(PlayLiveATC VERSION 0.01 DESCRIPTION "PlayLiveATC X-Plane plugin")
+project(PlayLiveATC VERSION 0.02 DESCRIPTION "PlayLiveATC X-Plane plugin")
 
 # By default, use optimized release configuration.
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
@@ -34,7 +34,7 @@ endif ()
 # message (STATUS "CMAKE_LIBRARY_PATH" = ${CMAKE_LIBRARY_PATH})
 
 # Enable all X-Plane SDK APIs up to the newest version.
-add_definitions(-DXPLM200=1 -DXPLM210=1)
+add_definitions(-DXPLM200=1 -DXPLM210=1 -DXPLM300=1 -DXPLM301=1)
 # Define platform macros.
 add_definitions(-DAPL=$<BOOL:${APPLE}> -DIBM=$<BOOL:${WIN32}> -DLIN=$<AND:$<BOOL:${UNIX}>,$<NOT:$<BOOL:${APPLE}>>>)
 
@@ -69,19 +69,21 @@ set(Header_Files
     Include/TextIO.h
     Include/TFWidgets.h
     Include/Utilities.h
+    Include/XPCompatibility.h
 )
 source_group("Header Files" FILES ${Header_Files})
 
 set(Source_Files
     Src/CoordCalc.cpp
     Src/DataRefs.cpp
-    Src/SettingsUI.cpp
     Src/PLACOMChannel.cpp
     Src/PlayLiveATC.cpp
+    Src/SettingsUI.cpp
     Src/TextIO.cpp
     Src/TFWidgets.cpp
     Src/Utilities.cpp
     Src/Version.cpp
+    Src/XPCompatibility.cpp
 )
 source_group("Source Files" FILES ${Source_Files})
 

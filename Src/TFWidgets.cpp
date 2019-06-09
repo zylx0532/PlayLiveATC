@@ -30,7 +30,7 @@
  * THE SOFTWARE.
  */
 
-#include "TFWidgets.h"
+#include "PlayLiveATC.h"
 
 #include <string>
 #include <climits>
@@ -43,6 +43,16 @@
 
 #include "XPLMProcessing.h"
 #include "XPLMPlugin.h"
+
+/// default window open mode depends on XP10/11 and VR
+TFWndMode GetDefaultWndOpenMode ()
+{
+    return
+    !XPLMHasFeature("XPLM_USE_NATIVE_WIDGET_WINDOWS") ?
+    TF_MODE_CLASSIC :               // XP10
+    dataRefs.IsVREnabled() ?
+    TF_MODE_VR : TF_MODE_FLOAT;     // XP11, VR vs. non-VR
+}
 
 //
 //MARK: replacement/enhancement for XPUCreateWidgets

@@ -138,6 +138,7 @@ constexpr long HTTP_NOT_AVAIL =     503;        // "Service not available"
 constexpr int CH_MAC_ERR_CNT =      5;          // max number of tolerated errors, afterwards invalid channel
 constexpr int SERR_LEN = 100;                   // size of buffer for IO error texts (strerror_s)
 constexpr int ERR_CFG_FILE_MAXWARN = 5;     // maximum number of warnings while reading config file, then: dead
+#define ERR_XPLANE_ONLY         "LiveTraffic works in X-Plane only, version 10 or higher"
 #define ERR_APPEND_MENU_ITEM    "Could not append a menu item"
 #define ERR_CREATE_MENU         "Could not create menu %s"
 #define ERR_DATAREF_FIND        "Could not find DataRef/CmdRef: %s"

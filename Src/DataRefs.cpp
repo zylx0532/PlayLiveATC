@@ -48,6 +48,7 @@ const char* DATA_REFS_XP[] = {
     "sim/flightmodel/failures/onground_any",
     // X-Plane 11 only
     "sim/atc/atis_enabled",                                 // int    y    boolean    Is the ATIS system enabled? If not, no ATIS text or audio will appear even when tuned to a proper frequency."
+    "sim/graphics/VR/enabled",                              // int    n    Boolean    True if VR is enabled, false if it is disabled
     // LiveTraffic
     "livetraffic/cfg/aircrafts_displayed",
     "livetraffic/cfg/fd_buf_period",
@@ -63,8 +64,8 @@ struct cmdRefDescrTy {
     const char* cmdName;
     const char* cmdDescr;
 } CMD_REFS_PLA[] = {
-    {"PlayLiveATC/Toggle_ActOn_COM1", "Toggle acting on COM1 frequency change"},
-    {"PlayLiveATC/Toggle_ActOn_COM2", "Toggle acting on COM2 frequency change"},
+    {"PlayLiveATC/Monitor_COM1", "Monitor COM1 frequency change"},
+    {"PlayLiveATC/Monitor_COM2", "Monitor COM2 frequency change"},
 };
 
 static_assert(sizeof(CMD_REFS_PLA) / sizeof(CMD_REFS_PLA[0]) == CNT_CMDREFS_PLA,
@@ -92,6 +93,10 @@ iLogLevel (initLogLevel)
 // Find and register dataRefs
 bool DataRefs::Init ()
 {
+    // initialize XP compatibility proxy functions
+    if (!XPC_Init())
+        return false;
+    
     // XP System Path
     char aszPath[512];
     XPLMGetSystemPath ( aszPath );

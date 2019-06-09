@@ -115,9 +115,11 @@ bool MenuRegisterItems ()
     
     // Toggle acting upon change of which COM frequency?
     aMenuItems[MENU_ID_TOGGLE_COM1] =
-    XPLMAppendMenuItem(menuID, MENU_TOGGLE_COM1, (void *)MENU_ID_TOGGLE_COM1,1);
+    LT_AppendMenuItem(menuID, MENU_TOGGLE_COM1, (void *)MENU_ID_TOGGLE_COM1,
+                      dataRefs.cmdPLA[CR_MONITOR_COM1]);
     aMenuItems[MENU_ID_TOGGLE_COM2] =
-    XPLMAppendMenuItem(menuID, MENU_TOGGLE_COM2, (void *)MENU_ID_TOGGLE_COM2,1);
+    LT_AppendMenuItem(menuID, MENU_TOGGLE_COM2, (void *)MENU_ID_TOGGLE_COM2,
+                      dataRefs.cmdPLA[CR_MONITOR_COM2]);
     MenuUpdateCheckmarks();
     
     // Show Settings UI
@@ -158,8 +160,8 @@ struct cmdMenuMap {
     cmdRefsPLA cmd;
     menuItems menu;
 } CMD_MENU_MAP[] = {
-    { CR_TOGGLE_ACT_COM1, MENU_ID_TOGGLE_COM1 },
-    { CR_TOGGLE_ACT_COM2, MENU_ID_TOGGLE_COM2 },
+    { CR_MONITOR_COM1, MENU_ID_TOGGLE_COM1 },
+    { CR_MONITOR_COM2, MENU_ID_TOGGLE_COM2 },
 };
 
 int CommandHandlerMenuItems (XPLMCommandRef       /*inCommand*/,
@@ -251,11 +253,11 @@ PLUGIN_API int XPluginStart(
     // init DataRefs
     if (!dataRefs.Init()) { DestroyWindow(); return 0; }
     
+    // register commands
+    if (!RegisterCommandHandlers()) { DestroyWindow(); return 0; }
+    
     // create menu
     if (!MenuRegisterItems()) { DestroyWindow(); return 0; }
-    
-    // create Commands
-    RegisterCommandHandlers();
     
 #if IBM
     // Windows: Recommended before calling ShellExecuteA
@@ -319,5 +321,30 @@ PLUGIN_API void XPluginDisable(void)
 }
 
 PLUGIN_API void XPluginReceiveMessage(XPLMPluginID inFrom, int inMsg, void * inParam)
-{ }
+{
+    // we only process msgs from X-Plane
+    if (inFrom != XPLM_PLUGIN_XPLANE)
+        return;
+    
+#ifdef DEBUG
+    // for me not having a VR rig I do some basic testing with sending XPLM_MSG_AIRPLANE_COUNT_CHANGED
+    if (inMsg == XPLM_MSG_AIRPLANE_COUNT_CHANGED) {
+        dataRefs.bSimVREntered = !dataRefs.bSimVREntered;
+        inMsg = dataRefs.bSimVREntered ? XPLM_MSG_ENTERED_VR : XPLM_MSG_EXITING_VR;
+    }
+#endif
+    
+    switch (inMsg) {
+            // *** entering VR mode ***
+        case XPLM_MSG_ENTERED_VR:
+            // move eligible windows into VR
+            break;
+            
+            // *** existing from VR mode ***
+        case XPLM_MSG_EXITING_VR:
+            // move eligible windows out of VR
+            break;
+    }
+    
+}
 
