@@ -20,12 +20,10 @@
     <ClCompile Include="Src\SettingsUI.cpp" />
     <ClCompile Include="Src\PlayLiveATC.cpp" />
     <ClCompile Include="Src\TextIO.cpp" />
-    <ClCompile Include="Src\TFWidgets.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="Src\TFWidgets.cpp" />
     <ClCompile Include="Src\Utilities.cpp" />
     <ClCompile Include="Src\Version.cpp" />
+    <ClCompile Include="Src\XPCompatibility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Constants.h" />
@@ -37,6 +35,7 @@
     <ClInclude Include="Include\TextIO.h" />
     <ClInclude Include="Include\TFWidgets.h" />
     <ClInclude Include="Include\Utilities.h" />
+    <ClInclude Include="Include\XPCompatibility.h" />
     <ClInclude Include="Lib\vlc\include\vlcpp\common.hpp" />
     <ClInclude Include="Lib\vlc\include\vlcpp\Dialog.hpp" />
     <ClInclude Include="Lib\vlc\include\vlcpp\Equalizer.hpp" />
@@ -67,6 +66,9 @@
     <ClInclude Include="Lib\vlc\include\vlc\libvlc_version.h" />
     <ClInclude Include="Lib\vlc\include\vlc\libvlc_vlm.h" />
     <ClInclude Include="Lib\vlc\include\vlc\vlc.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PlayLiveATC.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <SccProjectName />
@@ -127,7 +129,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
       <AdditionalIncludeDirectories>Include;Lib\vlc\include;Lib\XPSDK301\CHeaders\Widgets;Lib\XPSDK301\CHeaders\XPLM;..\..\LibIncludes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;CURL_STATICLIB;IBM=1;XPLM200=1;XPLM210=1;_CRT_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;CURL_STATICLIB;IBM=1;XPLM200=1;XPLM210=1;XPLM300=1;XPLM301=1;_CRT_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -181,7 +183,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>Include;Lib\vlc\include;Lib\XPSDK301\CHeaders\Widgets;Lib\XPSDK301\CHeaders\XPLM;..\..\LibIncludes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;CURL_STATICLIB;IBM=1;XPLM200=1;XPLM210=1;_CRT_SECURE_NO_WARNINGS;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;CURL_STATICLIB;IBM=1;XPLM200=1;XPLM210=1;XPLM300=1;XPLM301=1;_CRT_SECURE_NO_WARNINGS;_DEBUG;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <StructMemberAlignment>Default</StructMemberAlignment>

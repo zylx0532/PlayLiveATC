@@ -45,6 +45,9 @@
     <ClCompile Include="Src\PLACOMChannel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Src\XPCompatibility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Constants.h">
@@ -164,5 +167,11 @@
     <ClInclude Include="Lib\vlc\include\vlc\vlc.h">
       <Filter>vlc\vlc</Filter>
     </ClInclude>
+    <ClInclude Include="Include\XPCompatibility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PlayLiveATC.rc" />
   </ItemGroup>
 </Project>
