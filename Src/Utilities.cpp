@@ -100,7 +100,10 @@ std::istream& safeGetline(std::istream& is, std::string& t)
 // https://stackoverflow.com/a/51301928
 bool existsFile (const std::string& filename) {
     struct stat buffer;
-    return (stat (filename.c_str(), &buffer) == 0);
+    if (filename.empty())
+        return false;
+    else
+        return (stat (filename.c_str(), &buffer) == 0);
 }
 
 // does a path specify a directory

@@ -126,6 +126,10 @@ bool MenuRegisterItems ()
     aMenuItems[MENU_ID_SETTINGS_UI] =
     XPLMAppendMenuItem(menuID, MENU_SETTINGS_UI, (void *)MENU_ID_SETTINGS_UI,1);
     
+    // Help
+    aMenuItems[MENU_ID_HELP] =
+    XPLMAppendMenuItem(menuID, MENU_HELP, (void *)MENU_ID_HELP,1);
+    
 #ifdef DEBUG
     // Separator
     XPLMAppendMenuSeparator(menuID);

@@ -2,7 +2,7 @@
 #
 
 cmake_minimum_required(VERSION 3.9)
-project(PlayLiveATC VERSION 0.02 DESCRIPTION "PlayLiveATC X-Plane plugin")
+project(PlayLiveATC VERSION 0.10 DESCRIPTION "PlayLiveATC X-Plane plugin")
 
 # By default, use optimized release configuration.
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")

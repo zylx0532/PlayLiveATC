@@ -30,7 +30,7 @@
 //
 // MARK: Version Information (CHANGE VERSION HERE)
 //
-constexpr float VERSION_NR = 0.02f;
+constexpr float VERSION_NR = 0.10f;
 constexpr bool VERSION_BETA = true;
 
 //MARK: Window Position
@@ -87,7 +87,7 @@ constexpr float PLA_STARTUP_DELAY = 5.0f;    // [s] before starting to check for
 #define PLUGIN_DESCRIPTION      "Switch LiveATC channel based on COM radios."
 #define LT_UNAVAILABLE          "not available"
 #define LT_INACTIVE             "installed, but inactive"
-#define LT_ACTIVE               "active, displaying aircrafts"
+#define LT_ACTIVE               "active, displaying aircraft"
 
 //MARK: Menu Items
 #define MENU_TOGGLE_COM1        "Act on COM1 change"
@@ -103,12 +103,15 @@ constexpr float PLA_STARTUP_DELAY = 5.0f;    // [s] before starting to check for
 #define CFG_RESPECT_COM_SELECT  "RespectComSelect"
 #define CFG_VOLUME              "Volume"
 
-#if LIN                         // Linux default path and parameters
+// For Mac and Linux, setting the VLC_PLUGIN_PATH variable has an effect,
+// but usually it is not needed as libvlc looks in its own path:
+#if !(IBM)
 #define CFG_VLC_PATH            "VLCPath"
-#define CFG_PATH_DEFAULT        "/usr/lib/vlc/plugins"
-#elif APL                       // Mac OS default path and parameters
-#define CFG_VLC_PATH            "VLCPath"
+#if APL
 #define CFG_PATH_DEFAULT        "/Applications/VLC.app/Contents/MacOS/plugins"
+#elif LIN
+#define CFG_PATH_DEFAULT        ""
+#endif
 #endif
 
 #define CFG_LT_DESYNC_BUF       "LTDesyncByBufPeriod"
@@ -123,8 +126,8 @@ constexpr float PLA_STARTUP_DELAY = 5.0f;    // [s] before starting to check for
 
 //MARK: Help URLs
 // TODO: Set real URLs
-#define HELP_URL                "https://twinfan.gitbook.io/livetraffic/PlayLiveATC"
-#define HELP_URL_SETTINGS       "https://twinfan.gitbook.io/livetraffic/PlayLiveATC/Settings"
+#define HELP_URL                "https://twinfan.gitbook.io/livetraffic/playliveatc/playliveatc"
+#define HELP_URL_SETTINGS       "https://twinfan.gitbook.io/livetraffic/playliveatc/pla_settings"
 
 //MARK: File Paths
 // these are under X-Plane's root dir

@@ -63,7 +63,8 @@ bool CreateVLCInstance ()
 #if !(IBM)
         // Tell VLC where to find the plugins
         // (In Windows, this has no effect.)
-        setenv(ENV_VLC_PLUGIN_PATH, dataRefs.GetVLCPath().c_str(), 1);
+        if (!dataRefs.GetVLCPath().empty())
+            setenv(ENV_VLC_PLUGIN_PATH, dataRefs.GetVLCPath().c_str(), 1);
 #endif
 
         // create VLC instance
