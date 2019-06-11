@@ -70,6 +70,9 @@
   <ItemGroup>
     <ResourceCompile Include="PlayLiveATC.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Doc\readme.html" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <SccProjectName />
     <SccLocalPath />

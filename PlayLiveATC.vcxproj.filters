@@ -16,6 +16,9 @@
     <Filter Include="vlc\vlc">
       <UniqueIdentifier>{163e8e0e-e9b6-45b4-889c-8dd83124b7d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Doc">
+      <UniqueIdentifier>{a534a770-2839-46da-85c9-823565459d59}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DataRefs.cpp">
@@ -173,5 +176,10 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PlayLiveATC.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Doc\readme.html">
+      <Filter>Doc</Filter>
+    </None>
   </ItemGroup>
 </Project>

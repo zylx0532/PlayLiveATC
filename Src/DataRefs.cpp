@@ -388,6 +388,7 @@ bool DataRefs::LoadConfigFile()
         
         // other entries
              if (sCfgName == CFG_RESPECT_COM_SELECT)   bRespectAudioSelect = bVal;
+        else if (sCfgName == CFG_AUDIO_DEVICE)      audioDev = sRestOfLine;
         else if (sCfgName == CFG_VOLUME)            iVolume = (int)lVal;
         else if (sCfgName == CFG_LT_DESYNC_BUF)     bDesyncLiveTrafficDelay = bVal;
         else if (sCfgName == CFG_DESYNC_MANUAL_ADJ) desyncManual = (int)lVal;
@@ -458,6 +459,7 @@ bool DataRefs::SaveConfigFile()
         fOut << CFG_VLC_PATH        << ' ' << VLCPluginPath             << '\n';
 #endif
     fOut << CFG_RESPECT_COM_SELECT  << ' ' << bRespectAudioSelect       << '\n';
+    fOut << CFG_AUDIO_DEVICE        << ' ' << audioDev                  << '\n';
     fOut << CFG_VOLUME              << ' ' << iVolume                   << '\n';
     fOut << CFG_LT_DESYNC_BUF       << ' ' << bDesyncLiveTrafficDelay   << '\n';
     fOut << CFG_DESYNC_MANUAL_ADJ   << ' ' << desyncManual              << '\n';

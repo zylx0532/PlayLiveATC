@@ -122,6 +122,10 @@ protected:
     std::string readBuf;
     /// Time point when audio desync should be finished (fair guess)
     std::chrono::time_point<std::chrono::steady_clock> desyncDone;
+    /// last volume set, value to be restored when unmuting
+    int volume = 100;
+    /// Muted? Which is simulated by setting volume = 0
+    bool bMute = false;
 
 public:
     // VLC control
@@ -168,7 +172,18 @@ public:
     inline bool IsDesyncDone() const { return GetSecTillDesyncDone() <= 0; }
     /// Clears the desync timer (and only the timer, does not change VLC's desync setting)
     inline void ClearDesyncTimer () { desyncDone = std::chrono::time_point<std::chrono::steady_clock>(); }
-    
+
+    /// Return volume as last set with SetVolume
+    inline int GetVolume() const { return volume; }
+    /// @brief Set the volume incl. unmute, and save the value in case of mute
+    /// @param v New Volume
+    void SetVolume(int v);
+    /// Return if currently muted
+    inline bool IsMuted() const { return bMute;  }
+    /// @brief Set (un)mute
+    /// @param mute Mute? or unmute?
+    void SetMute(bool mute);
+
     /// Stops playback and clears all data
     void StopAndClear ();
     
@@ -258,6 +273,13 @@ public:
     /// Cleanup *all* VLC instances, also stops all playback
     static void CleanupAllVLC();
 
+    /// Update list of available audio devices
+    static void UpdateVLCOutputDevices();
+
+    /// @brief Set all MediaPlayer to use the given audio device
+    /// @param dev The VLC audio device to use
+    static void SetAllAudioDevice(const std::string& devId);
+
     /// Set the volume of all playback streams
     static void SetAllVolume(int vol);
 
@@ -315,5 +337,7 @@ protected:
 //
 
 extern COMChannel gChn[COM_CNT];
+
+extern std::vector<VLC::AudioOutputDeviceDescription> gVLCOutputDevs;
 
 #endif /* PLACOMChannel_h */

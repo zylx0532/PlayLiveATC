@@ -49,17 +49,20 @@ const char* vlcArgs[] = {
 const int vlcArgC = sizeof(vlcArgs)/sizeof(vlcArgs[0]);
 
 /// The one and only VLC instance
-std::unique_ptr<VLC::Instance> gInst;
+std::unique_ptr<VLC::Instance> gVLCInst;
+
+/// List of available output devices
+std::vector<VLC::AudioOutputDeviceDescription> gVLCOutputDevs;
 
 //
-// MARK: Helper structs
+// MARK: Global VLC functions
 //
 
 /// Creates the global VLC instance object, if it doesn't exist yet
 /// @warning Fails if VLC plugins cannot be found.
 bool CreateVLCInstance ()
 {
-    if (!gInst) {
+    if (!gVLCInst) {
 #if !(IBM)
         // Tell VLC where to find the plugins
         // (In Windows, this has no effect.)
@@ -69,9 +72,9 @@ bool CreateVLCInstance ()
 
         // create VLC instance
         try {
-            gInst = std::make_unique<VLC::Instance>(vlcArgC, vlcArgs);
-            gInst->setAppId(PLUGIN_SIGNATURE, PLA_VERSION_FULL, "");
-            gInst->setUserAgent(HTTP_USER_AGENT, HTTP_USER_AGENT);
+            gVLCInst = std::make_unique<VLC::Instance>(vlcArgC, vlcArgs);
+            gVLCInst->setAppId(PLUGIN_SIGNATURE, PLA_VERSION_FULL, "");
+            gVLCInst->setUserAgent(HTTP_USER_AGENT, HTTP_USER_AGENT);
         }
         catch (std::runtime_error e)
         {
@@ -90,7 +93,7 @@ bool CreateVLCInstance ()
 /// Removes the global VLC instance object
 void CleanupVLCInstance ()
 {
-    gInst = nullptr;
+    gVLCInst = nullptr;
 }
 
 /// Static function to convert a status enum to a status text
@@ -122,6 +125,9 @@ void StreamCtrlTy::SetFrequ(int f)
     frequString = buf;
 }
 
+//
+// MARK: Helper structs
+//
 
 /// Stream's status, decides all but STREAM_SEARCHING (see COMChannel::GetStatus())
 StreamStatusTy StreamCtrlTy::GetStatus() const
@@ -136,7 +142,7 @@ StreamStatusTy StreamCtrlTy::GetStatus() const
 
     // playing a stream, i.e. emmitting sound?
     if (pMP->isPlaying()) {
-        return pMP->mute() ? STREAM_MUTED : STREAM_PLAYING;
+        return bMute ? STREAM_MUTED : STREAM_PLAYING;
     }
     
     // media defined? Then let's assume VLC is instructed to play and will soon
@@ -329,6 +335,28 @@ int StreamCtrlTy::GetSecTillDesyncDone () const
                (desyncDone - std::chrono::steady_clock::now()).count());
 }
 
+void StreamCtrlTy::SetVolume(int v)
+{
+    // normalize
+    if (v < 0) v = 0;
+    if (v > 100) v = 100;
+
+    // unmute
+    bMute = false;
+
+    // set volume
+    volume = v;
+    if (pMP)
+        pMP->setVolume(volume);
+}
+
+// Mute and UnMute
+void StreamCtrlTy::SetMute(bool mute)
+{
+    bMute = mute;
+    if (pMP)
+        pMP->setVolume(bMute ? 0 : volume);
+}
 
 void StreamCtrlTy::StopAndClear()
 {
@@ -369,14 +397,14 @@ COMChannel::~COMChannel()
 bool COMChannel::InitVLC()
 {
     // must have an instance
-    LOG_ASSERT(gInst);
+    LOG_ASSERT(gVLCInst);
     
     // just in case - cleanup in proper order
     CleanupVLC();
 
     // (re)create media player
-    dataA.pMP = std::make_unique<VLC::MediaPlayer>(*gInst);
-    dataB.pMP = std::make_unique<VLC::MediaPlayer>(*gInst);
+    dataA.pMP = std::make_unique<VLC::MediaPlayer>(*gVLCInst);
+    dataB.pMP = std::make_unique<VLC::MediaPlayer>(*gVLCInst);
     return true;
 }
 
@@ -565,12 +593,15 @@ std::string COMChannel::dbgStatus (bool bPrev) const
 bool COMChannel::InitAllVLC()
 {
     // in case of a re-init we firstly stop orderly
-    if (gInst)
+    if (gVLCInst)
         CleanupAllVLC();
     
     // create global VLC instance
     if (!CreateVLCInstance())
         return false;
+
+    // fetch all possible output devices
+    UpdateVLCOutputDevices();
     
     // create channels
     for (COMChannel& chn: gChn) {
@@ -601,14 +632,34 @@ void COMChannel::CleanupAllVLC()
     CleanupVLCInstance();
 }
 
+// Update list of available audio devices
+void COMChannel::UpdateVLCOutputDevices()
+{
+    // just use any existing MediaPlayer instance to do so:
+    if (!gChn[0].dataA.pMP)
+        return;
+    gVLCOutputDevs.clear();
+    gVLCOutputDevs = std::move(gChn[0].dataA.pMP->outputDeviceEnum());
+}
+
+// Set all MediaPlayer to use the given audio device
+void COMChannel::SetAllAudioDevice(const std::string& devId)
+{
+    for (COMChannel& chn : gChn) {
+        if (chn.dataA.pMP)
+            chn.dataA.pMP->outputDeviceSet(devId);
+        if (chn.dataB.pMP)
+            chn.dataB.pMP->outputDeviceSet(devId);
+    }
+}
+
+
 // Set the volume of all playback streams
 void COMChannel::SetAllVolume(int vol)
 {
     for (COMChannel& chn : gChn) {
-        if (chn.dataA.pMP)
-            chn.dataA.pMP->setVolume(vol);
-        if (chn.dataB.pMP)
-            chn.dataB.pMP->setVolume(vol);
+        chn.dataA.SetVolume(vol);
+        chn.dataB.SetVolume(vol);
     }
 }
 
@@ -616,10 +667,8 @@ void COMChannel::SetAllVolume(int vol)
 void COMChannel::MuteAll(bool bDoMute)
 {
     for (COMChannel& chn : gChn) {
-        if (chn.dataA.pMP)
-            chn.dataA.pMP->setMute(bDoMute);
-        if (chn.dataB.pMP)
-            chn.dataB.pMP->setMute(bDoMute);
+        chn.dataA.SetMute(bDoMute);
+        chn.dataB.SetMute(bDoMute);
     }
 }
 
@@ -921,7 +970,7 @@ void COMChannel::StartStream (bool bStandby)
     }
     
     // Create and play the media
-    strm.pMedia = std::make_unique<VLC::Media>(*gInst,
+    strm.pMedia = std::make_unique<VLC::Media>(*gVLCInst,
                                                strm.playUrl,
                                                VLC::Media::FromLocation);
     strm.pMP->setMedia(*strm.pMedia);
@@ -936,7 +985,8 @@ void COMChannel::StartStream (bool bStandby)
             strm.SetAudioDesync(desyncSecs);
         }
 
-        // set volume
+        // set audio device and volume
+        strm.pMP->outputDeviceSet(dataRefs.GetAudioDev());
         SetVolumeMute();
     }
     
@@ -964,17 +1014,14 @@ void COMChannel::SetVolumeMute ()
 {
     // globally muted? Or this channel muted?
     if (dataRefs.IsMuted() || dataRefs.ShallMuteCom(idx)) {
-        curr->pMP->setMute(true);
-        prev->pMP->setMute(true);
+        curr->SetMute(true);
+        prev->SetMute(true);
     } else {
-        curr->pMP->setMute(false);
-        curr->pMP->setVolume(dataRefs.GetVolume());
-        if (prev->IsStandbyPrebuf()) {
-            prev->pMP->setMute(true);
-        } else {
-            prev->pMP->setMute(false);
-            prev->pMP->setVolume(dataRefs.GetVolume());
-        }
+        curr->SetVolume(dataRefs.GetVolume());
+        if (prev->IsStandbyPrebuf())
+            prev->SetMute(true);
+        else
+            prev->SetVolume(dataRefs.GetVolume());
     }
 }
 

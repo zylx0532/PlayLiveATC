@@ -484,7 +484,7 @@ class AudioOutputDeviceDescription
             if ( d->psz_device != NULL )
                 m_device = d->psz_device;
             if ( d->psz_description != NULL )
-                m_device = d->psz_description;
+                m_description = d->psz_description;     // TwinFan: Fixed, was re-assignment to m_device before
         }
 
     private:

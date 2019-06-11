@@ -30,7 +30,7 @@
 //
 // MARK: Version Information (CHANGE VERSION HERE)
 //
-constexpr float VERSION_NR = 0.10f;
+constexpr float VERSION_NR = 0.11f;
 constexpr bool VERSION_BETA = true;
 
 //MARK: Window Position
@@ -90,8 +90,13 @@ constexpr float PLA_STARTUP_DELAY = 5.0f;    // [s] before starting to check for
 #define LT_ACTIVE               "active, displaying aircraft"
 
 //MARK: Menu Items
-#define MENU_TOGGLE_COM1        "Act on COM1 change"
-#define MENU_TOGGLE_COM2        "Act on COM2 change"
+#define MENU_TOGGLE_COM1        "Monitor COM1 change"
+#define MENU_TOGGLE_COM2        "Monitor COM2 change"
+#define MENU_VOLUME_UP          "Volume Up"
+#define MENU_VOLUME_DOWN        "Volume Down"
+#define MENU_MUTE               "Mute"
+#define MENU_AUDIO_DEVICE       "Audio Device"
+#define MENU_NO_DEVICE          "(no device)"
 #define MENU_SETTINGS_UI        "Settings..."
 #define MENU_HELP               "Help"
 #ifdef DEBUG
@@ -101,6 +106,7 @@ constexpr float PLA_STARTUP_DELAY = 5.0f;    // [s] before starting to check for
 //MARK: Config File Entries
 #define CFG_MONITOR_COM         "MonitorCOM%d"
 #define CFG_RESPECT_COM_SELECT  "RespectComSelect"
+#define CFG_AUDIO_DEVICE        "AudioDevice"
 #define CFG_VOLUME              "Volume"
 
 // For Mac and Linux, setting the VLC_PLUGIN_PATH variable has an effect,

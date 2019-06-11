@@ -104,6 +104,7 @@ protected:
 #if !(IBM)
     std::string VLCPluginPath;                  ///< Path to VLC plugins
 #endif
+    std::string audioDev;                       ///< VLC audio output device id
     int iVolume = 100;                          ///< volume VLC play at (0-100)
     bool bMute = false;                         ///< temporarily muted? (not stored in config file)
     bool bDesyncLiveTrafficDelay = true;        ///< audio-desync with LiveTraffic's delay?
@@ -146,6 +147,8 @@ public:
     void SetVLCPath (const std::string newPath) { VLCPluginPath = newPath; }
 #endif
 
+    std::string GetAudioDev() const { return audioDev; }    ///< Audio Device ID
+    void SetAudioDev(const std::string& dev) { audioDev = dev; }
     int GetVolume() const { return iVolume; }       ///< Volume
     void SetVolume(int iNewVolume);                 ///< sets new volume, also applies it to current playback
     bool IsMuted() const { return bMute; }          ///< Currently muted?

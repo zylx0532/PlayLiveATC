@@ -47,6 +47,10 @@ enum menuItems {
     MENU_ID_PlayLiveATC = 0,
     MENU_ID_TOGGLE_COM1,
     MENU_ID_TOGGLE_COM2,
+    MENU_ID_VOLUME_UP,
+    MENU_ID_VOLUME_DOWN,
+    MENU_ID_MUTE,
+    MENU_ID_SUB_AUDIO_DEVICE,
     MENU_ID_SETTINGS_UI,
     MENU_ID_HELP,
 #ifdef DEBUG
@@ -59,6 +63,87 @@ enum menuItems {
 XPLMMenuID menuID = 0;
 int aMenuItems[CNT_MENU_ID];
 
+/// ID of the "Output Device" submenu within the PlayLiveATC menu
+XPLMMenuID menuIDOutputDev = 0;
+
+// set checkmarks according to current settings
+void MenuUpdateCheckmarks()
+{
+    XPLMCheckMenuItem(menuID, aMenuItems[MENU_ID_TOGGLE_COM1],
+        dataRefs.ShallActOnCom(0) ? xplm_Menu_Checked : xplm_Menu_Unchecked);
+    XPLMCheckMenuItem(menuID, aMenuItems[MENU_ID_TOGGLE_COM2],
+        dataRefs.ShallActOnCom(1) ? xplm_Menu_Checked : xplm_Menu_Unchecked);
+
+    // checkmarks for the audio device selection
+    for (int i = 0;
+        i < gVLCOutputDevs.size();
+        i++)
+    {
+        // place a check mark if this is the current device
+        XPLMCheckMenuItem(menuIDOutputDev, i,
+            dataRefs.GetAudioDev() == gVLCOutputDevs[i].device() ? xplm_Menu_Checked : xplm_Menu_NoCheck);
+    }
+}
+
+//
+// MARK: Audio Device menu
+//
+
+/// Menu handler for audio device selection
+/// @param iRef Is actually a pointer to a string with the device id
+void MenuHandlerAudioDevices(void * /*mRef*/, void * iRef)
+{
+    if (iRef) {
+        const char* devId = reinterpret_cast<const char*>(iRef);
+        dataRefs.SetAudioDev(devId);
+        COMChannel::SetAllAudioDevice(devId);
+        MenuUpdateCheckmarks();
+    }
+}
+
+/// (Re)creates the sub menu for selection of the audio output device
+bool MenuAudioDevices()
+{
+    // update the list of audio devices
+    COMChannel::UpdateVLCOutputDevices();
+
+    // if the submenu doesn't exist yet create it
+    if (!menuIDOutputDev) {
+        aMenuItems[MENU_ID_SUB_AUDIO_DEVICE] =
+            XPLMAppendMenuItem(menuID, MENU_AUDIO_DEVICE, NULL, 1);
+        menuIDOutputDev = XPLMCreateMenu(MENU_AUDIO_DEVICE, menuID,
+            aMenuItems[MENU_ID_SUB_AUDIO_DEVICE], MenuHandlerAudioDevices, NULL);
+        if (!menuIDOutputDev) { LOG_MSG(logERR, ERR_CREATE_MENU, MENU_AUDIO_DEVICE); return false; }
+    }
+    else {
+        // remove any existing menu items
+        XPLMClearAllMenuItems(menuIDOutputDev);
+    }
+
+    // add one menu item per available output device
+    // using the description as item name and the device id as item reference
+    if (gVLCOutputDevs.empty()) {
+        XPLMAppendMenuItem(menuIDOutputDev, MENU_NO_DEVICE, NULL, 1);
+    }
+    else {
+        for (const VLC::AudioOutputDeviceDescription& dev : gVLCOutputDevs) {
+            // add a menu item for the device
+            XPLMAppendMenuItem(menuIDOutputDev,
+                dev.description().c_str(),
+                (void*)dev.device().c_str(), 1);
+        }
+    }
+
+    // set the checkmarks
+    MenuUpdateCheckmarks();
+
+    return true;
+}
+
+//
+// MARK: PlayLiveATC menu
+//
+
 // Callback called by XP, so this is an entry point into the plugin
 void MenuHandlerCB(void * /*mRef*/, void * iRef)
 {
@@ -66,40 +151,33 @@ void MenuHandlerCB(void * /*mRef*/, void * iRef)
     try {
         // act based on menu id
         switch (reinterpret_cast<unsigned long long>(iRef)) {
-            case MENU_ID_TOGGLE_COM1:
-                dataRefs.ToggleActOnCom(0);
-                break;
-            case MENU_ID_TOGGLE_COM2:
-                dataRefs.ToggleActOnCom(1);
-                break;
-            case MENU_ID_SETTINGS_UI:
-                settingsUI.Show();
-                settingsUI.Center();
-                break;
-            case MENU_ID_HELP:
-                OpenURL(HELP_URL);
-                break;
+        case MENU_ID_TOGGLE_COM1:
+            dataRefs.ToggleActOnCom(0);
+            break;
+        case MENU_ID_TOGGLE_COM2:
+            dataRefs.ToggleActOnCom(1);
+            break;
+        case MENU_ID_SETTINGS_UI:
+            settingsUI.Show();
+            settingsUI.Center();
+            break;
+        case MENU_ID_HELP:
+            OpenURL(HELP_URL);
+            break;
 #ifdef DEBUG
-            case MENU_ID_RELOAD_PLUGINS:
-                XPLMReloadPlugins();
-                break;
+        case MENU_ID_RELOAD_PLUGINS:
+            XPLMReloadPlugins();
+            break;
 #endif
         }
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         LOG_MSG(logERR, ERR_TOP_LEVEL_EXCEPTION, e.what());
         // otherwise ignore
-    } catch (...) {
+    }
+    catch (...) {
         // ignore
     }
-}
-
-// set checkmarks according to current settings
-void MenuUpdateCheckmarks()
-{
-    XPLMCheckMenuItem(menuID,aMenuItems[MENU_ID_TOGGLE_COM1],
-                      dataRefs.ShallActOnCom(0) ? xplm_Menu_Checked : xplm_Menu_Unchecked);
-    XPLMCheckMenuItem(menuID,aMenuItems[MENU_ID_TOGGLE_COM2],
-                      dataRefs.ShallActOnCom(1) ? xplm_Menu_Checked : xplm_Menu_Unchecked);
 }
 
 // register my menu items for the plugin during init
@@ -111,7 +189,7 @@ bool MenuRegisterItems ()
     // Create menu item and menu
     aMenuItems[MENU_ID_PlayLiveATC] = XPLMAppendMenuItem(XPLMFindPluginsMenu(), SWITCH_LIVE_ATC, NULL, 1);
     menuID = XPLMCreateMenu(SWITCH_LIVE_ATC, XPLMFindPluginsMenu(), aMenuItems[MENU_ID_PlayLiveATC], MenuHandlerCB, NULL);
-    if ( !menuID ) { LOG_MSG(logERR,ERR_CREATE_MENU,MENU_ID_PlayLiveATC); return false; }
+    if ( !menuID ) { LOG_MSG(logERR,ERR_CREATE_MENU, SWITCH_LIVE_ATC); return false; }
     
     // Toggle acting upon change of which COM frequency?
     aMenuItems[MENU_ID_TOGGLE_COM1] =
@@ -120,7 +198,9 @@ bool MenuRegisterItems ()
     aMenuItems[MENU_ID_TOGGLE_COM2] =
     LT_AppendMenuItem(menuID, MENU_TOGGLE_COM2, (void *)MENU_ID_TOGGLE_COM2,
                       dataRefs.cmdPLA[CR_MONITOR_COM2]);
-    MenuUpdateCheckmarks();
+
+    // Audio Device sub menu
+    MenuAudioDevices();
     
     // Show Settings UI
     aMenuItems[MENU_ID_SETTINGS_UI] =
@@ -146,7 +226,10 @@ bool MenuRegisterItems ()
             return false;
         }
     }
-    
+
+    // update the checkmarks so that selected options are marked
+    MenuUpdateCheckmarks();
+
     // Success
     LOG_MSG(logDEBUG,DBG_MENU_CREATED)
     return true;
@@ -213,6 +296,13 @@ float PLAFlightLoopCB (float, float, int, void*)
     // if there is no ATIS channel playing then make sure XP can play ATIS
     if (!COMChannel::AnyATISPlaying())
         dataRefs.EnableXPsATIS(true);
+
+    // every minute update the list of audio output devices
+    static int callCount = 0;
+    if (++callCount >= 60) {
+        callCount = 0;
+        MenuAudioDevices();
+    }
     
     // call me again in a second
     return 1.0f;
@@ -307,6 +397,10 @@ PLUGIN_API int  XPluginEnable(void)
     
     // Initialize all VLC instances
     COMChannel::InitAllVLC();
+
+    // Set initial audio output device as read from configuration
+    MenuAudioDevices();
+    COMChannel::SetAllAudioDevice(dataRefs.GetAudioDev());
     
     // start the actual processing
     XPLMRegisterFlightLoopCallback(PLAOneTimeCB, -1, NULL);
