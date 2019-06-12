@@ -150,7 +150,9 @@ void MenuHandlerCB(void * /*mRef*/, void * iRef)
     // top level exception handling
     try {
         // act based on menu id
-        switch (reinterpret_cast<unsigned long long>(iRef)) {
+        const long long m = reinterpret_cast<unsigned long long>(iRef);
+        LOG_MSG(logDEBUG, DBG_SELECTED_MENU_ID, m);
+        switch (m) {
         case MENU_ID_TOGGLE_COM1:
             dataRefs.ToggleActOnCom(0);
             break;
@@ -401,6 +403,13 @@ PLUGIN_API int  XPluginEnable(void)
     // Set initial audio output device as read from configuration
     MenuAudioDevices();
     COMChannel::SetAllAudioDevice(dataRefs.GetAudioDev());
+    // output a list of known device into the log
+    if (dataRefs.GetLogLevel() == logDEBUG) {
+        LOG_MSG(logDEBUG, DBG_AVAIL_AUDIO_DEVICE);
+        for (const VLC::AudioOutputDeviceDescription& dev : gVLCOutputDevs) {
+            LOG_MSG(logDEBUG, (dev.device() + " " + dev.description()).c_str());
+        }
+    }
     
     // start the actual processing
     XPLMRegisterFlightLoopCallback(PLAOneTimeCB, -1, NULL);

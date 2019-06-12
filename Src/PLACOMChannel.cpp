@@ -335,19 +335,21 @@ int StreamCtrlTy::GetSecTillDesyncDone () const
                (desyncDone - std::chrono::steady_clock::now()).count());
 }
 
-void StreamCtrlTy::SetVolume(int v)
+void StreamCtrlTy::SetVolume(int v, bool bUnMute)
 {
-    // normalize
+    // normalize and save the value
     if (v < 0) v = 0;
     if (v > 100) v = 100;
-
-    // unmute
-    bMute = false;
-
-    // set volume
     volume = v;
-    if (pMP)
-        pMP->setVolume(volume);
+
+    // not muted or instructed to unmute
+    if (!bMute || bUnMute) {
+        bMute = false;
+
+        // set volume
+        if (pMP)
+            pMP->setVolume(volume);
+    }
 }
 
 // Mute and UnMute
@@ -646,8 +648,16 @@ void COMChannel::UpdateVLCOutputDevices()
 void COMChannel::SetAllAudioDevice(const std::string& devId)
 {
     for (COMChannel& chn : gChn) {
-        if (chn.dataA.pMP)
+        if (chn.dataA.pMP) {
             chn.dataA.pMP->outputDeviceSet(devId);
+            // DEBUG: Check what is now reported as device and report both wanted and current
+            if (dataRefs.GetLogLevel() == logDEBUG) {
+                char* currDev = libvlc_audio_output_device_get(chn.dataA.pMP->get());
+                LOG_MSG(logDEBUG, DBG_VLC_OUT_DEV, chn.idx, devId.c_str(), currDev ? currDev : "(null)");
+                if (currDev)
+                    libvlc_free(currDev);
+            }
+        }
         if (chn.dataB.pMP)
             chn.dataB.pMP->outputDeviceSet(devId);
     }
@@ -657,6 +667,7 @@ void COMChannel::SetAllAudioDevice(const std::string& devId)
 // Set the volume of all playback streams
 void COMChannel::SetAllVolume(int vol)
 {
+    LOG_MSG(logDEBUG, DBG_VLC_VOLUME, vol);
     for (COMChannel& chn : gChn) {
         chn.dataA.SetVolume(vol);
         chn.dataB.SetVolume(vol);
@@ -666,6 +677,7 @@ void COMChannel::SetAllVolume(int vol)
 // (un)Mute all playback streams
 void COMChannel::MuteAll(bool bDoMute)
 {
+    LOG_MSG(logDEBUG, bDoMute ? DBG_VLC_MUTE : DBG_VLC_UNMUTE);
     for (COMChannel& chn : gChn) {
         chn.dataA.SetMute(bDoMute);
         chn.dataB.SetMute(bDoMute);
@@ -1017,11 +1029,11 @@ void COMChannel::SetVolumeMute ()
         curr->SetMute(true);
         prev->SetMute(true);
     } else {
-        curr->SetVolume(dataRefs.GetVolume());
+        curr->SetVolume(dataRefs.GetVolume(), true);
         if (prev->IsStandbyPrebuf())
             prev->SetMute(true);
         else
-            prev->SetVolume(dataRefs.GetVolume());
+            prev->SetVolume(dataRefs.GetVolume(), true);
     }
 }
 

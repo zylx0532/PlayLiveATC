@@ -181,6 +181,8 @@ constexpr int ERR_CFG_FILE_MAXWARN = 5;     // maximum number of warnings while 
 #define DBG_PLA_MAIN_ENABLE     "PlayLiveATC enabled"
 #define DBG_SENDING_HTTP        "%s: Sending HTTP: %s"
 #define DBG_RECEIVED_BYTES      "%s: Received %ld characters"
+#define DBG_SELECTED_MENU_ID    "Selected menu id %lld"
+#define DBG_AVAIL_AUDIO_DEVICE  "Available audio devices:"
 #ifdef DEBUG
 #define DBG_DEBUG_BUILD         "DEBUG BUILD with additional run-time checks and no optimizations"
 #endif

@@ -55,6 +55,10 @@
 #define DBG_AP_CLOSEST      "Closest airport is %s (%.1fnm)"
 #define DBG_AP_NO_CLOSEST   "No airport found within %.1fnm"
 #define DBG_STREAM_STOP     "Stopping playback of '%s' (%s)"
+#define DBG_VLC_OUT_DEV     "COM%d: Set output device to %s, is now reported to be %s"
+#define DBG_VLC_VOLUME      "Setting volume to %d%%"
+#define DBG_VLC_MUTE        "All Muting"
+#define DBG_VLC_UNMUTE      "All Unmuting"
 
 /// 100 KB of network response storage initially
 constexpr std::string::size_type READ_BUF_INIT_SIZE = 100 * 1024;
@@ -177,7 +181,7 @@ public:
     inline int GetVolume() const { return volume; }
     /// @brief Set the volume incl. unmute, and save the value in case of mute
     /// @param v New Volume
-    void SetVolume(int v);
+    void SetVolume(int v, bool bUnMute = false);
     /// Return if currently muted
     inline bool IsMuted() const { return bMute;  }
     /// @brief Set (un)mute
